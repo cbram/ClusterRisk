@@ -3,8 +3,11 @@
 ![Python](https://img.shields.io/badge/python-3.9+-blue.svg)
 ![Streamlit](https://img.shields.io/badge/streamlit-1.31+-red.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Portfolio Performance](https://img.shields.io/badge/Portfolio%20Performance-required-orange.svg)
 
-**ClusterRisk** ist ein Tool zur Analyse von Klumpenrisiken in Investment-Portfolios. Es liest Portfolio Performance CSV-Exporte (Vermögensaufstellung), löst ETFs in ihre Einzelpositionen auf und visualisiert Risiken über verschiedene Dimensionen.
+**ClusterRisk** ist ein Tool zur Analyse von Klumpenrisiken in Investment-Portfolios. Es liest [Portfolio Performance](https://www.portfolio-performance.info/) CSV-Exporte, löst ETFs in ihre Einzelpositionen auf und visualisiert Risiken über verschiedene Dimensionen.
+
+> **Wichtig:** Das Tool ist aktuell für die Verwendung mit [Portfolio Performance](https://www.portfolio-performance.info/) optimiert. Die kostenlose Open-Source-Software zur Depot-Verwaltung ist erforderlich, um die Portfolio-Daten im richtigen CSV-Format zu exportieren.
 
 ## 🎯 Features
 
@@ -75,9 +78,16 @@ docker run -p 8501:8501 -v $(pwd)/data:/app/data clusterrisk
 
 ## 📖 Verwendung
 
+### Voraussetzungen
+
+**[Portfolio Performance](https://www.portfolio-performance.info/)** (kostenlose Open-Source Depot-Verwaltung)
+- Download: https://www.portfolio-performance.info/
+- Verfügbar für Windows, macOS, Linux
+- Wird benötigt, um Portfolio-Daten im korrekten CSV-Format zu exportieren
+
 ### 1. Portfolio Performance CSV exportieren
 
-1. Öffne Portfolio Performance
+1. Öffne **Portfolio Performance**
 2. Gehe zu **Berichte** → **Vermögensaufstellung**
 3. Klicke auf **Daten Exportieren** → **CSV**
 4. Speichere die CSV-Datei
@@ -94,9 +104,10 @@ docker run -p 8501:8501 -v $(pwd)/data:/app/data clusterrisk
 
 ### 2. CSV-Datei hochladen
 
-1. Öffne ClusterRisk im Browser
-2. Klicke auf "Browse files" in der Sidebar
-3. Wähle deine CSV-Datei
+1. Öffne ClusterRisk im Browser (`http://localhost:8501`)
+2. Klicke auf **"Browse files"** in der Sidebar
+3. Wähle deine **Portfolio Performance CSV-Datei**
+4. Die Analyse startet automatisch
 
 ### 3. Analyse erkunden
 
