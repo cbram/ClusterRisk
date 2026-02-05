@@ -8,6 +8,7 @@ from typing import Dict, List
 from pathlib import Path
 from src.etf_data_fetcher import ETFDataFetcher, get_stock_info
 from src.etf_details_parser import get_etf_details_parser
+from src.diagnostics import get_diagnostics
 
 
 def _load_isin_ticker_map() -> Dict[str, str]:
@@ -263,6 +264,12 @@ def _expand_etf_holdings(portfolio_data: Dict, fetcher: ETFDataFetcher, use_cach
                 else:
                     print(f"DEBUG:   ⚠️  ETF could not be resolved - treating as whole")
                     # ETF konnte nicht aufgelöst werden - als Ganzes behandeln
+                    diagnostics = get_diagnostics()
+                    diagnostics.add_warning(
+                        'ETF-Daten',
+                        f'ETF "{position["name"]}" konnte nicht aufgelöst werden',
+                        f'ISIN: {position["isin"]}. Bitte erstelle eine ETF-Detail-Datei in data/etf_details/ oder ergänze user_etf_holdings.csv.'
+                    )
                     expanded.append({
                         'name': position['name'],
                         'type': position['type'],
@@ -314,6 +321,13 @@ def _expand_etf_holdings(portfolio_data: Dict, fetcher: ETFDataFetcher, use_cach
                         pos_info['industry'] = 'Unknown'
                         pos_info['sector_source'] = 'none'
                         print(f"DEBUG: ⚠️  No sector found for {position['name']} (ISIN: {position.get('isin')})")
+                        # Diagnose: Keine Branche für Aktie gefunden
+                        diagnostics = get_diagnostics()
+                        diagnostics.add_warning(
+                            'Branchen',
+                            f'Keine Branche für Aktie "{position["name"]}" gefunden',
+                            f'ISIN: {position.get("isin", "nicht vorhanden")}. Die Aktie wird unter "Unknown" kategorisiert.'
+                        )
                 
                 else:
                     # PRIORITÄT 3: Fallback auf Unknown (CSV ohne Mapping)
@@ -321,6 +335,13 @@ def _expand_etf_holdings(portfolio_data: Dict, fetcher: ETFDataFetcher, use_cach
                     pos_info['industry'] = 'Unknown'
                     pos_info['sector_source'] = 'none'
                     print(f"DEBUG: ⚠️  No sector info for {position['name']} (no CSV sector, no ISIN)")
+                    # Diagnose: Keine Branche für Aktie gefunden
+                    diagnostics = get_diagnostics()
+                    diagnostics.add_warning(
+                        'Branchen',
+                        f'Keine Branche für Aktie "{position["name"]}" gefunden',
+                        f'Weder CSV-Branche noch ISIN vorhanden. Die Aktie wird unter "Unknown" kategorisiert.'
+                    )
             
             else:
                 pos_info['sector'] = position['type']

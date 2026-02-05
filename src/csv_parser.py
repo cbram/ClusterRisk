@@ -7,6 +7,7 @@ import pandas as pd
 from typing import Dict, List
 from datetime import datetime
 from .ticker_sector_mapper import get_sector_for_ticker
+from .diagnostics import get_diagnostics
 
 
 def parse_portfolio_csv(filepath: str) -> Dict:
@@ -149,6 +150,13 @@ def parse_portfolio_csv(filepath: str) -> Dict:
                     print(f"DEBUG:   Branche aus Ticker: {name} ({symbol}) -> {sector}")
                 else:
                     print(f"DEBUG:   ⚠️  Keine Branche gefunden für {name} (Ticker: {symbol}, kein Mapping)")
+                    # Diagnose: Keine Branche gefunden
+                    diagnostics = get_diagnostics()
+                    diagnostics.add_warning(
+                        'Branchen',
+                        f'Keine Branche für Aktie "{name}" gefunden',
+                        f'Ticker: {symbol if symbol else "nicht vorhanden"}. Die Aktie wird unter "Unknown" kategorisiert.'
+                    )
             
             portfolio_data['positions'].append({
                 'name': name,

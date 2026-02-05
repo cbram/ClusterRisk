@@ -20,6 +20,7 @@ from src.risk_calculator import calculate_cluster_risks
 from src.visualizer import create_visualizations
 from src.export import export_to_calc
 from src.database import save_to_history, get_history
+from src.diagnostics import get_diagnostics, reset_diagnostics
 
 # Seiten-Konfiguration
 st.set_page_config(
@@ -139,6 +140,9 @@ if uploaded_file is None:
 
 else:
     # Datei verarbeiten (nur CSV)
+    # Reset Diagnostics vor neuem Parsing
+    reset_diagnostics()
+    
     with st.spinner("📂 Portfolio Performance CSV wird gelesen..."):
         try:
             portfolio_data = parse_portfolio_csv(uploaded_file)
@@ -170,6 +174,46 @@ else:
             )
             
             st.success("✅ Klumpenrisiken erfolgreich berechnet!")
+            
+            # Zeige Diagnose-Meldungen (Warnungen und Fehler)
+            diagnostics = get_diagnostics()
+            summary = diagnostics.get_summary()
+            
+            if summary['warnings'] > 0 or summary['errors'] > 0:
+                st.divider()
+                
+                # Erstelle Expander für Diagnosen
+                with st.expander(f"⚠️ {summary['warnings']} Warnung(en) und {summary['errors']} Fehler gefunden - Hier klicken für Details", expanded=(summary['errors'] > 0)):
+                    # Fehler anzeigen (falls vorhanden)
+                    errors = diagnostics.get_errors()
+                    if errors:
+                        st.error(f"**{len(errors)} Fehler:**")
+                        for err in errors:
+                            st.markdown(f"**{err['category']}:** {err['message']}")
+                            if err['details']:
+                                st.caption(err['details'])
+                    
+                    # Warnungen anzeigen
+                    warnings = diagnostics.get_warnings()
+                    if warnings:
+                        st.warning(f"**{len(warnings)} Warnung(en):**")
+                        
+                        # Gruppiere Warnungen nach Kategorie
+                        warnings_by_category = {}
+                        for warn in warnings:
+                            cat = warn['category']
+                            if cat not in warnings_by_category:
+                                warnings_by_category[cat] = []
+                            warnings_by_category[cat].append(warn)
+                        
+                        # Zeige Warnungen gruppiert
+                        for category, warns in warnings_by_category.items():
+                            st.markdown(f"**{category}** ({len(warns)} Problem(e)):")
+                            for warn in warns:
+                                st.markdown(f"- {warn['message']}")
+                                if warn['details']:
+                                    st.caption(f"  ℹ️ {warn['details']}")
+                            st.markdown("")  # Leerzeile zwischen Kategorien
             
         except Exception as e:
             st.error(f"❌ Fehler bei der Risikoberechnung: {str(e)}")

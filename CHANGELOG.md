@@ -1,5 +1,39 @@
 # Changelog - ClusterRisk
 
+## [1.2.0] - 2026-02-05 - Diagnose-System in GUI
+
+### ✨ Neue Features
+
+**Diagnose-System:**
+- ✅ **Warnungen & Fehler in GUI**: Keine Terminal-Logs mehr notwendig
+  - Fehlende ETF-Daten mit ISIN und Lösungsvorschlägen
+  - Aktien ohne Branchen-Information werden aufgelistet
+  - Parse-Fehler bei ETF-Detail-Dateien
+  - Gruppierung nach Kategorie (ETF-Daten, Branchen, etc.)
+- ✅ **Erweiterbarer Expander**: Automatisch geöffnet bei Fehlern, geschlossen bei nur Warnungen
+- ✅ **Klare Lösungsvorschläge**: Z.B. "Erstelle data/etf_details/[TICKER].csv"
+
+### 📁 Neue Dateien
+
+**Code:**
+- `src/diagnostics.py` - Diagnose-System Modul
+  - `DiagnosticsCollector` Klasse für strukturiertes Sammeln
+  - Kategorisierung nach Schweregrad (INFO, WARNING, ERROR)
+  - Globale Instanz für einfache Verwendung
+
+### 🔧 Verbesserungen
+
+- ✅ **Benutzerfreundlichkeit**: Sofortige Sichtbarkeit fehlender Daten
+- ✅ **Code-Integration**: Diagnosen in Parser, Calculator und ETF-Details-Parser
+- ✅ **Reset bei neuem Upload**: Diagnosen werden vor jedem neuen Parsing zurückgesetzt
+
+### 📚 Dokumentation
+
+- ✅ **VERSION**: Erhöht auf 1.2.0
+- ✅ **CHANGELOG.md**: Dieser Eintrag
+
+---
+
 ## [1.1.0] - 2026-02-04 - Währungsrisiko & Commodities
 
 ### ✨ Neue Features

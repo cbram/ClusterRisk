@@ -22,6 +22,12 @@
   - Berechnung der tatsächlichen Exposition pro Einzelaktie
   - Mehrere Datenquellen (justETF, Yahoo Finance, etc.)
 
+- ⚠️ **Diagnose-System**
+  - Fehlende ETF-Daten werden mit ISIN und Lösungsvorschlägen angezeigt
+  - Aktien ohne Branchen-Information werden aufgelistet
+  - Parse-Fehler bei ETF-Detail-Dateien werden gemeldet
+  - Übersichtliche Darstellung direkt in der GUI (kein Terminal-Log notwendig!)
+
 - 📈 **Interaktive Visualisierungen**
   - Treemap-Diagramme
   - Kreisdiagramme

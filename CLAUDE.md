@@ -595,4 +595,64 @@ volumes:
 
 ---
 
+## 🔍 Diagnose-System (v1.2.0 - 2026-02-05)
+
+### Zweck
+
+Das Diagnose-System sammelt Warnungen und Fehler während des Parsings und der Risikoberechnung und zeigt sie direkt in der GUI an. Der Benutzer muss nicht mehr Terminal-Logs durchsuchen.
+
+### Architektur
+
+**`src/diagnostics.py`**:
+- `DiagnosticLevel`: Enum für Schweregrad (INFO, WARNING, ERROR)
+- `DiagnosticsCollector`: Sammelt strukturierte Meldungen mit Kategorie, Message und Details
+- Globale Instanz: `get_diagnostics()` für einfache Verwendung
+
+### Kategorien
+
+1. **ETF-Daten**: Nicht auflösbare ETFs mit ISIN und Lösungsvorschlägen
+2. **Branchen**: Aktien ohne Sektor-Information
+3. **Parse-Fehler**: Probleme beim Lesen von ETF-Detail-Dateien
+
+### Integration
+
+**Parser & Calculator:**
+```python
+from src.diagnostics import get_diagnostics
+
+diagnostics = get_diagnostics()
+diagnostics.add_warning(
+    'ETF-Daten',
+    f'ETF "{name}" konnte nicht aufgelöst werden',
+    f'ISIN: {isin}. Erstelle data/etf_details/{ticker}.csv'
+)
+```
+
+**Streamlit App:**
+```python
+from src.diagnostics import get_diagnostics, reset_diagnostics
+
+# Vor neuem Parsing
+reset_diagnostics()
+
+# Nach Berechnung
+diagnostics = get_diagnostics()
+summary = diagnostics.get_summary()
+
+if summary['warnings'] > 0:
+    with st.expander(f"⚠️ {summary['warnings']} Warnung(en)"):
+        # Zeige gruppierte Warnungen
+```
+
+### Verwendung in Modulen
+
+- **`csv_parser.py`**: Warnung bei fehlenden Branchen (nur für Stocks)
+- **`risk_calculator.py`**: 
+  - Warnung bei nicht auflösbaren ETFs
+  - Warnung bei Aktien ohne Sektor-Information
+- **`etf_details_parser.py`**: Fehler bei Parse-Problemen
+- **`app.py`**: Anzeige aller gesammelten Diagnosen in Expander
+
+---
+
 **Erstellt mit ❤️ für Portfolio-Optimierung**

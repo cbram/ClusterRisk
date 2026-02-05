@@ -6,6 +6,7 @@ Parst die neuen ETF-Detail-CSV-Dateien mit Metadata, Holdings, Sektor-, Länder-
 import pandas as pd
 from pathlib import Path
 from typing import Dict, Optional
+from .diagnostics import get_diagnostics
 
 
 class ETFDetailsParser:
@@ -71,6 +72,13 @@ class ETFDetailsParser:
         
         except Exception as e:
             print(f"❌ Fehler beim Parsen von {filepath}: {e}")
+            # Diagnose: Fehler beim Parsen
+            diagnostics = get_diagnostics()
+            diagnostics.add_error(
+                'ETF-Daten',
+                f'Fehler beim Parsen der ETF-Detail-Datei "{ticker}.csv"',
+                f'Details: {str(e)}'
+            )
             return None
     
     def _split_sections(self, content: str) -> Dict[str, str]:
