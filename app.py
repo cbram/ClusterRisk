@@ -101,6 +101,79 @@ with st.sidebar:
     
     st.divider()
     
+    # Risikoschwellen
+    st.subheader("🎯 Risikoschwellen")
+    use_auto_thresholds = st.checkbox(
+        "Automatische Schwellen verwenden", 
+        value=True,
+        help="Verwendet kategorie-spezifische Schwellenwerte basierend auf Portfolio-Best-Practices"
+    )
+    
+    if use_auto_thresholds:
+        # Standard-Schwellenwerte aus config.py
+        risk_thresholds = None  # Signal für Visualizer, Defaults zu nutzen
+        st.caption("📊 Automatisch: Anlageklasse 75%, Sektor 25%, Währung 80%, Land 50%, Einzelpos. 10%")
+    else:
+        # Manuelle Anpassung in Expander
+        with st.expander("✏️ Risikoschwellen manuell anpassen"):
+            st.markdown("**Hohes Risiko ab...**")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                threshold_asset_class = st.slider(
+                    "Anlageklasse", 
+                    min_value=10, 
+                    max_value=100, 
+                    value=75,
+                    step=5,
+                    help="Ab welchem Prozentsatz gilt eine Anlageklasse als zu konzentriert?"
+                )
+                threshold_sector = st.slider(
+                    "Sektor", 
+                    min_value=5, 
+                    max_value=50, 
+                    value=25,
+                    step=5,
+                    help="Ab welchem Prozentsatz gilt ein Sektor als zu konzentriert?"
+                )
+                threshold_currency = st.slider(
+                    "Währung", 
+                    min_value=10, 
+                    max_value=100, 
+                    value=80,
+                    step=5,
+                    help="Ab welchem Prozentsatz gilt eine Währung als zu konzentriert?"
+                )
+            
+            with col2:
+                threshold_country = st.slider(
+                    "Land", 
+                    min_value=10, 
+                    max_value=100, 
+                    value=50,
+                    step=5,
+                    help="Ab welchem Prozentsatz gilt ein Land als zu konzentriert?"
+                )
+                threshold_positions = st.slider(
+                    "Einzelpositionen", 
+                    min_value=1, 
+                    max_value=30, 
+                    value=10,
+                    step=1,
+                    help="Ab welchem Prozentsatz gilt eine Einzelposition als zu konzentriert?"
+                )
+            
+            # Erstelle Dictionary für custom thresholds
+            risk_thresholds = {
+                'asset_class': {'high': threshold_asset_class, 'medium': threshold_asset_class * 0.66},
+                'sector': {'high': threshold_sector, 'medium': threshold_sector * 0.6},
+                'currency': {'high': threshold_currency, 'medium': threshold_currency * 0.75},
+                'country': {'high': threshold_country, 'medium': threshold_country * 0.6},
+                'positions': {'high': threshold_positions, 'medium': threshold_positions * 0.5}
+            }
+    
+    st.divider()
+    
     # Export Optionen
     st.subheader("Export")
     export_format = st.selectbox(
@@ -239,11 +312,11 @@ else:
     
     with tab1:
         st.subheader("Klumpenrisiko nach Anlageklasse")
-        create_visualizations(risk_data, "asset_class", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar)
+        create_visualizations(risk_data, "asset_class", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
     
     with tab2:
         st.subheader("Klumpenrisiko nach Branche/Sektor")
-        create_visualizations(risk_data, "sector", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar)
+        create_visualizations(risk_data, "sector", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
     
     with tab3:
         st.subheader("Klumpenrisiko nach Währung")
@@ -260,14 +333,14 @@ else:
             # Erstelle temporäres risk_data mit Commodities
             risk_data_with_commodities = risk_data.copy()
             risk_data_with_commodities['currency'] = risk_data['currency_with_commodities']
-            create_visualizations(risk_data_with_commodities, "currency", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar)
+            create_visualizations(risk_data_with_commodities, "currency", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
         else:
-            create_visualizations(risk_data, "currency", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar)
+            create_visualizations(risk_data, "currency", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
     
     with tab4:
         st.subheader("Klumpenrisiko nach Land")
         st.markdown("*Basierend auf ISIN-Ländercode (erste 2 Zeichen)*")
-        create_visualizations(risk_data, "country", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar)
+        create_visualizations(risk_data, "country", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
     
     with tab5:
         st.subheader("Klumpenrisiko nach Einzelpositionen")
@@ -288,9 +361,9 @@ else:
             # Erstelle temporäres risk_data für Visualisierung
             risk_data_filtered = risk_data.copy()
             risk_data_filtered['positions'] = positions_filtered
-            create_visualizations(risk_data_filtered, "positions", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar)
+            create_visualizations(risk_data_filtered, "positions", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
         else:
-            create_visualizations(risk_data, "positions", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar)
+            create_visualizations(risk_data, "positions", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
     
     with tab6:
         st.subheader("Detaillierte Daten")

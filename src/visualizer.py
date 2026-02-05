@@ -7,10 +7,11 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 import pandas as pd
-from typing import Dict
+from typing import Dict, Optional
+from config import RISK_THRESHOLDS
 
 
-def create_visualizations(risk_data: Dict, category: str, max_treemap: int = 30, max_pie: int = 10, max_bar: int = 30):
+def create_visualizations(risk_data: Dict, category: str, max_treemap: int = 30, max_pie: int = 10, max_bar: int = 30, risk_thresholds: Optional[Dict] = None):
     """
     Erstellt Visualisierungen für eine Risiko-Kategorie
     
@@ -20,7 +21,14 @@ def create_visualizations(risk_data: Dict, category: str, max_treemap: int = 30,
         max_treemap: Maximale Anzahl Positionen in Treemap
         max_pie: Maximale Anzahl Positionen in Pie Chart
         max_bar: Maximale Anzahl Positionen in Bar Chart
+        risk_thresholds: Optional custom risk thresholds (None = use defaults from config)
     """
+    
+    # Hole Schwellenwerte (custom oder defaults)
+    if risk_thresholds is None:
+        thresholds = RISK_THRESHOLDS.get(category, {'high': 10.0, 'medium': 5.0})
+    else:
+        thresholds = risk_thresholds.get(category, {'high': 10.0, 'medium': 5.0})
     
     df = risk_data[category]
     
@@ -43,11 +51,11 @@ def create_visualizations(risk_data: Dict, category: str, max_treemap: int = 30,
     
     # Volle Breite für Balkendiagramm
     st.subheader("Detaillierte Übersicht")
-    _create_bar_chart(df, category, max_items=max_bar)
+    _create_bar_chart(df, category, thresholds, max_items=max_bar)
     
     # Tabelle
     st.subheader("Daten-Tabelle")
-    _display_table(df, category)
+    _display_table(df, category, thresholds)
 
 
 def _create_treemap(df: pd.DataFrame, category: str, max_items: int = 30):
@@ -229,19 +237,24 @@ def _create_pie_chart(df: pd.DataFrame, category: str, max_items: int = 10):
     st.plotly_chart(fig, width='stretch', key=f"pie_{category}")
 
 
-def _create_bar_chart(df: pd.DataFrame, category: str, max_items: int = 30):
+def _create_bar_chart(df: pd.DataFrame, category: str, thresholds: Dict, max_items: int = 30):
     """
     Erstellt ein horizontales Balkendiagramm
     
     Args:
         df: DataFrame mit Daten
         category: Kategorie der Daten
+        thresholds: Risiko-Schwellenwerte (dict mit 'high' und 'medium')
         max_items: Maximale Anzahl anzuzeigender Items
     """
     label_col, value_col = _get_column_names(category)
     
     # Top N
     df_plot = df.head(max_items).copy()
+    
+    # Hole Schwellenwerte
+    high_threshold = thresholds.get('high', 10.0)
+    medium_threshold = thresholds.get('medium', 5.0)
     
     # Farbe basierend auf Risiko UND "Other Holdings"
     colors = []
@@ -251,8 +264,10 @@ def _create_bar_chart(df: pd.DataFrame, category: str, max_items: int = 30):
         
         if 'Other Holdings' in str(label):
             colors.append('#87CEEB')  # Sky Blue / Hellblau für Other Holdings
-        elif anteil > 10:
+        elif anteil > high_threshold:
             colors.append('red')  # Rot für hohes Risiko
+        elif anteil > medium_threshold:
+            colors.append('orange')  # Orange für mittleres Risiko
         else:
             colors.append('lightgray')  # Grau für normale Positionen
     
@@ -277,17 +292,27 @@ def _create_bar_chart(df: pd.DataFrame, category: str, max_items: int = 30):
         yaxis={'categoryorder': 'total ascending'}
     )
     
-    # Risiko-Linie bei 10%
-    fig.add_vline(x=10, line_dash="dash", line_color="red", 
-                  annotation_text="10% Risiko-Schwelle", 
+    # Risiko-Linien (beide Schwellenwerte)
+    fig.add_vline(x=high_threshold, line_dash="dash", line_color="red", 
+                  annotation_text=f"{high_threshold:.0f}% Hohes Risiko", 
                   annotation_position="top right")
+    
+    if medium_threshold > 0 and medium_threshold < high_threshold:
+        fig.add_vline(x=medium_threshold, line_dash="dot", line_color="orange", 
+                      annotation_text=f"{medium_threshold:.0f}% Mittleres Risiko", 
+                      annotation_position="bottom right")
     
     st.plotly_chart(fig, width='stretch', key=f"bar_{category}")
 
 
-def _display_table(df: pd.DataFrame, category: str):
+def _display_table(df: pd.DataFrame, category: str, thresholds: Dict):
     """
     Zeigt eine formatierte Tabelle an
+    
+    Args:
+        df: DataFrame mit Daten
+        category: Kategorie der Daten
+        thresholds: Risiko-Schwellenwerte (dict mit 'high' und 'medium')
     """
     # Formatierung mit korrektem Dtype-Handling
     df_display = df.copy()
@@ -300,12 +325,16 @@ def _display_table(df: pd.DataFrame, category: str):
     df_display['Wert (€)'] = df['Wert (€)'].apply(lambda x: f'€ {x:,.2f}')
     df_display['Anteil (%)'] = df['Anteil (%)'].apply(lambda x: f'{x:.2f}%')
     
-    # Risiko-Kennzeichnung
+    # Hole Schwellenwerte
+    high_threshold = thresholds.get('high', 10.0)
+    medium_threshold = thresholds.get('medium', 5.0)
+    
+    # Risiko-Kennzeichnung mit kategorie-spezifischen Schwellenwerten
     def highlight_risk(row):
         anteil = float(row['Anteil (%)'].replace('%', '').replace(',', '.'))
-        if anteil > 10:
+        if anteil > high_threshold:
             return ['background-color: #ffcccc'] * len(row)
-        elif anteil > 5:
+        elif anteil > medium_threshold:
             return ['background-color: #fff9cc'] * len(row)
         else:
             return [''] * len(row)
@@ -325,10 +354,10 @@ def _display_table(df: pd.DataFrame, category: str):
         )
     
     with col2:
-        # Positionen > 10%
-        high_risk = len(df[df['Anteil (%)'] > 10])
+        # Positionen über Schwellenwert
+        high_risk = len(df[df['Anteil (%)'] > high_threshold])
         st.metric(
-            "Positionen > 10%",
+            f"Positionen > {high_threshold:.0f}%",
             high_risk,
             delta=f"{'⚠️ Hohes Risiko' if high_risk > 0 else '✅ OK'}"
         )

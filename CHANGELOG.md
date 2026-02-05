@@ -1,5 +1,48 @@
 # Changelog - ClusterRisk
 
+## [1.3.0] - 2026-02-05 - Kategorie-spezifische Risikoschwellen
+
+### ✨ Neue Features
+
+**Intelligente Risikoschwellen:**
+- ✅ **Kategorie-spezifische Schwellenwerte**: Jede Kategorie hat sinnvolle Standard-Schwellen
+  - Anlageklasse: 50% / 75% (Aktien-Dominanz ist normal)
+  - Sektor: 15% / 25% (Sektor-Diversifikation wichtiger)
+  - Währung: 60% / 80% (EUR-Bias oft gewünscht)
+  - Land: 30% / 50% (geografische Diversifikation)
+  - Einzelpositionen: 5% / 10% (höchste Diversifikation)
+- ✅ **Automatik-Modus**: Verwendet Best-Practice-Werte ohne Konfiguration
+- ✅ **Manuelle Anpassung**: Optional in Expander für fortgeschrittene User
+- ✅ **Mittlere Risikostufe**: Zusätzlich zu "Hoch" jetzt auch "Mittel" (Orange)
+- ✅ **Dynamische Visualisierungen**: Bar Charts und Tabellen nutzen kategorie-spezifische Schwellen
+
+### 🎨 Verbesserungen
+
+- ✅ **Bar Charts**: Zeigen jetzt beide Schwellenlinien (Hoch + Mittel)
+- ✅ **Farb-Kodierung**: Rot (Hoch), Orange (Mittel), Grau (Normal)
+- ✅ **Statistiken**: "Positionen > X%" passt sich an aktuelle Schwelle an
+- ✅ **Tabellen-Highlighting**: Nutzt kategorie-spezifische Schwellen
+
+### 📁 Geänderte Dateien
+
+- **`config.py`**: Neue Struktur für `RISK_THRESHOLDS` mit kategorie-spezifischen Werten
+- **`app.py`**: 
+  - Neue UI-Sektion "🎯 Risikoschwellen" in Sidebar
+  - Automatik-Modus mit Info-Caption
+  - Optionaler Expander für manuelle Anpassung (5 Slider)
+  - `risk_thresholds` wird an alle `create_visualizations()` Aufrufe übergeben
+- **`src/visualizer.py`**: 
+  - Alle Funktionen nutzen jetzt kategorie-spezifische Schwellen
+  - `_create_bar_chart()`: Zeigt beide Schwellenlinien (Hoch + Mittel)
+  - `_display_table()`: Dynamische Schwellen für Highlighting und Statistiken
+  - Import von `RISK_THRESHOLDS` aus config
+
+### 💡 Fachliche Verbesserung
+
+Die alten fixen 10% machten bei Anlageklassen keinen Sinn (70% Aktien ist normal, nicht risikoreich). Die neuen kategorie-spezifischen Schwellen basieren auf Portfolio-Best-Practices und geben sinnvollere Risiko-Bewertungen.
+
+---
+
 ## [1.2.0] - 2026-02-05 - Diagnose-System in GUI
 
 ### ✨ Neue Features
