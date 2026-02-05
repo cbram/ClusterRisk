@@ -1,0 +1,291 @@
+"""
+ClusterRisk - Portfolio Klumpenrisiko Analyse Tool
+Analysiert Portfolios aus Portfolio Performance und visualisiert Klumpenrisiken
+"""
+
+import streamlit as st
+import pandas as pd
+from pathlib import Path
+import sys
+import warnings
+
+# Unterdrücke Pandas FutureWarnings (kommen von Plotly, nicht von uns)
+warnings.filterwarnings('ignore', category=FutureWarning, module='plotly')
+
+# Sicherstellen, dass src importiert werden kann
+sys.path.insert(0, str(Path(__file__).parent))
+
+from src.csv_parser import parse_portfolio_csv
+from src.risk_calculator import calculate_cluster_risks
+from src.visualizer import create_visualizations
+from src.export import export_to_calc
+from src.database import save_to_history, get_history
+
+# Seiten-Konfiguration
+st.set_page_config(
+    page_title="ClusterRisk - Portfolio Analyse",
+    page_icon="📊",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Titel und Beschreibung
+st.title("📊 ClusterRisk - Portfolio Klumpenrisiko Analyse")
+st.markdown("""
+Analysiere dein Investment-Portfolio auf Klumpenrisiken über verschiedene Dimensionen:
+- **Anlageklasse** (Tagesgeld, ETFs, Rohstoffe, Aktien)
+- **Branche/Sektor**
+- **Währung**
+- **Einzelpositionen** (mit ETF-Durchschau)
+""")
+
+# Sidebar
+with st.sidebar:
+    st.header("⚙️ Einstellungen")
+    
+    # File Upload
+    uploaded_file = st.file_uploader(
+        "Portfolio Performance CSV hochladen",
+        type=['csv'],
+        help="Exportiere dein Portfolio aus Portfolio Performance als CSV (Vermögensaufstellung)"
+    )
+    
+    # Format-Info
+    if uploaded_file:
+        st.caption(f"📄 Dateiformat: CSV")
+    
+    st.divider()
+    
+    # ETF Datenquelle
+    st.subheader("ETF Datenquellen")
+    use_cache = st.checkbox("Cache verwenden", value=True, help="Nutze gecachte ETF-Daten (schneller)")
+    cache_days = st.slider("Cache-Dauer (Tage)", 1, 30, 7)
+    
+    st.divider()
+    
+    # Visualisierungs-Optionen
+    st.subheader("Visualisierung")
+    max_positions_treemap = st.slider(
+        "Max. Positionen in Treemap", 
+        min_value=10, 
+        max_value=100, 
+        value=30,
+        step=5,
+        help="Anzahl der Positionen, die in der Treemap angezeigt werden (größere Werte können unübersichtlich werden)"
+    )
+    max_positions_pie = st.slider(
+        "Max. Positionen in Pie Chart", 
+        min_value=5, 
+        max_value=30, 
+        value=10,
+        step=5,
+        help="Anzahl der Positionen im Kreisdiagramm (Rest wird als 'Sonstige' zusammengefasst)"
+    )
+    max_positions_bar = st.slider(
+        "Max. Positionen in Bar Chart", 
+        min_value=10, 
+        max_value=100, 
+        value=30,
+        step=10,
+        help="Anzahl der Positionen im Balkendiagramm"
+    )
+    
+    st.divider()
+    
+    # Export Optionen
+    st.subheader("Export")
+    export_format = st.selectbox(
+        "Format",
+        ["Excel (.xlsx)", "LibreOffice (.ods)", "Beide"],
+        index=0
+    )
+    
+    st.divider()
+    
+    # Historie
+    st.subheader("Historie")
+    save_history = st.checkbox("Analyse speichern", value=True)
+    show_history = st.checkbox("Historie anzeigen", value=False)
+
+# Hauptbereich
+if uploaded_file is None:
+    st.info("👆 Bitte lade eine Portfolio Performance CSV-Datei hoch, um zu beginnen.")
+    
+    # Beispiel zeigen
+    with st.expander("ℹ️ Wie exportiere ich aus Portfolio Performance?"):
+        st.markdown("""
+        ### CSV-Export (Vermögensaufstellung)
+        1. Öffne Portfolio Performance
+        2. Gehe zu **Berichte** → **Vermögensaufstellung**
+        3. Klicke auf **Export** → **CSV**
+        4. Lade die CSV-Datei hier hoch
+        
+        ### Wichtig:
+        - Die CSV sollte folgende Spalten enthalten: Bestand, Name, Symbol, Kurs, Marktwert, ISIN
+        - Optional: Spalte "Branchen (GICS, Sektoren)" für Branchenzuordnung
+        - Optional: Spalte "Notiz" für spezielle Marker (z.B. "Geldmarkt ETF" für Cash-Klassifizierung)
+        
+        **Hinweis:** CSV ist einfacher und schneller!
+        """)
+    
+    # Historie anzeigen wenn gewünscht
+    if show_history:
+        st.subheader("📈 Analyse-Historie")
+        history = get_history()
+        if history:
+            st.dataframe(history, width='stretch')
+        else:
+            st.info("Noch keine Analysen gespeichert.")
+
+else:
+    # Datei verarbeiten (nur CSV)
+    with st.spinner("📂 Portfolio Performance CSV wird gelesen..."):
+        try:
+            portfolio_data = parse_portfolio_csv(uploaded_file)
+            
+            st.success(f"✅ Portfolio erfolgreich geladen: {portfolio_data['total_positions']} Positionen")
+            
+            # Portfolio Übersicht
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.metric("Gesamt-Wert", f"€ {portfolio_data['total_value']:,.2f}")
+            with col2:
+                st.metric("Positionen", portfolio_data['total_positions'])
+            with col3:
+                st.metric("ETFs", portfolio_data['etf_count'])
+            with col4:
+                st.metric("Einzelaktien", portfolio_data['stock_count'])
+            
+        except Exception as e:
+            st.error(f"❌ Fehler beim Lesen der Datei: {str(e)}")
+            st.stop()
+    
+    # ETF-Daten abrufen und Risiken berechnen
+    with st.spinner("🔍 ETF-Zusammensetzungen werden abgerufen und Klumpenrisiken berechnet..."):
+        try:
+            risk_data = calculate_cluster_risks(
+                portfolio_data,
+                use_cache=use_cache,
+                cache_days=cache_days
+            )
+            
+            st.success("✅ Klumpenrisiken erfolgreich berechnet!")
+            
+        except Exception as e:
+            st.error(f"❌ Fehler bei der Risikoberechnung: {str(e)}")
+            st.stop()
+    
+    # Tabs für verschiedene Analysen
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+        "📊 Anlageklasse",
+        "🏭 Branche",
+        "💱 Währung",
+        "🌍 Land",
+        "📈 Einzelpositionen",
+        "📋 Detaildaten"
+    ])
+    
+    with tab1:
+        st.subheader("Klumpenrisiko nach Anlageklasse")
+        create_visualizations(risk_data, "asset_class", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar)
+    
+    with tab2:
+        st.subheader("Klumpenrisiko nach Branche/Sektor")
+        create_visualizations(risk_data, "sector", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar)
+    
+    with tab3:
+        st.subheader("Klumpenrisiko nach Währung")
+        st.markdown("*Commodities (Gold, etc.) haben kein Währungsrisiko und werden optional angezeigt*")
+        
+        # Toggle für Commodities ein/aus
+        col1, col2 = st.columns([3, 1])
+        with col2:
+            include_commodities = st.checkbox("Commodities einblenden", value=False, key="include_commodities_currency")
+        
+        # Wähle die richtige Datenquelle
+        if include_commodities:
+            st.info("💡 **Hinweis:** Commodities werden als separate Kategorie 'Commodity (kein Währungsrisiko)' angezeigt.")
+            # Erstelle temporäres risk_data mit Commodities
+            risk_data_with_commodities = risk_data.copy()
+            risk_data_with_commodities['currency'] = risk_data['currency_with_commodities']
+            create_visualizations(risk_data_with_commodities, "currency", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar)
+        else:
+            create_visualizations(risk_data, "currency", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar)
+    
+    with tab4:
+        st.subheader("Klumpenrisiko nach Land")
+        st.markdown("*Basierend auf ISIN-Ländercode (erste 2 Zeichen)*")
+        create_visualizations(risk_data, "country", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar)
+    
+    with tab5:
+        st.subheader("Klumpenrisiko nach Einzelpositionen")
+        st.markdown("*Inkl. ETF-Durchschau: Jede Aktie in ETFs wird einzeln aufgeschlüsselt*")
+        
+        # Toggle für Cash ein/aus
+        col1, col2 = st.columns([3, 1])
+        with col2:
+            exclude_cash = st.checkbox("Cash ausblenden", value=False, key="exclude_cash_positions")
+        
+        # Filtere Cash wenn gewünscht
+        if exclude_cash:
+            positions_filtered = risk_data['positions'][risk_data['positions']['Position'] != 'Cash'].copy()
+            # Neuberechnung der Prozente ohne Cash (pandas-safe)
+            total_without_cash = positions_filtered['Wert (€)'].sum()
+            positions_filtered.loc[:, 'Anteil (%)'] = (positions_filtered['Wert (€)'] / total_without_cash * 100).round(2)
+            
+            # Erstelle temporäres risk_data für Visualisierung
+            risk_data_filtered = risk_data.copy()
+            risk_data_filtered['positions'] = positions_filtered
+            create_visualizations(risk_data_filtered, "positions", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar)
+        else:
+            create_visualizations(risk_data, "positions", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar)
+    
+    with tab6:
+        st.subheader("Detaillierte Daten")
+        
+        # Export-Buttons
+        col1, col2 = st.columns(2)
+        with col1:
+            if export_format in ["Excel (.xlsx)", "Beide"]:
+                xlsx_data = export_to_calc(risk_data, format='xlsx')
+                st.download_button(
+                    label="📥 Als Excel (.xlsx) herunterladen",
+                    data=xlsx_data,
+                    file_name="portfolio_klumpenrisiko.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+        
+        with col2:
+            if export_format in ["LibreOffice (.ods)", "Beide"]:
+                ods_data = export_to_calc(risk_data, format='ods')
+                st.download_button(
+                    label="📥 Als LibreOffice (.ods) herunterladen",
+                    data=ods_data,
+                    file_name="portfolio_klumpenrisiko.ods",
+                    mime="application/vnd.oasis.opendocument.spreadsheet"
+                )
+        
+        # Daten-Tabellen anzeigen
+        st.markdown("---")
+        
+        for category in ["asset_class", "sector", "currency", "country", "positions"]:
+            with st.expander(f"📊 {category.replace('_', ' ').title()}-Daten"):
+                df = risk_data[category]
+                st.dataframe(df, width='stretch', height=400)
+        
+        # Zusätzlich: Währung mit Commodities
+        with st.expander("📊 Währung (mit Commodities)-Daten"):
+            df = risk_data['currency_with_commodities']
+            st.dataframe(df, width='stretch', height=400)
+    
+    # Historie speichern
+    if save_history:
+        save_to_history(portfolio_data, risk_data)
+
+# Footer
+st.divider()
+st.markdown("""
+<div style='text-align: center; color: gray; font-size: 0.8em;'>
+    ClusterRisk v1.0 | Entwickelt für Portfolio-Analyse mit ETF-Durchschau
+</div>
+""", unsafe_allow_html=True)

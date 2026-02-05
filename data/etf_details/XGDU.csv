@@ -1,0 +1,24 @@
+METADATA
+ISIN,DE000A2T0VU5
+Name,Xtrackers IE Physical Gold ETC Securities
+Ticker,XGDU
+Type,Commodity
+Region,Global
+Currency,USD
+TER,0.11
+
+COUNTRY_ALLOCATION
+Country,Weight
+Global,100.0
+
+SECTOR_ALLOCATION
+Sector,Weight
+Commodity,100.0
+
+CURRENCY_ALLOCATION
+Currency,Weight
+None,100.0
+
+TOP_HOLDINGS
+Name,Weight,Currency,Sector,Industry,Country
+Physical Gold (LBMA),100.0,None,Commodity,Precious Metals,Global

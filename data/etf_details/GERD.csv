@@ -1,0 +1,72 @@
+# ETF Metadata
+ISIN,IE0001UQQ933
+Name,L&G Gerd Kommer Multifactor Equity UCITS ETF (Acc)
+Ticker,GERD
+Type,Stock
+Region,World
+Currency,USD
+TER,0.45%
+
+# Country Allocation (%)
+Country,Weight
+United States,46.16
+China,5.38
+Japan,5.22
+United Kingdom,3.87
+Germany,3.81
+Canada,3.21
+France,2.99
+India,2.85
+Switzerland,2.22
+Australia,2.22
+South Korea,2.22
+Taiwan,2.01
+Spain,1.66
+Netherlands,1.63
+Italy,1.47
+Sweden,1.27
+Brazil,1.12
+Hong Kong,0.96
+Denmark,0.91
+Singapore,0.90
+Other,9.91
+
+# Sector Allocation (%)
+Sector,Weight
+Financial Services,20.51
+Technology,20.26
+Industrials,11.36
+Consumer Cyclical,9.81
+Healthcare,7.50
+Consumer Staples,6.33
+Energy,5.50
+Communication Services,4.73
+Materials,4.16
+Utilities,2.33
+Real Estate,2.42
+
+# Currency Allocation (%)
+Currency,Weight
+USD,46.19
+EUR,13.14
+CNY,5.38
+JPY,5.22
+GBP,3.87
+CAD,3.21
+INR,2.85
+CHF,2.22
+AUD,2.22
+KRW,2.22
+TWD,2.01
+Other,11.27
+
+# Top Holdings
+Name,Weight,Currency,Sector,Country,ISIN
+Taiwan Semiconductor Manufacturing,1.23,TWD,Technology,TW,TW0002330008
+Samsung Electronics,0.87,KRW,Technology,KR,KR7005930003
+Tencent Holdings,0.76,HKD,Communication Services,CN,KYG875721634
+NVIDIA,0.71,USD,Technology,US,US67066G1040
+Apple,0.68,USD,Technology,US,US0378331005
+Alibaba Group,0.66,CNY,Consumer Cyclical,CN,KYG017191142
+Broadcom,0.62,USD,Technology,US,US11135F1012
+Other Holdings,94.47,Mixed,Diversified,Mixed,

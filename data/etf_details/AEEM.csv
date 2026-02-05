@@ -1,0 +1,59 @@
+# ETF Metadata
+ISIN,LU1681045370
+Name,Amundi MSCI Emerging Markets Swap UCITS ETF EUR Acc
+Ticker,AEEM
+Type,Stock
+Region,Emerging Markets
+Currency,EUR
+TER,0.20%
+
+# Country Allocation (%)
+Country,Weight
+China,27.5
+Taiwan,18.8
+India,20.8
+South Korea,11.8
+Brazil,4.8
+Saudi Arabia,3.5
+South Africa,3.1
+Mexico,2.4
+Thailand,2.2
+Malaysia,1.8
+Other,3.3
+
+# Sector Allocation (%)
+Sector,Weight
+Technology,24.5
+Financial Services,20.8
+Consumer Cyclical,11.2
+Communication Services,8.9
+Materials,7.6
+Industrials,6.4
+Energy,5.8
+Consumer Staples,5.2
+Healthcare,4.1
+Utilities,2.8
+Real Estate,2.7
+
+# Top Holdings
+Name,Weight,Currency,Sector,Country,ISIN
+Taiwan Semiconductor Manufacturing,12.56,TWD,Technology,TW,TW0002330008
+Samsung Electronics,4.71,KRW,Technology,KR,KR7005930003
+Tencent Holdings,4.51,HKD,Communication Services,CN,KYG875721634
+Alibaba Group Holding,3.37,HKD,Consumer Cyclical,CN,KYG017191142
+SK Hynix,2.91,KRW,Technology,KR,KR7000660001
+HDFC Bank,1.02,INR,Financial Services,IN,INE040A01034
+China Construction Bank,0.89,CNY,Financial Services,CN,CNE1000002H1
+Reliance Industries,0.81,INR,Energy,IN,INE002A01018
+Hon Hai Precision Industry,0.80,TWD,Technology,TW,TW0002317005
+MediaTek,0.77,TWD,Technology,TW,TW0002454006
+Other Holdings,68.65,Mixed,Diversified,Mixed,
+
+# Currency Allocation (%)
+Currency,Weight
+TWD,18.8
+KRW,11.8
+CNY,27.5
+INR,20.8
+BRL,4.8
+Other,16.3

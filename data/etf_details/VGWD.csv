@@ -1,0 +1,70 @@
+# ETF Metadata
+ISIN,IE00B8GKDB10
+Name,Vanguard FTSE All-World High Dividend Yield UCITS ETF (USD) Distributing
+Ticker,VGWD
+Type,Stock
+Region,World
+Currency,USD
+TER,0.29%
+
+# Country Allocation (%)
+Country,Weight
+United States,39.50
+Japan,8.98
+United Kingdom,7.13
+Switzerland,4.61
+Canada,4.16
+France,3.66
+China,3.50
+Germany,3.46
+Australia,3.26
+Taiwan,2.31
+South Korea,2.07
+Spain,2.03
+Italy,1.58
+Sweden,1.37
+Hong Kong,1.15
+Other,13.23
+
+# Sector Allocation (%)
+Sector,Weight
+Financial Services,29.73
+Industrials,12.04
+Healthcare,11.02
+Consumer Staples,9.87
+Energy,8.45
+Technology,7.82
+Communication Services,6.89
+Materials,5.34
+Consumer Cyclical,4.56
+Utilities,2.33
+Real Estate,1.95
+
+# Currency Allocation (%)
+Currency,Weight
+USD,43.66
+EUR,21.82
+JPY,8.98
+GBP,7.13
+CHF,4.61
+CAD,4.16
+Other,9.64
+
+# Top Holdings
+Name,Weight,Currency,Sector,Country,ISIN
+JPMorgan Chase & Co,2.25,USD,Financial Services,US,US46625H1005
+Exxon Mobil Corp,1.31,USD,Energy,US,US30231G1022
+Johnson & Johnson,1.28,USD,Healthcare,US,US4781601046
+AbbVie Inc,1.04,USD,Healthcare,US,US00287Y1091
+Samsung Electronics,1.01,KRW,Technology,KR,KR7005930003
+Bank of America Corp,0.94,USD,Financial Services,US,US0605051046
+Home Depot Inc,0.88,USD,Consumer Cyclical,US,US4370761029
+Procter & Gamble,0.86,USD,Consumer Staples,US,US7427181091
+Cisco Systems Inc,0.79,USD,Technology,US,US17275R1023
+UnitedHealth Group Inc,0.77,USD,Healthcare,US,US91324P1021
+Chevron Corp,0.72,USD,Energy,US,US1667641005
+Visa Inc Class A,0.67,USD,Financial Services,US,US92826C8394
+ASML Holding NV,0.66,EUR,Technology,NL,NL0010273215
+Walmart Inc,0.64,USD,Consumer Staples,US,US9311421039
+Mastercard Inc Class A,0.56,USD,Financial Services,US,US57636Q1040
+Other Holdings,85.62,Mixed,Diversified,Mixed,

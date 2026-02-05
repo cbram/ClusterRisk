@@ -1,0 +1,69 @@
+METADATA
+ISIN,IE00B4L5Y983
+Name,iShares Core MSCI World UCITS ETF USD (Acc)
+Ticker,EUNL
+Type,Stock
+Region,World
+Currency,USD
+TER,0.20
+
+COUNTRY_ALLOCATION
+Country,Weight
+US,70.8
+JP,6.2
+GB,3.8
+FR,3.1
+CA,2.9
+CH,2.5
+DE,2.1
+AU,1.9
+NL,1.3
+SE,1.1
+DK,0.9
+HK,0.8
+IT,0.7
+ES,0.7
+Other,1.2
+
+SECTOR_ALLOCATION
+Sector,Weight
+Technology,24.5
+Financial Services,15.2
+Healthcare,11.8
+Consumer Cyclical,10.9
+Industrials,10.1
+Communication Services,8.7
+Consumer Staples,6.4
+Energy,4.2
+Basic Materials,3.8
+Real Estate,2.4
+Utilities,2.0
+
+CURRENCY_ALLOCATION
+Currency,Weight
+USD,72.5
+JPY,6.2
+GBP,3.8
+EUR,9.5
+CAD,2.9
+CHF,2.5
+Other,2.6
+
+TOP_HOLDINGS
+Name,Weight,Currency,Sector,Industry,Country
+Apple Inc,4.98,USD,Technology,Consumer Electronics,US
+NVIDIA Corp,4.67,USD,Technology,Semiconductors,US
+Microsoft Corp,3.95,USD,Technology,Software,US
+Amazon.com Inc,2.28,USD,Consumer Cyclical,Internet Retail,US
+Meta Platforms Inc,1.63,USD,Communication Services,Internet Content & Information,US
+Alphabet Inc Class A,1.41,USD,Communication Services,Internet Content & Information,US
+Alphabet Inc Class C,1.23,USD,Communication Services,Internet Content & Information,US
+Broadcom Inc,1.08,USD,Technology,Semiconductors,US
+Tesla Inc,0.99,USD,Consumer Cyclical,Auto Manufacturers,US
+Berkshire Hathaway Inc,0.95,USD,Financial Services,Insurance,US
+Eli Lilly and Co,0.88,USD,Healthcare,Drug Manufacturers,US
+JPMorgan Chase & Co,0.81,USD,Financial Services,Banks,US
+Walmart Inc,0.74,USD,Consumer Staples,Retail,US
+Visa Inc,0.69,USD,Financial Services,Credit Services,US
+UnitedHealth Group Inc,0.65,USD,Healthcare,Healthcare Plans,US
+Other Holdings,68.94,Mixed,Diversified,Diversified,Mixed

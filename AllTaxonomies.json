@@ -1,0 +1,7454 @@
+[
+  {
+    "name": "Wertpapierart",
+    "color": "#ebaad1",
+    "categories": [
+      {
+        "name": "Hebelscheine",
+        "color": "#75448a"
+      },
+      {
+        "name": "Aktie Anker",
+        "key": "Stock",
+        "color": "#444f8a"
+      },
+      {
+        "name": "Aktie Spass",
+        "color": "#0432ff"
+      },
+      {
+        "name": "Exchange Traded Fund (ETF)",
+        "key": "ETF",
+        "color": "#448a4c"
+      },
+      {
+        "name": "Aktienfonds",
+        "key": "Fund",
+        "color": "#448a89"
+      },
+      {
+        "name": "Optionsschein",
+        "key": "Option",
+        "color": "#788a44"
+      },
+      {
+        "name": "Tagesgeld",
+        "color": "#8a6044"
+      },
+      {
+        "name": "Festgeld",
+        "color": "#8a4464"
+      },
+      {
+        "name": "Rohstoffe",
+        "color": "#8ed9ef"
+      },
+      {
+        "name": "Krypto",
+        "color": "#9bcfe9"
+      }
+    ],
+    "instruments": [
+      {
+        "identifiers": {
+          "name": "Amazon UBS TurboC O.End",
+          "isin": "DE000UD9BG09",
+          "wkn": "UD9BG0"
+        },
+        "categories": [
+          {
+            "path": [
+              "Hebelscheine"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Apple UBS Open End Turbo Call Option",
+          "isin": "DE000UE0D2M2",
+          "wkn": "UE0D2M"
+        },
+        "categories": [
+          {
+            "path": [
+              "Hebelscheine"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NVIDIA VONTOBEL TURBOC O.END",
+          "isin": "DE000VP6KLX0",
+          "wkn": "VP6KLX"
+        },
+        "categories": [
+          {
+            "path": [
+              "Hebelscheine"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NVIDIA Vontobel TurboC O.End 268,88",
+          "isin": "DE000VX232F5",
+          "wkn": "VX232F"
+        },
+        "categories": [
+          {
+            "path": [
+              "Hebelscheine"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Apple",
+          "isin": "US0378331005",
+          "wkn": "865985",
+          "ticker": "APC.DE"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ASML Holding",
+          "isin": "NL0010273215",
+          "wkn": "A1J4U4",
+          "ticker": "ASME.DE"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "CHURCH + DWIGHT",
+          "isin": "US1713401024",
+          "wkn": "864371",
+          "ticker": "CHD"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "UNITEDHEALTH GROUP DL-,01",
+          "isin": "US91324P1021",
+          "wkn": "869561",
+          "ticker": "UNH"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "APPLE INC.",
+          "isin": "US0378331005",
+          "wkn": "865985",
+          "ticker": "AAPL"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALPHABET INC-CL A",
+          "isin": "US02079K3059",
+          "wkn": "208813719",
+          "ticker": "GOOGL"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ENCAVIS AG",
+          "isin": "DE0006095003",
+          "wkn": "32837336",
+          "ticker": "ECV.DE"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "HOME DEPOT INC",
+          "isin": "US4370761029",
+          "wkn": "866953",
+          "ticker": "HD"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALIMENTATION COUCHE-TARD INC OLD",
+          "isin": "CA01626P3043",
+          "wkn": "14888503",
+          "ticker": "ATD.TO"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AMPHENOL CORP-CL A",
+          "isin": "US0320951017",
+          "wkn": "882749",
+          "ticker": "APH"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NEXSTAR MEDIA GROUP INC-CL A",
+          "isin": "US65336K1034",
+          "wkn": "26904818",
+          "ticker": "NXST"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NEXTERA ENERGY INC",
+          "isin": "US65339F1012",
+          "wkn": "A1CZ4H",
+          "ticker": "NEE"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "THERMO FISHER SCIENTIFIC INC",
+          "isin": "US8835561023",
+          "wkn": "857209",
+          "ticker": "TMO"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "UNION PACIFIC CORP",
+          "isin": "US9078181081",
+          "wkn": "13284",
+          "ticker": "UNP"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NISSAN CHEMICAL CORP",
+          "isin": "JP3670800006",
+          "wkn": "13905418",
+          "ticker": "4021.T"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AMERICAN STATES WATER CO",
+          "isin": "US0298991011",
+          "wkn": "881720",
+          "ticker": "AWR"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AUTOMATIC DATA PROCESSING",
+          "isin": "US0530151036",
+          "wkn": "4661",
+          "ticker": "ADP"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MSCI INC",
+          "isin": "US55354G1004",
+          "wkn": "A0M63R",
+          "ticker": "MSCI"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AMERICAN TOWER CORP",
+          "isin": "US03027X1000",
+          "wkn": "A1JRLA",
+          "ticker": "AMT"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SIKA AG-REG",
+          "isin": "CH0418792922",
+          "wkn": "A2JNV8",
+          "ticker": "SIKA.SW"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "LINDE PLC",
+          "isin": "IE000S9YS762",
+          "wkn": "338719530",
+          "ticker": "LIN"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "VISA INC-CLASS A SHARES",
+          "isin": "US92826C8394",
+          "wkn": "A0NC7B",
+          "ticker": "V"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALIMENTATION COUCHE-TARD INC",
+          "isin": "CA01626P1484",
+          "wkn": "583257700",
+          "ticker": "ATD.TO"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ROLLINS INC",
+          "isin": "US7757111049",
+          "wkn": "859002",
+          "ticker": "ROL"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BROADCOM INC",
+          "isin": "US11135F1012",
+          "wkn": "A2JG9Z",
+          "ticker": "AVGO"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "EDP RENOVAVEIS SA",
+          "isin": "ES0127797019",
+          "wkn": "51689221",
+          "ticker": "EDPR.LS"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "OLD DOMINION FREIGHT LINE",
+          "isin": "US6795801009",
+          "wkn": "923655",
+          "ticker": "ODFL"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MICROSOFT CORP",
+          "isin": "US5949181045",
+          "wkn": "870747",
+          "ticker": "MSFT"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALPHABET INC-CL C",
+          "isin": "US02079K1079",
+          "wkn": "A14Y6H",
+          "ticker": "GOOG"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "COPART INC",
+          "isin": "US2172041061",
+          "wkn": "893807",
+          "ticker": "CPRT"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "HERMES INTL",
+          "isin": "FR0000052292",
+          "wkn": "886670",
+          "ticker": "RMS.PA"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "IBERDROLA SA.",
+          "isin": "ES0144580Y14",
+          "wkn": "A0M46B",
+          "ticker": "IBE1.DE"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALZCHEM GROUP AG",
+          "isin": "DE000A2YNT30",
+          "wkn": "373291272",
+          "ticker": "ACT.DE"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "PARKER HANNIFIN CORP",
+          "isin": "US7010941042",
+          "wkn": "855950",
+          "ticker": "PH"
+        },
+        "categories": [
+          {
+            "key": "Stock",
+            "path": [
+              "Aktie Anker"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "JD.COM",
+          "isin": "US47215P1066",
+          "wkn": "A112ST",
+          "ticker": "JD"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Mercadolibre Inc. Registered Shares DL-,001",
+          "isin": "US58733R1023",
+          "wkn": "A0MYNP",
+          "ticker": "MELI"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Nikola Corp. Registered Shares  o.N.",
+          "isin": "US6541101050",
+          "wkn": "A2P4A9",
+          "ticker": "NKLA"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TUI AG",
+          "isin": "DE000TUAG000",
+          "wkn": "TUAG00",
+          "ticker": "TUI1"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "VARTA AG Inhaber-Aktien o.N.",
+          "isin": "DE000A0TGJ55",
+          "wkn": "A0TGJ5",
+          "ticker": "VAR1"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "VESTAS WIND BR/RG",
+          "isin": "DK0061539921",
+          "wkn": "A3CMNS",
+          "ticker": "VWSYF"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NIO",
+          "isin": "US62914V1061",
+          "wkn": "A2N4PB",
+          "ticker": "NIO"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Deutsche Lufthansa AG",
+          "isin": "DE0008232125",
+          "wkn": "823212",
+          "ticker": "LHA.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "IBM",
+          "isin": "US4592001014",
+          "wkn": "851399",
+          "ticker": "IBM"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TESLA EUR",
+          "isin": "US88160R1014",
+          "wkn": "A1CX3T",
+          "ticker": "TL0.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "PVA TEPLA AG O.N.",
+          "isin": "DE0007461006",
+          "wkn": "746100",
+          "ticker": "TPE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NVIDIA",
+          "isin": "US67066G1040",
+          "wkn": "918422",
+          "ticker": "NVD.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Sartorius AG VZ",
+          "isin": "DE0007165631",
+          "wkn": "716563",
+          "ticker": "SRT3.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AMAZON.COM INC",
+          "isin": "US0231351067",
+          "wkn": "906866",
+          "ticker": "AMZN"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "FIRST SOLAR INC",
+          "isin": "US3364331070",
+          "wkn": "41622169",
+          "ticker": "FSLR"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "PAYPAL HOLDINGS INC",
+          "isin": "US70450Y1038",
+          "wkn": "A14R7U",
+          "ticker": "PYPL"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BANCFIRST CORP",
+          "isin": "US05945F1030",
+          "wkn": "266611",
+          "ticker": "BANF"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BOOKING HOLDINGS INC",
+          "isin": "US09857L1089",
+          "wkn": "308728373",
+          "ticker": "BKNG"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DELIVERY HERO SE",
+          "isin": "DE000A2E4K43",
+          "wkn": "281129632",
+          "ticker": "DHER.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "GERON CORP",
+          "isin": "US3741631036",
+          "wkn": "4812254",
+          "ticker": "GERN"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MERIDIAN BIOSCIENCE INC",
+          "isin": "US5895841014",
+          "wkn": "270952",
+          "ticker": "VIVO"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MGP INGREDIENTS INC",
+          "isin": "US55303J1060",
+          "wkn": "99990497",
+          "ticker": "MGPI"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SAREPTA THERAPEUTICS INC",
+          "isin": "US8036071004",
+          "wkn": "110434131",
+          "ticker": "SRPT"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NETFLIX INC",
+          "isin": "US64110L1061",
+          "wkn": "552484",
+          "ticker": "NFLX"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BANK OF AMERICA CORP",
+          "isin": "US0605051046",
+          "wkn": "10098",
+          "ticker": "BAC"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "VERU INC",
+          "isin": "US92536C1036",
+          "wkn": "285043314",
+          "ticker": "VERU"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SANMINA CORP",
+          "isin": "US8010561020",
+          "wkn": "117032813",
+          "ticker": "SANM"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ADVANCED MICRO DEVICES",
+          "isin": "US0079031078",
+          "wkn": "863186",
+          "ticker": "AMD"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AGILENT TECHNOLOGIES INC",
+          "isin": "US00846U1016",
+          "wkn": "1715006",
+          "ticker": "A"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BURLINGTON STORES INC",
+          "isin": "US1220171060",
+          "wkn": "135699190",
+          "ticker": "BURL"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TESLA USD",
+          "isin": "US88160R1014",
+          "wkn": "A1CX3T",
+          "ticker": "TSLA"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "META PLATFORMS INC-CLASS A",
+          "isin": "US30303M1027",
+          "wkn": "A1JWVX",
+          "ticker": "META"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DUOLINGO",
+          "isin": "US26603R1068",
+          "wkn": "505002183",
+          "ticker": "DUOL"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "UBER TECHNOLOGIES INC",
+          "isin": "US90353T1007",
+          "wkn": "A2PHHG",
+          "ticker": "UBER"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NVIDIA Corporation",
+          "ticker": "NVDA"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ADOBE INC",
+          "isin": "US00724F1012",
+          "wkn": "871981",
+          "ticker": "ADBE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ELI LILLY \u0026 CO",
+          "isin": "US5324571083",
+          "wkn": "858560",
+          "ticker": "LLY"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "KLA CORP",
+          "isin": "US4824801009",
+          "wkn": "865884",
+          "ticker": "KLAC"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "PALANTIR TECHNOLOGIES INC-A",
+          "isin": "US69608A1088",
+          "wkn": "A2QA4J",
+          "ticker": "PLTR"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SAP SE",
+          "isin": "DE0007164600",
+          "wkn": "716460",
+          "ticker": "SAP.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "INTEL CORP",
+          "isin": "US4581401001",
+          "wkn": "855681",
+          "ticker": "INTC"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TAIWAN SEMICONDUCTOR-SP ADR",
+          "isin": "US8740391003",
+          "wkn": "909800",
+          "ticker": "TSM"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DOMINO\u0027S PIZZA INC",
+          "isin": "US25754A2015",
+          "wkn": "A0B6VQ",
+          "ticker": "DPZ"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "COSTCO WHOLESALE CORP",
+          "isin": "US22160K1051",
+          "wkn": "888351",
+          "ticker": "COST"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ARM HOLDINGS PLC-ADR",
+          "isin": "US0420682058",
+          "wkn": "653400472",
+          "ticker": "ARM"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BWX TECHNOLOGIES INC",
+          "isin": "US05605H1005",
+          "wkn": "A14V4U",
+          "ticker": "BWXT"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "LENNOX INTL INC",
+          "isin": "US5261071071",
+          "wkn": "924838",
+          "ticker": "LII"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "KKR \u0026 CO INC",
+          "isin": "US48251W1045",
+          "wkn": "A2LQV6",
+          "ticker": "KKR"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SHERWIN-WILLIAMS CO/THE",
+          "isin": "US8243481061",
+          "wkn": "856050",
+          "ticker": "SHW"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BLACKSTONE INC",
+          "isin": "US09260D1072",
+          "wkn": "372834689",
+          "ticker": "BX"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BOSTON BEER COMPANY INC-A",
+          "isin": "US1005571070",
+          "wkn": "1841216",
+          "ticker": "SAM"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "JPMORGAN CHASE \u0026 CO",
+          "isin": "US46625H1005",
+          "wkn": "1520593",
+          "ticker": "JPM"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MONGODB INC",
+          "isin": "US60937P1066",
+          "wkn": "292833239",
+          "ticker": "MDB"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALBEMARLE CORP",
+          "isin": "US0126531013",
+          "wkn": "4347",
+          "ticker": "ALB"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SMA SOLAR TECHNOLOGY AG",
+          "isin": "DE000A0DJ6J9",
+          "wkn": "52164436",
+          "ticker": "S92.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "GENERAL ELECTRIC",
+          "isin": "US3696043013",
+          "wkn": "498843743",
+          "ticker": "GE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Aktie Spass"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "UBS MSCI World Soc. Resp. ACC",
+          "isin": "LU0950674332",
+          "wkn": "A1W3CQ",
+          "ticker": "SEAC.DE"
+        },
+        "categories": [
+          {
+            "key": "ETF",
+            "path": [
+              "Exchange Traded Fund (ETF)"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MSCI World Xtr.(IE) -  Registered Shares",
+          "isin": "IE00BJ0KDQ92",
+          "wkn": "A1XB5U",
+          "ticker": "XDWD.DE"
+        },
+        "categories": [
+          {
+            "key": "ETF",
+            "path": [
+              "Exchange Traded Fund (ETF)"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MSCI World iShsII-DJ Gl.Sustain.Scr.U.ETF Registered Shs USD (Acc) o.N.",
+          "isin": "IE00B57X3V84",
+          "wkn": "A1H7ZT",
+          "ticker": "IUSL.DE"
+        },
+        "categories": [
+          {
+            "key": "ETF",
+            "path": [
+              "Exchange Traded Fund (ETF)"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MSCI World ISHSIII-CORE DLA",
+          "isin": "IE00B4L5Y983",
+          "wkn": "A0RPWH",
+          "ticker": "EUNL.DE"
+        },
+        "categories": [
+          {
+            "key": "ETF",
+            "path": [
+              "Exchange Traded Fund (ETF)"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MSCI World ISHS- DL D",
+          "isin": "IE00B0M62Q58",
+          "wkn": "A0HGV0",
+          "ticker": "IQQW.DE"
+        },
+        "categories": [
+          {
+            "key": "ETF",
+            "path": [
+              "Exchange Traded Fund (ETF)"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "S\u0026P 500 Vanguard UCITS ETF Reg. Shs USD Acc. oN",
+          "isin": "IE00BFMXXD54",
+          "wkn": "A2PFN2",
+          "ticker": "VUAA.DE"
+        },
+        "categories": [
+          {
+            "key": "ETF",
+            "path": [
+              "Exchange Traded Fund (ETF)"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Vanguard FTSE All-World U.ETF Reg. Shs USD Acc. oN",
+          "isin": "IE00BK5BQT80",
+          "wkn": "A2PKXG"
+        },
+        "categories": [
+          {
+            "key": "ETF",
+            "path": [
+              "Exchange Traded Fund (ETF)"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "iShsII-Gl.Clean Energy U.ETF Registered Shares o.N.",
+          "isin": "IE00B1XNHC34",
+          "wkn": "A0MW0M",
+          "ticker": "IQQH.DE"
+        },
+        "categories": [
+          {
+            "key": "ETF",
+            "path": [
+              "Exchange Traded Fund (ETF)"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AIS-AMUNDI S+P500UETF EOC",
+          "isin": "LU1681048804",
+          "wkn": "A2H573",
+          "ticker": "AUM5.DE"
+        },
+        "categories": [
+          {
+            "key": "ETF",
+            "path": [
+              "Exchange Traded Fund (ETF)"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "X EUR OVERNIGHT RATE SWAP 1C",
+          "isin": "LU0290358497",
+          "wkn": "DBX0AN",
+          "ticker": "XEON.DE"
+        },
+        "categories": [
+          {
+            "key": "ETF",
+            "path": [
+              "Exchange Traded Fund (ETF)"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "X MSCI WORLD MOMENTUM 1C",
+          "isin": "IE00BL25JP72",
+          "wkn": "167234535",
+          "ticker": "XDEM.DE"
+        },
+        "categories": [
+          {
+            "key": "ETF",
+            "path": [
+              "Exchange Traded Fund (ETF)"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "X EUR CORPORATE BOND",
+          "isin": "LU0478205379",
+          "ticker": "D5BG.DE"
+        },
+        "categories": [
+          {
+            "key": "ETF",
+            "path": [
+              "Exchange Traded Fund (ETF)"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Vanguard World High Dividend Yield",
+          "isin": "IE00B8GKDB10",
+          "ticker": "VGWD.DE"
+        },
+        "categories": [
+          {
+            "key": "ETF",
+            "path": [
+              "Exchange Traded Fund (ETF)"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "L\u0026G GERD KOMMER ACC ETF",
+          "isin": "IE0001UQQ933",
+          "wkn": "WELT0A",
+          "ticker": "GERD.DE"
+        },
+        "categories": [
+          {
+            "key": "ETF",
+            "path": [
+              "Exchange Traded Fund (ETF)"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "10XDNA - DISRUPTIVE TECHNOLOGIE",
+          "isin": "DE000DNA10X3",
+          "wkn": "DNA10X",
+          "ticker": "10XDNA"
+        },
+        "categories": [
+          {
+            "key": "Fund",
+            "path": [
+              "Aktienfonds"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DKB Tagesgeld"
+        },
+        "categories": [
+          {
+            "path": [
+              "Tagesgeld"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TF Bank Tagesgeld"
+        },
+        "categories": [
+          {
+            "path": [
+              "Tagesgeld"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Leaseplan Tagesgeld"
+        },
+        "categories": [
+          {
+            "path": [
+              "Tagesgeld"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DebBeKa Tagesgeld"
+        },
+        "categories": [
+          {
+            "path": [
+              "Tagesgeld"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DKB"
+        },
+        "categories": [
+          {
+            "path": [
+              "Tagesgeld"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Finanzen.net Zero"
+        },
+        "categories": [
+          {
+            "path": [
+              "Tagesgeld"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "CapTrader Anker EUR"
+        },
+        "categories": [
+          {
+            "path": [
+              "Tagesgeld"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Captrader Anker USD"
+        },
+        "categories": [
+          {
+            "path": [
+              "Tagesgeld"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Captrader Anker CAD"
+        },
+        "categories": [
+          {
+            "path": [
+              "Tagesgeld"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Captrader Anker JPY"
+        },
+        "categories": [
+          {
+            "path": [
+              "Tagesgeld"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Captrader Spass USD"
+        },
+        "categories": [
+          {
+            "path": [
+              "Tagesgeld"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Computershare"
+        },
+        "categories": [
+          {
+            "path": [
+              "Tagesgeld"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Captrader Spass EUR"
+        },
+        "categories": [
+          {
+            "path": [
+              "Tagesgeld"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Captrader Anker CHF"
+        },
+        "categories": [
+          {
+            "path": [
+              "Tagesgeld"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TradeRepublic"
+        },
+        "categories": [
+          {
+            "path": [
+              "Tagesgeld"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Klarna Festgeld"
+        },
+        "categories": [
+          {
+            "path": [
+              "Festgeld"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Gold Future",
+          "ticker": "GC\u003dF"
+        },
+        "categories": [
+          {
+            "path": [
+              "Rohstoffe"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "X IE PHYSICAL GOLD ETC",
+          "isin": "DE000A2T0VU5",
+          "wkn": "424741055",
+          "ticker": "XGDU.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Rohstoffe"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Bitcoin EUR",
+          "ticker": "BTC-EUR"
+        },
+        "categories": [
+          {
+            "path": [
+              "Krypto"
+            ],
+            "weight": 100.0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Asset Allocation",
+    "color": "#c188a8",
+    "categories": [
+      {
+        "name": "Risikobehafteter Portfolioteil",
+        "key": "K001",
+        "color": "#869668",
+        "children": [
+          {
+            "name": "ETFs",
+            "color": "#db98a5"
+          },
+          {
+            "name": "Aktien",
+            "color": "#a9de96"
+          },
+          {
+            "name": "Aktienfonds",
+            "color": "#d7d0cb"
+          },
+          {
+            "name": "Hebelscheine",
+            "color": "#a2dbe5"
+          },
+          {
+            "name": "Krypto",
+            "color": "#ccebf2"
+          }
+        ]
+      },
+      {
+        "name": "Risikofreier Portfolioteil",
+        "key": "K002",
+        "color": "#b94e54"
+      }
+    ],
+    "instruments": [
+      {
+        "identifiers": {
+          "name": "MSCI World ISHS- DL D",
+          "isin": "IE00B0M62Q58",
+          "wkn": "A0HGV0",
+          "ticker": "IQQW.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MSCI World iShsII-DJ Gl.Sustain.Scr.U.ETF Registered Shs USD (Acc) o.N.",
+          "isin": "IE00B57X3V84",
+          "wkn": "A1H7ZT",
+          "ticker": "IUSL.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MSCI World ISHSIII-CORE DLA",
+          "isin": "IE00B4L5Y983",
+          "wkn": "A0RPWH",
+          "ticker": "EUNL.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MSCI World Xtr.(IE) -  Registered Shares",
+          "isin": "IE00BJ0KDQ92",
+          "wkn": "A1XB5U",
+          "ticker": "XDWD.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "UBS MSCI World Soc. Resp. ACC",
+          "isin": "LU0950674332",
+          "wkn": "A1W3CQ",
+          "ticker": "SEAC.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "S\u0026P 500 Vanguard UCITS ETF Reg. Shs USD Acc. oN",
+          "isin": "IE00BFMXXD54",
+          "wkn": "A2PFN2",
+          "ticker": "VUAA.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Vanguard FTSE All-World U.ETF Reg. Shs USD Acc. oN",
+          "isin": "IE00BK5BQT80",
+          "wkn": "A2PKXG"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "iShsII-Gl.Clean Energy U.ETF Registered Shares o.N.",
+          "isin": "IE00B1XNHC34",
+          "wkn": "A0MW0M",
+          "ticker": "IQQH.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AIS-AMUNDI S+P500UETF EOC",
+          "isin": "LU1681048804",
+          "wkn": "A2H573",
+          "ticker": "AUM5.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "X MSCI WORLD MOMENTUM 1C",
+          "isin": "IE00BL25JP72",
+          "wkn": "167234535",
+          "ticker": "XDEM.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "X EUR CORPORATE BOND",
+          "isin": "LU0478205379",
+          "ticker": "D5BG.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Vanguard World High Dividend Yield",
+          "isin": "IE00B8GKDB10",
+          "ticker": "VGWD.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "L\u0026G GERD KOMMER ACC ETF",
+          "isin": "IE0001UQQ933",
+          "wkn": "WELT0A",
+          "ticker": "GERD.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Apple",
+          "isin": "US0378331005",
+          "wkn": "865985",
+          "ticker": "APC.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "VARTA AG Inhaber-Aktien o.N.",
+          "isin": "DE000A0TGJ55",
+          "wkn": "A0TGJ5",
+          "ticker": "VAR1"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "VESTAS WIND BR/RG",
+          "isin": "DK0061539921",
+          "wkn": "A3CMNS",
+          "ticker": "VWSYF"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Sartorius AG VZ",
+          "isin": "DE0007165631",
+          "wkn": "716563",
+          "ticker": "SRT3.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TUI AG",
+          "isin": "DE000TUAG000",
+          "wkn": "TUAG00",
+          "ticker": "TUI1"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "JD.COM",
+          "isin": "US47215P1066",
+          "wkn": "A112ST",
+          "ticker": "JD"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Mercadolibre Inc. Registered Shares DL-,001",
+          "isin": "US58733R1023",
+          "wkn": "A0MYNP",
+          "ticker": "MELI"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Nikola Corp. Registered Shares  o.N.",
+          "isin": "US6541101050",
+          "wkn": "A2P4A9",
+          "ticker": "NKLA"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NIO",
+          "isin": "US62914V1061",
+          "wkn": "A2N4PB",
+          "ticker": "NIO"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Deutsche Lufthansa AG",
+          "isin": "DE0008232125",
+          "wkn": "823212",
+          "ticker": "LHA.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ASML Holding",
+          "isin": "NL0010273215",
+          "wkn": "A1J4U4",
+          "ticker": "ASME.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "IBM",
+          "isin": "US4592001014",
+          "wkn": "851399",
+          "ticker": "IBM"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TESLA EUR",
+          "isin": "US88160R1014",
+          "wkn": "A1CX3T",
+          "ticker": "TL0.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "PVA TEPLA AG O.N.",
+          "isin": "DE0007461006",
+          "wkn": "746100",
+          "ticker": "TPE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NVIDIA",
+          "isin": "US67066G1040",
+          "wkn": "918422",
+          "ticker": "NVD.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "CHURCH + DWIGHT",
+          "isin": "US1713401024",
+          "wkn": "864371",
+          "ticker": "CHD"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "UNITEDHEALTH GROUP DL-,01",
+          "isin": "US91324P1021",
+          "wkn": "869561",
+          "ticker": "UNH"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "APPLE INC.",
+          "isin": "US0378331005",
+          "wkn": "865985",
+          "ticker": "AAPL"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALPHABET INC-CL A",
+          "isin": "US02079K3059",
+          "wkn": "208813719",
+          "ticker": "GOOGL"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ENCAVIS AG",
+          "isin": "DE0006095003",
+          "wkn": "32837336",
+          "ticker": "ECV.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "HOME DEPOT INC",
+          "isin": "US4370761029",
+          "wkn": "866953",
+          "ticker": "HD"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALIMENTATION COUCHE-TARD INC OLD",
+          "isin": "CA01626P3043",
+          "wkn": "14888503",
+          "ticker": "ATD.TO"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AMPHENOL CORP-CL A",
+          "isin": "US0320951017",
+          "wkn": "882749",
+          "ticker": "APH"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NEXSTAR MEDIA GROUP INC-CL A",
+          "isin": "US65336K1034",
+          "wkn": "26904818",
+          "ticker": "NXST"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NEXTERA ENERGY INC",
+          "isin": "US65339F1012",
+          "wkn": "A1CZ4H",
+          "ticker": "NEE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "THERMO FISHER SCIENTIFIC INC",
+          "isin": "US8835561023",
+          "wkn": "857209",
+          "ticker": "TMO"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "UNION PACIFIC CORP",
+          "isin": "US9078181081",
+          "wkn": "13284",
+          "ticker": "UNP"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NISSAN CHEMICAL CORP",
+          "isin": "JP3670800006",
+          "wkn": "13905418",
+          "ticker": "4021.T"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AMERICAN STATES WATER CO",
+          "isin": "US0298991011",
+          "wkn": "881720",
+          "ticker": "AWR"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AUTOMATIC DATA PROCESSING",
+          "isin": "US0530151036",
+          "wkn": "4661",
+          "ticker": "ADP"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MSCI INC",
+          "isin": "US55354G1004",
+          "wkn": "A0M63R",
+          "ticker": "MSCI"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AMAZON.COM INC",
+          "isin": "US0231351067",
+          "wkn": "906866",
+          "ticker": "AMZN"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "FIRST SOLAR INC",
+          "isin": "US3364331070",
+          "wkn": "41622169",
+          "ticker": "FSLR"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "PAYPAL HOLDINGS INC",
+          "isin": "US70450Y1038",
+          "wkn": "A14R7U",
+          "ticker": "PYPL"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BANCFIRST CORP",
+          "isin": "US05945F1030",
+          "wkn": "266611",
+          "ticker": "BANF"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BOOKING HOLDINGS INC",
+          "isin": "US09857L1089",
+          "wkn": "308728373",
+          "ticker": "BKNG"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DELIVERY HERO SE",
+          "isin": "DE000A2E4K43",
+          "wkn": "281129632",
+          "ticker": "DHER.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "GERON CORP",
+          "isin": "US3741631036",
+          "wkn": "4812254",
+          "ticker": "GERN"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MERIDIAN BIOSCIENCE INC",
+          "isin": "US5895841014",
+          "wkn": "270952",
+          "ticker": "VIVO"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MGP INGREDIENTS INC",
+          "isin": "US55303J1060",
+          "wkn": "99990497",
+          "ticker": "MGPI"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SAREPTA THERAPEUTICS INC",
+          "isin": "US8036071004",
+          "wkn": "110434131",
+          "ticker": "SRPT"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SMA SOLAR TECHNOLOGY AG",
+          "isin": "DE000A0DJ6J9",
+          "wkn": "52164436",
+          "ticker": "S92.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AMERICAN TOWER CORP",
+          "isin": "US03027X1000",
+          "wkn": "A1JRLA",
+          "ticker": "AMT"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NETFLIX INC",
+          "isin": "US64110L1061",
+          "wkn": "552484",
+          "ticker": "NFLX"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SIKA AG-REG",
+          "isin": "CH0418792922",
+          "wkn": "A2JNV8",
+          "ticker": "SIKA.SW"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "LINDE PLC",
+          "isin": "IE000S9YS762",
+          "wkn": "338719530",
+          "ticker": "LIN"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "VISA INC-CLASS A SHARES",
+          "isin": "US92826C8394",
+          "wkn": "A0NC7B",
+          "ticker": "V"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALIMENTATION COUCHE-TARD INC",
+          "isin": "CA01626P1484",
+          "wkn": "583257700",
+          "ticker": "ATD.TO"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BANK OF AMERICA CORP",
+          "isin": "US0605051046",
+          "wkn": "10098",
+          "ticker": "BAC"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "VERU INC",
+          "isin": "US92536C1036",
+          "wkn": "285043314",
+          "ticker": "VERU"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SANMINA CORP",
+          "isin": "US8010561020",
+          "wkn": "117032813",
+          "ticker": "SANM"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ADVANCED MICRO DEVICES",
+          "isin": "US0079031078",
+          "wkn": "863186",
+          "ticker": "AMD"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AGILENT TECHNOLOGIES INC",
+          "isin": "US00846U1016",
+          "wkn": "1715006",
+          "ticker": "A"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BURLINGTON STORES INC",
+          "isin": "US1220171060",
+          "wkn": "135699190",
+          "ticker": "BURL"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ROLLINS INC",
+          "isin": "US7757111049",
+          "wkn": "859002",
+          "ticker": "ROL"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BROADCOM INC",
+          "isin": "US11135F1012",
+          "wkn": "A2JG9Z",
+          "ticker": "AVGO"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TESLA USD",
+          "isin": "US88160R1014",
+          "wkn": "A1CX3T",
+          "ticker": "TSLA"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "EDP RENOVAVEIS SA",
+          "isin": "ES0127797019",
+          "wkn": "51689221",
+          "ticker": "EDPR.LS"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "OLD DOMINION FREIGHT LINE",
+          "isin": "US6795801009",
+          "wkn": "923655",
+          "ticker": "ODFL"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "META PLATFORMS INC-CLASS A",
+          "isin": "US30303M1027",
+          "wkn": "A1JWVX",
+          "ticker": "META"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DUOLINGO",
+          "isin": "US26603R1068",
+          "wkn": "505002183",
+          "ticker": "DUOL"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "UBER TECHNOLOGIES INC",
+          "isin": "US90353T1007",
+          "wkn": "A2PHHG",
+          "ticker": "UBER"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NVIDIA Corporation",
+          "ticker": "NVDA"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MICROSOFT CORP",
+          "isin": "US5949181045",
+          "wkn": "870747",
+          "ticker": "MSFT"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALPHABET INC-CL C",
+          "isin": "US02079K1079",
+          "wkn": "A14Y6H",
+          "ticker": "GOOG"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ADOBE INC",
+          "isin": "US00724F1012",
+          "wkn": "871981",
+          "ticker": "ADBE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ELI LILLY \u0026 CO",
+          "isin": "US5324571083",
+          "wkn": "858560",
+          "ticker": "LLY"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "COPART INC",
+          "isin": "US2172041061",
+          "wkn": "893807",
+          "ticker": "CPRT"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "HERMES INTL",
+          "isin": "FR0000052292",
+          "wkn": "886670",
+          "ticker": "RMS.PA"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "KLA CORP",
+          "isin": "US4824801009",
+          "wkn": "865884",
+          "ticker": "KLAC"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "PALANTIR TECHNOLOGIES INC-A",
+          "isin": "US69608A1088",
+          "wkn": "A2QA4J",
+          "ticker": "PLTR"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SAP SE",
+          "isin": "DE0007164600",
+          "wkn": "716460",
+          "ticker": "SAP.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "INTEL CORP",
+          "isin": "US4581401001",
+          "wkn": "855681",
+          "ticker": "INTC"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TAIWAN SEMICONDUCTOR-SP ADR",
+          "isin": "US8740391003",
+          "wkn": "909800",
+          "ticker": "TSM"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DOMINO\u0027S PIZZA INC",
+          "isin": "US25754A2015",
+          "wkn": "A0B6VQ",
+          "ticker": "DPZ"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "COSTCO WHOLESALE CORP",
+          "isin": "US22160K1051",
+          "wkn": "888351",
+          "ticker": "COST"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ARM HOLDINGS PLC-ADR",
+          "isin": "US0420682058",
+          "wkn": "653400472",
+          "ticker": "ARM"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BWX TECHNOLOGIES INC",
+          "isin": "US05605H1005",
+          "wkn": "A14V4U",
+          "ticker": "BWXT"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "PARKER HANNIFIN CORP",
+          "isin": "US7010941042",
+          "wkn": "855950",
+          "ticker": "PH"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "LENNOX INTL INC",
+          "isin": "US5261071071",
+          "wkn": "924838",
+          "ticker": "LII"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "IBERDROLA SA.",
+          "isin": "ES0144580Y14",
+          "wkn": "A0M46B",
+          "ticker": "IBE1.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "KKR \u0026 CO INC",
+          "isin": "US48251W1045",
+          "wkn": "A2LQV6",
+          "ticker": "KKR"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SHERWIN-WILLIAMS CO/THE",
+          "isin": "US8243481061",
+          "wkn": "856050",
+          "ticker": "SHW"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BLACKSTONE INC",
+          "isin": "US09260D1072",
+          "wkn": "372834689",
+          "ticker": "BX"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALBEMARLE CORP",
+          "isin": "US0126531013",
+          "wkn": "4347",
+          "ticker": "ALB"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "JPMORGAN CHASE \u0026 CO",
+          "isin": "US46625H1005",
+          "wkn": "1520593",
+          "ticker": "JPM"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALZCHEM GROUP AG",
+          "isin": "DE000A2YNT30",
+          "wkn": "373291272",
+          "ticker": "ACT.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MONGODB INC",
+          "isin": "US60937P1066",
+          "wkn": "292833239",
+          "ticker": "MDB"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "GENERAL ELECTRIC",
+          "isin": "US3696043013",
+          "wkn": "498843743",
+          "ticker": "GE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktien"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "10XDNA - DISRUPTIVE TECHNOLOGIE",
+          "isin": "DE000DNA10X3",
+          "wkn": "DNA10X",
+          "ticker": "10XDNA"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Aktienfonds"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NVIDIA VONTOBEL TURBOC O.END",
+          "isin": "DE000VP6KLX0",
+          "wkn": "VP6KLX"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Hebelscheine"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Amazon UBS TurboC O.End",
+          "isin": "DE000UD9BG09",
+          "wkn": "UD9BG0"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Hebelscheine"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Apple UBS Open End Turbo Call Option",
+          "isin": "DE000UE0D2M2",
+          "wkn": "UE0D2M"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Hebelscheine"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NVIDIA Vontobel TurboC O.End 268,88",
+          "isin": "DE000VX232F5",
+          "wkn": "VX232F"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Hebelscheine"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Bitcoin EUR",
+          "ticker": "BTC-EUR"
+        },
+        "categories": [
+          {
+            "path": [
+              "Risikobehafteter Portfolioteil",
+              "Krypto"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DebBeKa Tagesgeld"
+        },
+        "categories": [
+          {
+            "key": "K002",
+            "path": [
+              "Risikofreier Portfolioteil"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DKB"
+        },
+        "categories": [
+          {
+            "key": "K002",
+            "path": [
+              "Risikofreier Portfolioteil"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DKB Tagesgeld"
+        },
+        "categories": [
+          {
+            "key": "K002",
+            "path": [
+              "Risikofreier Portfolioteil"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Finanzen.net Zero"
+        },
+        "categories": [
+          {
+            "key": "K002",
+            "path": [
+              "Risikofreier Portfolioteil"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TF Bank Tagesgeld"
+        },
+        "categories": [
+          {
+            "key": "K002",
+            "path": [
+              "Risikofreier Portfolioteil"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Leaseplan Tagesgeld"
+        },
+        "categories": [
+          {
+            "key": "K002",
+            "path": [
+              "Risikofreier Portfolioteil"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Klarna Festgeld"
+        },
+        "categories": [
+          {
+            "key": "K002",
+            "path": [
+              "Risikofreier Portfolioteil"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "CapTrader Anker EUR"
+        },
+        "categories": [
+          {
+            "key": "K002",
+            "path": [
+              "Risikofreier Portfolioteil"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Captrader Anker USD"
+        },
+        "categories": [
+          {
+            "key": "K002",
+            "path": [
+              "Risikofreier Portfolioteil"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Captrader Anker CAD"
+        },
+        "categories": [
+          {
+            "key": "K002",
+            "path": [
+              "Risikofreier Portfolioteil"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Captrader Anker JPY"
+        },
+        "categories": [
+          {
+            "key": "K002",
+            "path": [
+              "Risikofreier Portfolioteil"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Captrader Spass USD"
+        },
+        "categories": [
+          {
+            "key": "K002",
+            "path": [
+              "Risikofreier Portfolioteil"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Computershare"
+        },
+        "categories": [
+          {
+            "key": "K002",
+            "path": [
+              "Risikofreier Portfolioteil"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Captrader Spass EUR"
+        },
+        "categories": [
+          {
+            "key": "K002",
+            "path": [
+              "Risikofreier Portfolioteil"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "X EUR OVERNIGHT RATE SWAP 1C",
+          "isin": "LU0290358497",
+          "wkn": "DBX0AN",
+          "ticker": "XEON.DE"
+        },
+        "categories": [
+          {
+            "key": "K002",
+            "path": [
+              "Risikofreier Portfolioteil"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Captrader Anker CHF"
+        },
+        "categories": [
+          {
+            "key": "K002",
+            "path": [
+              "Risikofreier Portfolioteil"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Gold Future",
+          "ticker": "GC\u003dF"
+        },
+        "categories": [
+          {
+            "key": "K002",
+            "path": [
+              "Risikofreier Portfolioteil"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "X IE PHYSICAL GOLD ETC",
+          "isin": "DE000A2T0VU5",
+          "wkn": "424741055",
+          "ticker": "XGDU.DE"
+        },
+        "categories": [
+          {
+            "key": "K002",
+            "path": [
+              "Risikofreier Portfolioteil"
+            ],
+            "weight": 100.0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Depotart",
+    "color": "#8df7eb",
+    "categories": [
+      {
+        "name": "Ankerdepot",
+        "color": "#c9eec2"
+      },
+      {
+        "name": "Spaßdepot",
+        "color": "#c1a0e4"
+      },
+      {
+        "name": "ETFs",
+        "color": "#818e7f"
+      },
+      {
+        "name": "Cash",
+        "color": "#e79bdd"
+      },
+      {
+        "name": "Rohstoffe",
+        "color": "#8881b6"
+      }
+    ],
+    "instruments": [
+      {
+        "identifiers": {
+          "name": "Apple",
+          "isin": "US0378331005",
+          "wkn": "865985",
+          "ticker": "APC.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ASML Holding",
+          "isin": "NL0010273215",
+          "wkn": "A1J4U4",
+          "ticker": "ASME.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "CHURCH + DWIGHT",
+          "isin": "US1713401024",
+          "wkn": "864371",
+          "ticker": "CHD"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "UNITEDHEALTH GROUP DL-,01",
+          "isin": "US91324P1021",
+          "wkn": "869561",
+          "ticker": "UNH"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NVIDIA",
+          "isin": "US67066G1040",
+          "wkn": "918422",
+          "ticker": "NVD.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "APPLE INC.",
+          "isin": "US0378331005",
+          "wkn": "865985",
+          "ticker": "AAPL"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALPHABET INC-CL A",
+          "isin": "US02079K3059",
+          "wkn": "208813719",
+          "ticker": "GOOGL"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ENCAVIS AG",
+          "isin": "DE0006095003",
+          "wkn": "32837336",
+          "ticker": "ECV.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "HOME DEPOT INC",
+          "isin": "US4370761029",
+          "wkn": "866953",
+          "ticker": "HD"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALIMENTATION COUCHE-TARD INC OLD",
+          "isin": "CA01626P3043",
+          "wkn": "14888503",
+          "ticker": "ATD.TO"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AMPHENOL CORP-CL A",
+          "isin": "US0320951017",
+          "wkn": "882749",
+          "ticker": "APH"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NEXSTAR MEDIA GROUP INC-CL A",
+          "isin": "US65336K1034",
+          "wkn": "26904818",
+          "ticker": "NXST"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NEXTERA ENERGY INC",
+          "isin": "US65339F1012",
+          "wkn": "A1CZ4H",
+          "ticker": "NEE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "THERMO FISHER SCIENTIFIC INC",
+          "isin": "US8835561023",
+          "wkn": "857209",
+          "ticker": "TMO"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "UNION PACIFIC CORP",
+          "isin": "US9078181081",
+          "wkn": "13284",
+          "ticker": "UNP"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NISSAN CHEMICAL CORP",
+          "isin": "JP3670800006",
+          "wkn": "13905418",
+          "ticker": "4021.T"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AMERICAN STATES WATER CO",
+          "isin": "US0298991011",
+          "wkn": "881720",
+          "ticker": "AWR"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AUTOMATIC DATA PROCESSING",
+          "isin": "US0530151036",
+          "wkn": "4661",
+          "ticker": "ADP"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MSCI INC",
+          "isin": "US55354G1004",
+          "wkn": "A0M63R",
+          "ticker": "MSCI"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AMERICAN TOWER CORP",
+          "isin": "US03027X1000",
+          "wkn": "A1JRLA",
+          "ticker": "AMT"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SIKA AG-REG",
+          "isin": "CH0418792922",
+          "wkn": "A2JNV8",
+          "ticker": "SIKA.SW"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "LINDE PLC",
+          "isin": "IE000S9YS762",
+          "wkn": "338719530",
+          "ticker": "LIN"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "VISA INC-CLASS A SHARES",
+          "isin": "US92826C8394",
+          "wkn": "A0NC7B",
+          "ticker": "V"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALIMENTATION COUCHE-TARD INC",
+          "isin": "CA01626P1484",
+          "wkn": "583257700",
+          "ticker": "ATD.TO"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ROLLINS INC",
+          "isin": "US7757111049",
+          "wkn": "859002",
+          "ticker": "ROL"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "EDP RENOVAVEIS SA",
+          "isin": "ES0127797019",
+          "wkn": "51689221",
+          "ticker": "EDPR.LS"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "OLD DOMINION FREIGHT LINE",
+          "isin": "US6795801009",
+          "wkn": "923655",
+          "ticker": "ODFL"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MICROSOFT CORP",
+          "isin": "US5949181045",
+          "wkn": "870747",
+          "ticker": "MSFT"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALPHABET INC-CL C",
+          "isin": "US02079K1079",
+          "wkn": "A14Y6H",
+          "ticker": "GOOG"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "COPART INC",
+          "isin": "US2172041061",
+          "wkn": "893807",
+          "ticker": "CPRT"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "HERMES INTL",
+          "isin": "FR0000052292",
+          "wkn": "886670",
+          "ticker": "RMS.PA"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BROADCOM INC",
+          "isin": "US11135F1012",
+          "wkn": "A2JG9Z",
+          "ticker": "AVGO"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "IBERDROLA SA.",
+          "isin": "ES0144580Y14",
+          "wkn": "A0M46B",
+          "ticker": "IBE1.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALZCHEM GROUP AG",
+          "isin": "DE000A2YNT30",
+          "wkn": "373291272",
+          "ticker": "ACT.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "PARKER HANNIFIN CORP",
+          "isin": "US7010941042",
+          "wkn": "855950",
+          "ticker": "PH"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "L\u0026G GERD KOMMER ACC ETF",
+          "isin": "IE0001UQQ933",
+          "wkn": "WELT0A",
+          "ticker": "GERD.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Ankerdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "IBM",
+          "isin": "US4592001014",
+          "wkn": "851399",
+          "ticker": "IBM"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "JD.COM",
+          "isin": "US47215P1066",
+          "wkn": "A112ST",
+          "ticker": "JD"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NIO",
+          "isin": "US62914V1061",
+          "wkn": "A2N4PB",
+          "ticker": "NIO"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Sartorius AG VZ",
+          "isin": "DE0007165631",
+          "wkn": "716563",
+          "ticker": "SRT3.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TUI AG",
+          "isin": "DE000TUAG000",
+          "wkn": "TUAG00",
+          "ticker": "TUI1"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TESLA EUR",
+          "isin": "US88160R1014",
+          "wkn": "A1CX3T",
+          "ticker": "TL0.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Deutsche Lufthansa AG",
+          "isin": "DE0008232125",
+          "wkn": "823212",
+          "ticker": "LHA.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "PVA TEPLA AG O.N.",
+          "isin": "DE0007461006",
+          "wkn": "746100",
+          "ticker": "TPE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AMAZON.COM INC",
+          "isin": "US0231351067",
+          "wkn": "906866",
+          "ticker": "AMZN"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "FIRST SOLAR INC",
+          "isin": "US3364331070",
+          "wkn": "41622169",
+          "ticker": "FSLR"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "PAYPAL HOLDINGS INC",
+          "isin": "US70450Y1038",
+          "wkn": "A14R7U",
+          "ticker": "PYPL"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BANCFIRST CORP",
+          "isin": "US05945F1030",
+          "wkn": "266611",
+          "ticker": "BANF"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BOOKING HOLDINGS INC",
+          "isin": "US09857L1089",
+          "wkn": "308728373",
+          "ticker": "BKNG"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DELIVERY HERO SE",
+          "isin": "DE000A2E4K43",
+          "wkn": "281129632",
+          "ticker": "DHER.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MERIDIAN BIOSCIENCE INC",
+          "isin": "US5895841014",
+          "wkn": "270952",
+          "ticker": "VIVO"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "GERON CORP",
+          "isin": "US3741631036",
+          "wkn": "4812254",
+          "ticker": "GERN"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MGP INGREDIENTS INC",
+          "isin": "US55303J1060",
+          "wkn": "99990497",
+          "ticker": "MGPI"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SAREPTA THERAPEUTICS INC",
+          "isin": "US8036071004",
+          "wkn": "110434131",
+          "ticker": "SRPT"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NETFLIX INC",
+          "isin": "US64110L1061",
+          "wkn": "552484",
+          "ticker": "NFLX"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BANK OF AMERICA CORP",
+          "isin": "US0605051046",
+          "wkn": "10098",
+          "ticker": "BAC"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "VERU INC",
+          "isin": "US92536C1036",
+          "wkn": "285043314",
+          "ticker": "VERU"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SANMINA CORP",
+          "isin": "US8010561020",
+          "wkn": "117032813",
+          "ticker": "SANM"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ADVANCED MICRO DEVICES",
+          "isin": "US0079031078",
+          "wkn": "863186",
+          "ticker": "AMD"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AGILENT TECHNOLOGIES INC",
+          "isin": "US00846U1016",
+          "wkn": "1715006",
+          "ticker": "A"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BURLINGTON STORES INC",
+          "isin": "US1220171060",
+          "wkn": "135699190",
+          "ticker": "BURL"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TESLA USD",
+          "isin": "US88160R1014",
+          "wkn": "A1CX3T",
+          "ticker": "TSLA"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "META PLATFORMS INC-CLASS A",
+          "isin": "US30303M1027",
+          "wkn": "A1JWVX",
+          "ticker": "META"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DUOLINGO",
+          "isin": "US26603R1068",
+          "wkn": "505002183",
+          "ticker": "DUOL"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "UBER TECHNOLOGIES INC",
+          "isin": "US90353T1007",
+          "wkn": "A2PHHG",
+          "ticker": "UBER"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NVIDIA Corporation",
+          "ticker": "NVDA"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ADOBE INC",
+          "isin": "US00724F1012",
+          "wkn": "871981",
+          "ticker": "ADBE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ELI LILLY \u0026 CO",
+          "isin": "US5324571083",
+          "wkn": "858560",
+          "ticker": "LLY"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "KLA CORP",
+          "isin": "US4824801009",
+          "wkn": "865884",
+          "ticker": "KLAC"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "PALANTIR TECHNOLOGIES INC-A",
+          "isin": "US69608A1088",
+          "wkn": "A2QA4J",
+          "ticker": "PLTR"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SAP SE",
+          "isin": "DE0007164600",
+          "wkn": "716460",
+          "ticker": "SAP.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "INTEL CORP",
+          "isin": "US4581401001",
+          "wkn": "855681",
+          "ticker": "INTC"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TAIWAN SEMICONDUCTOR-SP ADR",
+          "isin": "US8740391003",
+          "wkn": "909800",
+          "ticker": "TSM"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DOMINO\u0027S PIZZA INC",
+          "isin": "US25754A2015",
+          "wkn": "A0B6VQ",
+          "ticker": "DPZ"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "COSTCO WHOLESALE CORP",
+          "isin": "US22160K1051",
+          "wkn": "888351",
+          "ticker": "COST"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ARM HOLDINGS PLC-ADR",
+          "isin": "US0420682058",
+          "wkn": "653400472",
+          "ticker": "ARM"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BWX TECHNOLOGIES INC",
+          "isin": "US05605H1005",
+          "wkn": "A14V4U",
+          "ticker": "BWXT"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "LENNOX INTL INC",
+          "isin": "US5261071071",
+          "wkn": "924838",
+          "ticker": "LII"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "KKR \u0026 CO INC",
+          "isin": "US48251W1045",
+          "wkn": "A2LQV6",
+          "ticker": "KKR"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SHERWIN-WILLIAMS CO/THE",
+          "isin": "US8243481061",
+          "wkn": "856050",
+          "ticker": "SHW"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BLACKSTONE INC",
+          "isin": "US09260D1072",
+          "wkn": "372834689",
+          "ticker": "BX"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALBEMARLE CORP",
+          "isin": "US0126531013",
+          "wkn": "4347",
+          "ticker": "ALB"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "JPMORGAN CHASE \u0026 CO",
+          "isin": "US46625H1005",
+          "wkn": "1520593",
+          "ticker": "JPM"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MONGODB INC",
+          "isin": "US60937P1066",
+          "wkn": "292833239",
+          "ticker": "MDB"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SMA SOLAR TECHNOLOGY AG",
+          "isin": "DE000A0DJ6J9",
+          "wkn": "52164436",
+          "ticker": "S92.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "GENERAL ELECTRIC",
+          "isin": "US3696043013",
+          "wkn": "498843743",
+          "ticker": "GE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Spaßdepot"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MSCI World ISHS- DL D",
+          "isin": "IE00B0M62Q58",
+          "wkn": "A0HGV0",
+          "ticker": "IQQW.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MSCI World iShsII-DJ Gl.Sustain.Scr.U.ETF Registered Shs USD (Acc) o.N.",
+          "isin": "IE00B57X3V84",
+          "wkn": "A1H7ZT",
+          "ticker": "IUSL.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MSCI World ISHSIII-CORE DLA",
+          "isin": "IE00B4L5Y983",
+          "wkn": "A0RPWH",
+          "ticker": "EUNL.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MSCI World Xtr.(IE) -  Registered Shares",
+          "isin": "IE00BJ0KDQ92",
+          "wkn": "A1XB5U",
+          "ticker": "XDWD.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "S\u0026P 500 Vanguard UCITS ETF Reg. Shs USD Acc. oN",
+          "isin": "IE00BFMXXD54",
+          "wkn": "A2PFN2",
+          "ticker": "VUAA.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "UBS MSCI World Soc. Resp. ACC",
+          "isin": "LU0950674332",
+          "wkn": "A1W3CQ",
+          "ticker": "SEAC.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Vanguard FTSE All-World U.ETF Reg. Shs USD Acc. oN",
+          "isin": "IE00BK5BQT80",
+          "wkn": "A2PKXG"
+        },
+        "categories": [
+          {
+            "path": [
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "iShsII-Gl.Clean Energy U.ETF Registered Shares o.N.",
+          "isin": "IE00B1XNHC34",
+          "wkn": "A0MW0M",
+          "ticker": "IQQH.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AIS-AMUNDI S+P500UETF EOC",
+          "isin": "LU1681048804",
+          "wkn": "A2H573",
+          "ticker": "AUM5.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "X MSCI WORLD MOMENTUM 1C",
+          "isin": "IE00BL25JP72",
+          "wkn": "167234535",
+          "ticker": "XDEM.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "X EUR CORPORATE BOND",
+          "isin": "LU0478205379",
+          "ticker": "D5BG.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Vanguard World High Dividend Yield",
+          "isin": "IE00B8GKDB10",
+          "ticker": "VGWD.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "X EUR OVERNIGHT RATE SWAP 1C",
+          "isin": "LU0290358497",
+          "wkn": "DBX0AN",
+          "ticker": "XEON.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "ETFs"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DebBeKa Tagesgeld"
+        },
+        "categories": [
+          {
+            "path": [
+              "Cash"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DKB"
+        },
+        "categories": [
+          {
+            "path": [
+              "Cash"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DKB Tagesgeld"
+        },
+        "categories": [
+          {
+            "path": [
+              "Cash"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Finanzen.net Zero"
+        },
+        "categories": [
+          {
+            "path": [
+              "Cash"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Klarna Festgeld"
+        },
+        "categories": [
+          {
+            "path": [
+              "Cash"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Leaseplan Tagesgeld"
+        },
+        "categories": [
+          {
+            "path": [
+              "Cash"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TF Bank Tagesgeld"
+        },
+        "categories": [
+          {
+            "path": [
+              "Cash"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "CapTrader Anker EUR"
+        },
+        "categories": [
+          {
+            "path": [
+              "Cash"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Captrader Anker USD"
+        },
+        "categories": [
+          {
+            "path": [
+              "Cash"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Captrader Anker CAD"
+        },
+        "categories": [
+          {
+            "path": [
+              "Cash"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Captrader Anker JPY"
+        },
+        "categories": [
+          {
+            "path": [
+              "Cash"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Captrader Spass USD"
+        },
+        "categories": [
+          {
+            "path": [
+              "Cash"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Computershare"
+        },
+        "categories": [
+          {
+            "path": [
+              "Cash"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Captrader Spass EUR"
+        },
+        "categories": [
+          {
+            "path": [
+              "Cash"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Gold Future",
+          "ticker": "GC\u003dF"
+        },
+        "categories": [
+          {
+            "path": [
+              "Rohstoffe"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "X IE PHYSICAL GOLD ETC",
+          "isin": "DE000A2T0VU5",
+          "wkn": "424741055",
+          "ticker": "XGDU.DE"
+        },
+        "categories": [
+          {
+            "path": [
+              "Rohstoffe"
+            ],
+            "weight": 100.0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Branchen (GICS, Sektoren)",
+    "color": "#cb9afc",
+    "categories": [
+      {
+        "name": "Energie",
+        "key": "10",
+        "color": "#b3d743"
+      },
+      {
+        "name": "Roh-, Hilfs- \u0026 Betriebsstoffe",
+        "key": "15",
+        "color": "#62d743"
+      },
+      {
+        "name": "Industrie",
+        "key": "20",
+        "color": "#43d774"
+      },
+      {
+        "name": "Nicht-Basiskonsumgüter",
+        "key": "25",
+        "color": "#43d7c5"
+      },
+      {
+        "name": "Basiskonsumgüter",
+        "key": "30",
+        "color": "#4398d7"
+      },
+      {
+        "name": "Gesundheitswesen",
+        "key": "35",
+        "color": "#4347d7"
+      },
+      {
+        "name": "Finanzwesen",
+        "key": "40",
+        "color": "#8f43d7"
+      },
+      {
+        "name": "Informationstechnologie",
+        "key": "45",
+        "color": "#d743ce"
+      },
+      {
+        "name": "Kommunikationsdienste",
+        "key": "50",
+        "color": "#d7437d"
+      },
+      {
+        "name": "Versorgungsbetriebe",
+        "key": "55",
+        "color": "#d75943"
+      },
+      {
+        "name": "Immobilien",
+        "key": "60",
+        "color": "#d7aa43"
+      }
+    ],
+    "instruments": [
+      {
+        "identifiers": {
+          "name": "ENCAVIS AG",
+          "isin": "DE0006095003",
+          "wkn": "32837336",
+          "ticker": "ECV.DE"
+        },
+        "categories": [
+          {
+            "key": "10",
+            "path": [
+              "Energie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NEXTERA ENERGY INC",
+          "isin": "US65339F1012",
+          "wkn": "A1CZ4H",
+          "ticker": "NEE"
+        },
+        "categories": [
+          {
+            "key": "10",
+            "path": [
+              "Energie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "FIRST SOLAR INC",
+          "isin": "US3364331070",
+          "wkn": "41622169",
+          "ticker": "FSLR"
+        },
+        "categories": [
+          {
+            "key": "10",
+            "path": [
+              "Energie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "iShsII-Gl.Clean Energy U.ETF Registered Shares o.N.",
+          "isin": "IE00B1XNHC34",
+          "wkn": "A0MW0M",
+          "ticker": "IQQH.DE"
+        },
+        "categories": [
+          {
+            "key": "10",
+            "path": [
+              "Energie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SMA SOLAR TECHNOLOGY AG",
+          "isin": "DE000A0DJ6J9",
+          "wkn": "52164436",
+          "ticker": "S92.DE"
+        },
+        "categories": [
+          {
+            "key": "10",
+            "path": [
+              "Energie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "EDP RENOVAVEIS SA",
+          "isin": "ES0127797019",
+          "wkn": "51689221",
+          "ticker": "EDPR.LS"
+        },
+        "categories": [
+          {
+            "key": "10",
+            "path": [
+              "Energie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BWX TECHNOLOGIES INC",
+          "isin": "US05605H1005",
+          "wkn": "A14V4U",
+          "ticker": "BWXT"
+        },
+        "categories": [
+          {
+            "key": "10",
+            "path": [
+              "Energie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "IBERDROLA SA.",
+          "isin": "ES0144580Y14",
+          "wkn": "A0M46B",
+          "ticker": "IBE1.DE"
+        },
+        "categories": [
+          {
+            "key": "10",
+            "path": [
+              "Energie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NISSAN CHEMICAL CORP",
+          "isin": "JP3670800006",
+          "wkn": "13905418",
+          "ticker": "4021.T"
+        },
+        "categories": [
+          {
+            "key": "15",
+            "path": [
+              "Roh-, Hilfs- \u0026 Betriebsstoffe"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SIKA AG-REG",
+          "isin": "CH0418792922",
+          "wkn": "A2JNV8",
+          "ticker": "SIKA.SW"
+        },
+        "categories": [
+          {
+            "key": "15",
+            "path": [
+              "Roh-, Hilfs- \u0026 Betriebsstoffe"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALZCHEM GROUP AG",
+          "isin": "DE000A2YNT30",
+          "wkn": "373291272",
+          "ticker": "ACT.DE"
+        },
+        "categories": [
+          {
+            "key": "15",
+            "path": [
+              "Roh-, Hilfs- \u0026 Betriebsstoffe"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ROLLINS INC",
+          "isin": "US7757111049",
+          "wkn": "859002",
+          "ticker": "ROL"
+        },
+        "categories": [
+          {
+            "key": "15",
+            "path": [
+              "Roh-, Hilfs- \u0026 Betriebsstoffe"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "X IE PHYSICAL GOLD ETC",
+          "isin": "DE000A2T0VU5",
+          "wkn": "424741055",
+          "ticker": "XGDU.DE"
+        },
+        "categories": [
+          {
+            "key": "15",
+            "path": [
+              "Roh-, Hilfs- \u0026 Betriebsstoffe"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AMPHENOL CORP-CL A",
+          "isin": "US0320951017",
+          "wkn": "882749",
+          "ticker": "APH"
+        },
+        "categories": [
+          {
+            "key": "20",
+            "path": [
+              "Industrie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Deutsche Lufthansa AG",
+          "isin": "DE0008232125",
+          "wkn": "823212",
+          "ticker": "LHA.DE"
+        },
+        "categories": [
+          {
+            "key": "20",
+            "path": [
+              "Industrie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AUTOMATIC DATA PROCESSING",
+          "isin": "US0530151036",
+          "wkn": "4661",
+          "ticker": "ADP"
+        },
+        "categories": [
+          {
+            "key": "20",
+            "path": [
+              "Industrie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "UNION PACIFIC CORP",
+          "isin": "US9078181081",
+          "wkn": "13284",
+          "ticker": "UNP"
+        },
+        "categories": [
+          {
+            "key": "20",
+            "path": [
+              "Industrie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "OLD DOMINION FREIGHT LINE",
+          "isin": "US6795801009",
+          "wkn": "923655",
+          "ticker": "ODFL"
+        },
+        "categories": [
+          {
+            "key": "20",
+            "path": [
+              "Industrie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "PARKER HANNIFIN CORP",
+          "isin": "US7010941042",
+          "wkn": "855950",
+          "ticker": "PH"
+        },
+        "categories": [
+          {
+            "key": "20",
+            "path": [
+              "Industrie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "LENNOX INTL INC",
+          "isin": "US5261071071",
+          "wkn": "924838",
+          "ticker": "LII"
+        },
+        "categories": [
+          {
+            "key": "20",
+            "path": [
+              "Industrie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SHERWIN-WILLIAMS CO/THE",
+          "isin": "US8243481061",
+          "wkn": "856050",
+          "ticker": "SHW"
+        },
+        "categories": [
+          {
+            "key": "20",
+            "path": [
+              "Industrie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "GENERAL ELECTRIC",
+          "isin": "US3696043013",
+          "wkn": "498843743",
+          "ticker": "GE"
+        },
+        "categories": [
+          {
+            "key": "20",
+            "path": [
+              "Industrie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "HOME DEPOT INC",
+          "isin": "US4370761029",
+          "wkn": "866953",
+          "ticker": "HD"
+        },
+        "categories": [
+          {
+            "key": "25",
+            "path": [
+              "Nicht-Basiskonsumgüter"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TUI AG",
+          "isin": "DE000TUAG000",
+          "wkn": "TUAG00",
+          "ticker": "TUI1"
+        },
+        "categories": [
+          {
+            "key": "25",
+            "path": [
+              "Nicht-Basiskonsumgüter"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NEXSTAR MEDIA GROUP INC-CL A",
+          "isin": "US65336K1034",
+          "wkn": "26904818",
+          "ticker": "NXST"
+        },
+        "categories": [
+          {
+            "key": "25",
+            "path": [
+              "Nicht-Basiskonsumgüter"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "JD.COM",
+          "isin": "US47215P1066",
+          "wkn": "A112ST",
+          "ticker": "JD"
+        },
+        "categories": [
+          {
+            "key": "25",
+            "path": [
+              "Nicht-Basiskonsumgüter"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TESLA EUR",
+          "isin": "US88160R1014",
+          "wkn": "A1CX3T",
+          "ticker": "TL0.DE"
+        },
+        "categories": [
+          {
+            "key": "25",
+            "path": [
+              "Nicht-Basiskonsumgüter"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NIO",
+          "isin": "US62914V1061",
+          "wkn": "A2N4PB",
+          "ticker": "NIO"
+        },
+        "categories": [
+          {
+            "key": "25",
+            "path": [
+              "Nicht-Basiskonsumgüter"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALIMENTATION COUCHE-TARD INC",
+          "isin": "CA01626P1484",
+          "wkn": "583257700",
+          "ticker": "ATD.TO"
+        },
+        "categories": [
+          {
+            "key": "25",
+            "path": [
+              "Nicht-Basiskonsumgüter"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BURLINGTON STORES INC",
+          "isin": "US1220171060",
+          "wkn": "135699190",
+          "ticker": "BURL"
+        },
+        "categories": [
+          {
+            "key": "25",
+            "path": [
+              "Nicht-Basiskonsumgüter"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TESLA USD",
+          "isin": "US88160R1014",
+          "wkn": "A1CX3T",
+          "ticker": "TSLA"
+        },
+        "categories": [
+          {
+            "key": "25",
+            "path": [
+              "Nicht-Basiskonsumgüter"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DUOLINGO",
+          "isin": "US26603R1068",
+          "wkn": "505002183",
+          "ticker": "DUOL"
+        },
+        "categories": [
+          {
+            "key": "25",
+            "path": [
+              "Nicht-Basiskonsumgüter"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "UBER TECHNOLOGIES INC",
+          "isin": "US90353T1007",
+          "wkn": "A2PHHG",
+          "ticker": "UBER"
+        },
+        "categories": [
+          {
+            "key": "25",
+            "path": [
+              "Nicht-Basiskonsumgüter"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "HERMES INTL",
+          "isin": "FR0000052292",
+          "wkn": "886670",
+          "ticker": "RMS.PA"
+        },
+        "categories": [
+          {
+            "key": "25",
+            "path": [
+              "Nicht-Basiskonsumgüter"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALIMENTATION COUCHE-TARD INC OLD",
+          "isin": "CA01626P3043",
+          "wkn": "14888503",
+          "ticker": "ATD.TO"
+        },
+        "categories": [
+          {
+            "key": "30",
+            "path": [
+              "Basiskonsumgüter"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "CHURCH + DWIGHT",
+          "isin": "US1713401024",
+          "wkn": "864371",
+          "ticker": "CHD"
+        },
+        "categories": [
+          {
+            "key": "30",
+            "path": [
+              "Basiskonsumgüter"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "COPART INC",
+          "isin": "US2172041061",
+          "wkn": "893807",
+          "ticker": "CPRT"
+        },
+        "categories": [
+          {
+            "key": "30",
+            "path": [
+              "Basiskonsumgüter"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "DOMINO\u0027S PIZZA INC",
+          "isin": "US25754A2015",
+          "wkn": "A0B6VQ",
+          "ticker": "DPZ"
+        },
+        "categories": [
+          {
+            "key": "30",
+            "path": [
+              "Basiskonsumgüter"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "COSTCO WHOLESALE CORP",
+          "isin": "US22160K1051",
+          "wkn": "888351",
+          "ticker": "COST"
+        },
+        "categories": [
+          {
+            "key": "30",
+            "path": [
+              "Basiskonsumgüter"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "Sartorius AG VZ",
+          "isin": "DE0007165631",
+          "wkn": "716563",
+          "ticker": "SRT3.DE"
+        },
+        "categories": [
+          {
+            "key": "35",
+            "path": [
+              "Gesundheitswesen"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "THERMO FISHER SCIENTIFIC INC",
+          "isin": "US8835561023",
+          "wkn": "857209",
+          "ticker": "TMO"
+        },
+        "categories": [
+          {
+            "key": "35",
+            "path": [
+              "Gesundheitswesen"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "UNITEDHEALTH GROUP DL-,01",
+          "isin": "US91324P1021",
+          "wkn": "869561",
+          "ticker": "UNH"
+        },
+        "categories": [
+          {
+            "key": "35",
+            "path": [
+              "Gesundheitswesen"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SAREPTA THERAPEUTICS INC",
+          "isin": "US8036071004",
+          "wkn": "110434131",
+          "ticker": "SRPT"
+        },
+        "categories": [
+          {
+            "key": "35",
+            "path": [
+              "Gesundheitswesen"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "VERU INC",
+          "isin": "US92536C1036",
+          "wkn": "285043314",
+          "ticker": "VERU"
+        },
+        "categories": [
+          {
+            "key": "35",
+            "path": [
+              "Gesundheitswesen"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ELI LILLY \u0026 CO",
+          "isin": "US5324571083",
+          "wkn": "858560",
+          "ticker": "LLY"
+        },
+        "categories": [
+          {
+            "key": "35",
+            "path": [
+              "Gesundheitswesen"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALBEMARLE CORP",
+          "isin": "US0126531013",
+          "wkn": "4347",
+          "ticker": "ALB"
+        },
+        "categories": [
+          {
+            "key": "35",
+            "path": [
+              "Gesundheitswesen"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MSCI INC",
+          "isin": "US55354G1004",
+          "wkn": "A0M63R",
+          "ticker": "MSCI"
+        },
+        "categories": [
+          {
+            "key": "40",
+            "path": [
+              "Finanzwesen"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "PAYPAL HOLDINGS INC",
+          "isin": "US70450Y1038",
+          "wkn": "A14R7U",
+          "ticker": "PYPL"
+        },
+        "categories": [
+          {
+            "key": "40",
+            "path": [
+              "Finanzwesen"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "VISA INC-CLASS A SHARES",
+          "isin": "US92826C8394",
+          "wkn": "A0NC7B",
+          "ticker": "V"
+        },
+        "categories": [
+          {
+            "key": "40",
+            "path": [
+              "Finanzwesen"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BANK OF AMERICA CORP",
+          "isin": "US0605051046",
+          "wkn": "10098",
+          "ticker": "BAC"
+        },
+        "categories": [
+          {
+            "key": "40",
+            "path": [
+              "Finanzwesen"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "X EUR OVERNIGHT RATE SWAP 1C",
+          "isin": "LU0290358497",
+          "wkn": "DBX0AN",
+          "ticker": "XEON.DE"
+        },
+        "categories": [
+          {
+            "key": "40",
+            "path": [
+              "Finanzwesen"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "KKR \u0026 CO INC",
+          "isin": "US48251W1045",
+          "wkn": "A2LQV6",
+          "ticker": "KKR"
+        },
+        "categories": [
+          {
+            "key": "40",
+            "path": [
+              "Finanzwesen"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BLACKSTONE INC",
+          "isin": "US09260D1072",
+          "wkn": "372834689",
+          "ticker": "BX"
+        },
+        "categories": [
+          {
+            "key": "40",
+            "path": [
+              "Finanzwesen"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "JPMORGAN CHASE \u0026 CO",
+          "isin": "US46625H1005",
+          "wkn": "1520593",
+          "ticker": "JPM"
+        },
+        "categories": [
+          {
+            "key": "40",
+            "path": [
+              "Finanzwesen"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "APPLE INC.",
+          "isin": "US0378331005",
+          "wkn": "865985",
+          "ticker": "AAPL"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ASML Holding",
+          "isin": "NL0010273215",
+          "wkn": "A1J4U4",
+          "ticker": "ASME.DE"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NVIDIA",
+          "isin": "US67066G1040",
+          "wkn": "918422",
+          "ticker": "NVD.DE"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "IBM",
+          "isin": "US4592001014",
+          "wkn": "851399",
+          "ticker": "IBM"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AMAZON.COM INC",
+          "isin": "US0231351067",
+          "wkn": "906866",
+          "ticker": "AMZN"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SANMINA CORP",
+          "isin": "US8010561020",
+          "wkn": "117032813",
+          "ticker": "SANM"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ADVANCED MICRO DEVICES",
+          "isin": "US0079031078",
+          "wkn": "863186",
+          "ticker": "AMD"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AGILENT TECHNOLOGIES INC",
+          "isin": "US00846U1016",
+          "wkn": "1715006",
+          "ticker": "A"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "META PLATFORMS INC-CLASS A",
+          "isin": "US30303M1027",
+          "wkn": "A1JWVX",
+          "ticker": "META"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NVIDIA Corporation",
+          "ticker": "NVDA"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MICROSOFT CORP",
+          "isin": "US5949181045",
+          "wkn": "870747",
+          "ticker": "MSFT"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ADOBE INC",
+          "isin": "US00724F1012",
+          "wkn": "871981",
+          "ticker": "ADBE"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "KLA CORP",
+          "isin": "US4824801009",
+          "wkn": "865884",
+          "ticker": "KLAC"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "PALANTIR TECHNOLOGIES INC-A",
+          "isin": "US69608A1088",
+          "wkn": "A2QA4J",
+          "ticker": "PLTR"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "SAP SE",
+          "isin": "DE0007164600",
+          "wkn": "716460",
+          "ticker": "SAP.DE"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "INTEL CORP",
+          "isin": "US4581401001",
+          "wkn": "855681",
+          "ticker": "INTC"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "TAIWAN SEMICONDUCTOR-SP ADR",
+          "isin": "US8740391003",
+          "wkn": "909800",
+          "ticker": "TSM"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ARM HOLDINGS PLC-ADR",
+          "isin": "US0420682058",
+          "wkn": "653400472",
+          "ticker": "ARM"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "MONGODB INC",
+          "isin": "US60937P1066",
+          "wkn": "292833239",
+          "ticker": "MDB"
+        },
+        "categories": [
+          {
+            "key": "45",
+            "path": [
+              "Informationstechnologie"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALPHABET INC-CL A",
+          "isin": "US02079K3059",
+          "wkn": "208813719",
+          "ticker": "GOOGL"
+        },
+        "categories": [
+          {
+            "key": "50",
+            "path": [
+              "Kommunikationsdienste"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AMERICAN TOWER CORP",
+          "isin": "US03027X1000",
+          "wkn": "A1JRLA",
+          "ticker": "AMT"
+        },
+        "categories": [
+          {
+            "key": "50",
+            "path": [
+              "Kommunikationsdienste"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "NETFLIX INC",
+          "isin": "US64110L1061",
+          "wkn": "552484",
+          "ticker": "NFLX"
+        },
+        "categories": [
+          {
+            "key": "50",
+            "path": [
+              "Kommunikationsdienste"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "BROADCOM INC",
+          "isin": "US11135F1012",
+          "wkn": "A2JG9Z",
+          "ticker": "AVGO"
+        },
+        "categories": [
+          {
+            "key": "50",
+            "path": [
+              "Kommunikationsdienste"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "ALPHABET INC-CL C",
+          "isin": "US02079K1079",
+          "wkn": "A14Y6H",
+          "ticker": "GOOG"
+        },
+        "categories": [
+          {
+            "key": "50",
+            "path": [
+              "Kommunikationsdienste"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "AMERICAN STATES WATER CO",
+          "isin": "US0298991011",
+          "wkn": "881720",
+          "ticker": "AWR"
+        },
+        "categories": [
+          {
+            "key": "55",
+            "path": [
+              "Versorgungsbetriebe"
+            ],
+            "weight": 100.0
+          }
+        ]
+      },
+      {
+        "identifiers": {
+          "name": "LINDE PLC",
+          "isin": "IE000S9YS762",
+          "wkn": "338719530",
+          "ticker": "LIN"
+        },
+        "categories": [
+          {
+            "key": "55",
+            "path": [
+              "Versorgungsbetriebe"
+            ],
+            "weight": 100.0
+          }
+        ]
+      }
+    ]
+  }
+]

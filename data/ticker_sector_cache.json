@@ -1,0 +1,172 @@
+{
+  "AAPL": {
+    "sector": "Technology",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "MSFT": {
+    "sector": "Technology",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "NVDA": {
+    "sector": "Technology",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "GOOGL": {
+    "sector": "Technology",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "GOOG": {
+    "sector": "Technology",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "META": {
+    "sector": "Technology",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "TSLA": {
+    "sector": "Technology",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "AMZN": {
+    "sector": "Consumer Cyclical",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "AVGO": {
+    "sector": "Technology",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "JPM": {
+    "sector": "Financial Services",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "V": {
+    "sector": "Financial Services",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "JNJ": {
+    "sector": "Healthcare",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "WMT": {
+    "sector": "Consumer Staples",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "XOM": {
+    "sector": "Energy",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "ASML": {
+    "sector": "Technology",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "ARM": {
+    "sector": "Technology",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "MDB": {
+    "sector": "Technology",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "KLAC": {
+    "sector": "Technology",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "PLTR": {
+    "sector": "Technology",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "MSCI": {
+    "sector": "Financial Services",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "ODFL": {
+    "sector": "Industrials",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "PH": {
+    "sector": "Industrials",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "ALB": {
+    "sector": "Materials",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "LIN": {
+    "sector": "Materials",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "TMO": {
+    "sector": "Healthcare",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "HD": {
+    "sector": "Consumer Cyclical",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "GE": {
+    "sector": "Industrials",
+    "timestamp": "2026-02-04T20:00:00",
+    "source": "manual"
+  },
+  "BA": {
+    "sector": "Equity",
+    "timestamp": "2026-02-04T20:06:48.359657",
+    "source": "yahoo"
+  },
+  "XEON.DE": {
+    "sector": "Unknown",
+    "timestamp": "2026-02-04T20:06:58.481542",
+    "source": "unknown"
+  },
+  "EUNL.DE": {
+    "sector": "Unknown",
+    "timestamp": "2026-02-04T20:06:59.493774",
+    "source": "unknown"
+  },
+  "VGWD.DE": {
+    "sector": "Unknown",
+    "timestamp": "2026-02-04T20:07:25.779328",
+    "source": "unknown"
+  },
+  "GERD.DE": {
+    "sector": "Unknown",
+    "timestamp": "2026-02-04T20:07:26.992185",
+    "source": "unknown"
+  },
+  "GC=F": {
+    "sector": "Unknown",
+    "timestamp": "2026-02-04T20:07:28.225140",
+    "source": "unknown"
+  },
+  "AUM5.DE": {
+    "sector": "Unknown",
+    "timestamp": "2026-02-04T20:07:29.420792",
+    "source": "unknown"
+  }
+}

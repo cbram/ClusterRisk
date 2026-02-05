@@ -1,0 +1,24 @@
+METADATA
+ISIN,LU0290358497
+Name,Xtrackers II EUR Overnight Rate Swap UCITS ETF 1C
+Ticker,XEON
+Type,Money Market
+Region,Europe
+Currency,EUR
+TER,0.10
+
+COUNTRY_ALLOCATION
+Country,Weight
+EU,100.0
+
+SECTOR_ALLOCATION
+Sector,Weight
+Cash,100.0
+
+CURRENCY_ALLOCATION
+Currency,Weight
+EUR,100.0
+
+TOP_HOLDINGS
+Name,Weight,Currency,Sector,Industry,Country
+EUR Overnight Rate Swap,100.0,EUR,Cash,Money Market,EU

@@ -1,0 +1,598 @@
+# ClusterRisk - Technische Dokumentation
+
+Dieses Dokument beschreibt die technische Implementierung und Architektur von ClusterRisk.
+
+## Architektur-Übersicht
+
+```
+Portfolio Performance CSV
+         ↓
+    CSV Parser
+         ↓
+  Risk Calculator ←→ ETF Details Parser
+         ↓              ↓
+   Visualizer      (ETF-Detail-Dateien)
+         ↓
+   Streamlit App
+```
+
+## Datenfluss
+
+### 1. Input-Verarbeitung
+
+**Portfolio Performance CSV → `src/csv_parser.py`**
+
+Der CSV-Parser liest die Vermögensaufstellung aus Portfolio Performance:
+
+```python
+def parse_portfolio_csv(csv_path: str) -> Dict:
+    # Liest CSV mit deutschen Dezimaltrennern
+    # Extrahiert:
+    # - Positionen (Bestand, Name, Symbol, ISIN, Kurs, Marktwert)
+    # - Währung (aus Kurs-Feld extrahiert)
+    # - Sektor (aus PP Taxonomie, höchste Priorität)
+    # - Typ (Stock, ETF, Cash, Commodity)
+```
+
+**Wichtige Features:**
+- Erkennt Cash-Konten via Keywords ("Konto", "Cash") oder `Notiz`-Feld
+- Unterstützt mehrere Portfolios/Konten
+- Priorisiert Sektor aus PP-Taxonomie über andere Quellen
+
+### 2. ETF-Auflösung
+
+**`src/risk_calculator.py::_expand_etf_holdings()`**
+
+ETFs werden in ihre Einzelpositionen aufgelöst mit mehreren Datenquellen:
+
+**Priorität der ETF-Datenquellen:**
+
+1. **ETF-Detail-Dateien** (`data/etf_details/*.csv`)
+   - Strukturierte CSV-Dateien pro ETF (benannt nach Ticker)
+   - Enthalten: Metadata, Top Holdings, Country/Sector/Currency Allocations
+   - Parser: `src/etf_details_parser.py`
+   - **Vorteil:** Vollständige Allokationsdaten für korrekte "Other Holdings" Behandlung
+
+2. **User ETF Holdings** (`data/user_etf_holdings.csv`)
+   - Legacy-Format für manuelle Pflege
+   - Eine Datei für alle ETFs
+   - Parser: `src/user_etf_holdings.py`
+
+3. **Mock-Daten** (`src/mock_etf_holdings.py`)
+   - Statische Daten für populäre ETFs
+   - Fallback wenn keine User-Daten vorhanden
+
+4. **API-Fetcher** (`src/etf_data_fetcher.py`)
+   - Yahoo Finance, OpenFIGI
+   - Letzter Fallback, meist für europäische ETFs unzuverlässig
+
+### 3. ETF-Detail-Dateien (Neue Struktur)
+
+**Format:** `data/etf_details/{TICKER}.csv`
+
+**Sections:**
+
+```csv
+METADATA
+ISIN,IE00B4L5Y983
+Name,iShares Core MSCI World UCITS ETF USD (Acc)
+Ticker,EUNL
+Type,Stock
+Region,World
+Currency,USD
+TER,0.20
+
+COUNTRY_ALLOCATION
+Country,Weight
+US,70.8
+JP,6.2
+...
+
+SECTOR_ALLOCATION
+Sector,Weight
+Technology,24.5
+Financial Services,15.2
+...
+
+CURRENCY_ALLOCATION
+Currency,Weight
+USD,72.5
+JPY,6.2
+...
+
+TOP_HOLDINGS
+Name,Weight,Currency,Sector,Industry,Country
+Apple Inc,4.98,USD,Technology,Consumer Electronics,US
+NVIDIA Corp,4.67,USD,Technology,Semiconductors,US
+...
+```
+
+**ETF-Typ-Behandlung:**
+
+- `Type: Stock` → Holdings werden als `Stock` klassifiziert
+- `Type: Money Market` → ETF wird als `Cash` in der Anlageklassen-Ansicht behandelt
+- `Type: Bond` → Holdings werden als `Bond` klassifiziert
+- `Type: Commodity` → ETF wird als `Commodity` klassifiziert, **KEIN Währungsrisiko**
+
+**ISIN-zu-Ticker-Mapping:**
+
+`data/etf_isin_ticker_map.csv`:
+```csv
+ISIN,Ticker,Name
+IE00B4L5Y983,EUNL,iShares Core MSCI World UCITS ETF USD (Acc)
+LU0290358497,XEON,Xtrackers II EUR Overnight Rate Swap UCITS ETF 1C
+DE000A2T0VU5,XGDU,Xtrackers IE Physical Gold ETC Securities
+```
+
+Wird von `risk_calculator.py` beim Start geladen.
+
+### 4. Risiko-Berechnung
+
+**`src/risk_calculator.py`**
+
+Berechnet Klumpenrisiken über 5 Dimensionen:
+
+#### 4.1 Anlageklasse (`_calculate_asset_class_risk`)
+
+```python
+# ETF_Holding → Stock (Holdings sind meist Aktien)
+# Money Market ETFs → Cash (via etf_type)
+```
+
+**Spezialbehandlung:**
+- Geldmarkt-ETFs werden als `Cash` klassifiziert (via `Type: Money Market` in Metadata)
+- ETF-Holdings werden nach ihrem tatsächlichen Typ klassifiziert
+
+#### 4.2 Sektor (`_calculate_sector_risk`)
+
+**Sektor-Priorität (Konfliktauflösung):**
+
+1. **CSV** (Priorität 2): Sektor aus Portfolio Performance Taxonomie
+   - `sector_source = 'csv'`
+   - Höchste Priorität, da vom User manuell zugeordnet
+
+2. **ISIN/ETF-Details** (Priorität 1): Sektor via ISIN-Lookup oder ETF-Detail-Datei
+   - `sector_source = 'isin'` oder `'etf_details'`
+   - Mittlere Priorität
+
+3. **ETF-Holdings** (Priorität 0): Sektor aus ETF-Holding-Daten
+   - `sector_source = 'etf'`
+   - Niedrigste Priorität
+
+**Sektor-Normalisierung:**
+
+`_normalize_sector_name()` mapped verschiedene Bezeichnungen:
+```python
+'Informationstechnologie' → 'Technology'
+'Basiskonsumgüter' → 'Consumer Staples'
+'Zyklische Konsumgüter' → 'Consumer Cyclical'
+```
+
+**Filtering:**
+- `Diversified` und `ETF` werden ausgefiltert (keine echten Branchen)
+
+#### 4.3 Währung (`_calculate_currency_risk`)
+
+Verwendet die **Handelswährung** der Aktie, nicht die ETF-Währung:
+
+```python
+# AAPL wird an NYSE in USD gehandelt
+# → Währung: USD (nicht EUR, auch wenn ETF in EUR ist)
+```
+
+**WICHTIG: Commodities haben KEIN Währungsrisiko!**
+
+Commodities (Gold, Silber, Rohstoffe) werden aus der Währungsberechnung **ausgeschlossen**:
+
+```python
+for position in expanded_positions:
+    if position.get('type') == 'Commodity':
+        continue  # Kein Währungsrisiko!
+    currencies[currency] += position['value']
+```
+
+**Alternative Ansicht: Mit Commodities**
+
+`_calculate_currency_risk_with_commodities()` bietet eine optionale Ansicht, die Commodities als separate Kategorie "Commodity (kein Währungsrisiko)" zeigt.
+
+Währung wird bestimmt via:
+1. Explizite Währung aus Holding-Daten
+2. ISIN-basierte Zuordnung (`_get_stock_currency`)
+   - US → USD, GB → GBP, DE → EUR, etc.
+
+**"Other Holdings" Währungsverteilung:**
+
+Für "Other Holdings" wird die Currency Allocation des ETFs genutzt, **MINUS** der Währungen der Top Holdings:
+
+```python
+# Beispiel EUNL:
+# - Top 15 Holdings: 25% des ETFs in USD
+# - Currency Allocation Gesamt: 72.5% USD
+# - Other Holdings USD: 72.5% - 25% = 47.5% des ETFs
+```
+
+Dies vermeidet Doppelzählung und ergibt korrektes Währungsrisiko.
+
+#### 4.4 Land (`_calculate_country_risk`)
+
+**Länder-Priorität:**
+
+1. **Explizites Country-Feld** (aus ETF-Detail-Datei oder User-CSV)
+2. **ISIN-Ländercode** (erste 2 Zeichen)
+   - US → USA, DE → Deutschland, GB → Großbritannien
+3. **Währung als Proxy** (für ETF-Holdings ohne ISIN)
+   - USD → USA, EUR → Eurozone
+
+**Spezialbehandlung:**
+- Cash-Positionen: Immer Währung verwenden (ISIN oft irreführend bei LU-ISINs)
+- Filtering: ETFs die nicht aufgelöst wurden werden übersprungen
+
+#### 4.5 Einzelpositionen (`_calculate_position_risk`)
+
+**Aggregation:**
+- Positionen werden nach normalisiertem Namen gruppiert
+- Alle Cash-Positionen werden zu "Cash" zusammengefasst
+- Ticker-Symbol wird für Labels verwendet
+
+**Name-Normalisierung:**
+```python
+"Apple Inc." → "apple inc"
+"APPLE INC" → "apple inc"
+"Apple Inc Class A" → "apple inc"
+```
+
+**Konfliktauflösung:**
+- Höchste Sektor-Priorität gewinnt (CSV > ISIN/ETF-Details > ETF)
+- Ticker-Symbol wird aktualisiert wenn vorhanden
+
+### 5. Visualisierung
+
+**`src/visualizer.py`**
+
+Erstellt interaktive Plotly-Visualisierungen:
+
+#### 5.1 Treemap
+
+```python
+def _create_treemap(df, category, max_items=30):
+    # Diskrete Farbskala für alle Kategorien
+    # "Other Holdings" → hellblau (#ADD8E6)
+    # Ticker-Symbole als Labels (falls vorhanden)
+```
+
+#### 5.2 Pie Chart
+
+```python
+def _create_pie_chart(df, category, max_items=10):
+    # Top N Positionen + "Sonstige"
+    # Ticker-Symbole für Einzelpositionen
+    # "Other Holdings" → hellblau
+```
+
+#### 5.3 Bar Chart
+
+```python
+def _create_bar_chart(df, category, max_items=30):
+    # Risiko-Schwellenwerte:
+    # > 10% → rot
+    # 5-10% → gelb
+    # < 5% → grün
+```
+
+**User-konfigurierbare Limits:**
+
+In `app.py` (Sidebar):
+```python
+max_positions_treemap = st.slider("Max. Positionen in Treemap", 10, 100, 30, 5)
+max_positions_pie = st.slider("Max. Positionen in Pie Chart", 5, 30, 10, 5)
+max_positions_bar = st.slider("Max. Positionen in Bar Chart", 10, 100, 30, 10)
+```
+
+### 6. Spezial-Features
+
+#### 6.1 Dynamisches Ticker-Sektor-Mapping
+
+**`src/ticker_sector_mapper.py`**
+
+Intelligentes Caching-System für Ticker-zu-Sektor-Zuordnungen:
+
+```python
+class TickerSectorMapper:
+    def get_sector_for_ticker(ticker: str, use_cache: bool = True):
+        # 1. Lokaler Cache (data/ticker_sector_cache.json)
+        # 2. Yahoo Finance API
+        # 3. OpenFIGI API (Fallback)
+        # Cache-Dauer: 90 Tage
+```
+
+**Management-Script:** `manage_ticker_cache.py`
+```bash
+python manage_ticker_cache.py stats     # Statistiken
+python manage_ticker_cache.py add AAPL Technology
+python manage_ticker_cache.py fetch TSLA  # Force refresh
+```
+
+#### 6.2 Wechselkurs-Management
+
+**`src/exchange_rate.py`**
+
+```python
+class ExchangeRateManager:
+    def get_rate(from_currency: str, to_currency: str = 'EUR'):
+        # Quelle: EZB-API
+        # Cache: 24h
+        # Fallback: Statische Rates
+```
+
+#### 6.3 Historie-Tracking
+
+**`src/database.py`**
+
+SQLite-Datenbank für Portfolio-Historie:
+
+```python
+def save_analysis(portfolio_data: Dict, risk_data: Dict):
+    # Speichert:
+    # - Timestamp
+    # - Total Value
+    # - Positions (JSON)
+    # - Risk Data (JSON)
+```
+
+**TODO:** Timeline-Visualisierungen
+
+#### 6.4 Cash-Toggle
+
+In der "Einzelpositionen"-Ansicht:
+
+```python
+exclude_cash = st.checkbox("Cash ausblenden")
+if exclude_cash:
+    positions_filtered = risk_data['positions'][
+        risk_data['positions']['Position'] != 'Cash'
+    ].copy()
+    # Neuberechnung der Prozentsätze
+```
+
+### 7. Export-Funktionen
+
+**`src/export.py`**
+
+```python
+def export_to_excel(risk_data: Dict) -> bytes:
+    # Erstellt .xlsx mit mehreren Sheets
+    # - Anlageklasse
+    # - Sektor
+    # - Währung
+    # - Land
+    # - Einzelpositionen
+
+def export_to_ods(risk_data: Dict) -> bytes:
+    # LibreOffice-Format
+```
+
+## Datenstrukturen
+
+### Portfolio Data (nach CSV-Parse)
+
+```python
+{
+    'total_value': 50000.0,
+    'positions': [
+        {
+            'name': 'Apple Inc',
+            'type': 'Stock',
+            'isin': 'US0378331005',
+            'ticker_symbol': 'AAPL',
+            'shares': 10,
+            'value': 2000.0,
+            'currency': 'USD',
+            'sector_from_pp': 'Technology'  # Aus PP Taxonomie
+        },
+        {
+            'name': 'iShares Core MSCI World',
+            'type': 'ETF',
+            'isin': 'IE00B4L5Y983',
+            'ticker_symbol': 'EUNL',
+            'shares': 50,
+            'value': 5000.0,
+            'currency': 'EUR'
+        }
+    ]
+}
+```
+
+### ETF Details (aus Detail-Datei)
+
+```python
+{
+    'ticker': 'EUNL',
+    'isin': 'IE00B4L5Y983',
+    'name': 'iShares Core MSCI World UCITS ETF',
+    'type': 'Stock',  # ETF-Typ
+    'region': 'World',
+    'currency': 'USD',
+    'ter': '0.20',
+    'country_allocation': [
+        {'name': 'US', 'weight': 0.708},
+        {'name': 'JP', 'weight': 0.062}
+    ],
+    'sector_allocation': [
+        {'name': 'Technology', 'weight': 0.245},
+        {'name': 'Financial Services', 'weight': 0.152}
+    ],
+    'currency_allocation': [
+        {'name': 'USD', 'weight': 0.725},
+        {'name': 'JPY', 'weight': 0.062}
+    ],
+    'holdings': [
+        {
+            'name': 'Apple Inc',
+            'weight': 0.0498,
+            'currency': 'USD',
+            'sector': 'Technology',
+            'country': 'US'
+        }
+    ]
+}
+```
+
+### Expanded Positions (nach ETF-Auflösung)
+
+```python
+[
+    {
+        'name': 'Apple Inc',
+        'type': 'Stock',
+        'value': 2249.0,  # 2000 direkt + 249 aus ETF
+        'currency': 'USD',
+        'sector': 'Technology',
+        'country': 'US',
+        'source_etf': 'iShares Core MSCI World',  # Falls aus ETF
+        'original_type': 'ETF_Holding',
+        'sector_source': 'etf_details',  # Priorität 1
+        'etf_type': 'Stock'  # Aus ETF Metadata
+    }
+]
+```
+
+### Risk Data (Output)
+
+```python
+{
+    'asset_class': pd.DataFrame([...]),  # Anlageklasse
+    'sector': pd.DataFrame([...]),       # Sektor
+    'currency': pd.DataFrame([...]),     # Währung
+    'country': pd.DataFrame([...]),      # Land
+    'positions': pd.DataFrame([...]),    # Einzelpositionen
+    'total_value': 50000.0
+}
+```
+
+## Bekannte Limitierungen
+
+### ETF-Daten
+
+- **Yahoo Finance:** Stellt für europäische ETFs meist keine Holdings bereit
+- **Web-Scraping:** Fragil, bricht bei Website-Änderungen
+- **Lösung:** ETF-Detail-Dateien manuell pflegen
+
+### "Other Holdings" Behandlung
+
+**Problem:** Bei ETFs mit nur Top 10-15 Holdings fehlen Allokationsdaten für "Other Holdings"
+
+**Lösung in neuer Struktur:**
+- ETF-Detail-Dateien enthalten vollständige Sektor/Land/Währungsverteilungen
+- "Other Holdings" wird in Sektor/Land/Währung-Ansichten über Gesamt-Allokation behandelt
+- In Einzelpositionen-Ansicht: "Other Holdings - {ETF Name}" pro ETF
+
+### Sektor-Mapping
+
+- **Herausforderung:** Verschiedene Taxonomien (GICS, MSCI, PP custom)
+- **Lösung:** Normalisierung + User kann in PP Taxonomie überschreiben (höchste Priorität)
+
+## Performance-Optimierungen
+
+### Caching
+
+1. **ETF-Daten:** 7 Tage (konfigurierbar)
+2. **Wechselkurse:** 24 Stunden
+3. **Ticker-Sektor-Mapping:** 90 Tage
+
+### Batch-Verarbeitung
+
+- Alle API-Calls werden gecacht
+- CSV-Parsing ist optimiert für große Dateien
+- ETF-Detail-Dateien werden lazy geladen
+
+## Testing
+
+### Testdaten
+
+- `Testdepot.csv`: Minimales Portfolio für Entwicklung
+- Mock-ETFs: Populäre ETFs für Tests ohne API-Calls
+
+### Debug-Modus
+
+Aktiviere Debug-Output in `risk_calculator.py`:
+```python
+DEBUG = True  # Zeigt detaillierte Verarbeitungsschritte
+```
+
+## Deployment
+
+### Docker
+
+```dockerfile
+FROM python:3.9-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE 8501
+CMD ["streamlit", "run", "app.py"]
+```
+
+### Volumes
+
+```yaml
+volumes:
+  - ./data:/app/data  # Persistente Daten
+```
+
+## Erweiterungen
+
+### Neue ETF-Datenquelle
+
+1. Erstelle neue Fetch-Methode in `etf_data_fetcher.py`
+2. Integriere in `get_etf_holdings()` Fallback-Kette
+3. Oder: Erstelle ETF-Detail-Datei (bevorzugt)
+
+### Neue Analyse-Dimension
+
+1. Füge `_calculate_xyz_risk()` in `risk_calculator.py` hinzu
+2. Erweitere `calculate_cluster_risks()` Return-Dict
+3. Neuer Tab in `app.py`
+4. Visualisierung in `visualizer.py`
+
+## Changelog
+
+### 2026-02-04: Währungsrisiko & Commodities
+
+- ✅ **Korrekte "Other Holdings" Währungsverteilung**: Verwendet ETF Currency Allocation minus Top Holdings (keine Doppelzählung)
+- ✅ **Commodities ohne Währungsrisiko**: Gold, Rohstoffe werden aus Währungsberechnung ausgeschlossen
+- ✅ **Gold ETC Support**: XGDU (Xetra Gold) als Commodity-ETF integriert
+- ✅ **Commodities-Toggle**: Optional Commodities in Währungsansicht einblenden
+- ✅ **CSV-Parser Optimierung**: Ticker-Sektor-Mapping nur für Aktien, nicht für ETFs
+- ✅ **"Other Holdings" ergänzt**: Alle ETF-Detail-Dateien enthalten jetzt "Other Holdings" Einträge
+
+### 2026-02-04: ETF-Detail-Struktur
+
+- ✅ Neue strukturierte ETF-Detail-Dateien (`data/etf_details/*.csv`)
+- ✅ Parser für ETF-Detail-Dateien (`src/etf_details_parser.py`)
+- ✅ ISIN-zu-Ticker-Mapping (`data/etf_isin_ticker_map.csv`)
+- ✅ Korrekte Behandlung von Money Market ETFs als Cash
+- ✅ Vollständige Sektor/Land/Währungs-Allokationen pro ETF
+- ✅ Priorisierung: ETF-Details > User-CSV > Mock > API
+
+### 2026-02-03: CSV-Parser
+
+- ✅ CSV-Parser für Portfolio Performance Vermögensaufstellung
+- ✅ Entfernung des XML-Parsers
+- ✅ Sektor-Priorität aus PP Taxonomie
+
+### 2026-02-02: Ticker-Sektor-Mapping
+
+- ✅ Dynamisches Ticker-zu-Sektor-Mapping mit Caching
+- ✅ Management-Script für Cache-Verwaltung
+- ✅ Yahoo Finance + OpenFIGI Integration
+
+### 2026-02-01: Visualisierungs-Slider
+
+- ✅ User-konfigurierbare Limits für Treemap/Pie/Bar
+- ✅ Cash-Toggle für Einzelpositionen
+- ✅ Ticker-Symbole in Visualisierungen
+
+---
+
+**Erstellt mit ❤️ für Portfolio-Optimierung**

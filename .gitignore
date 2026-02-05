@@ -1,0 +1,77 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Cache & Data (sensible Daten)
+data/cache/*.json
+data/*.db
+data/history.db
+
+# User-spezifische Dateien (WICHTIG: Nicht committen!)
+# Diese könnten persönliche Portfolio-Daten enthalten
+Vermögensaufstellung*.csv
+Portfolio*.csv
+Testdepot*.csv
+MeinDepot*.csv
+*_privat.csv
+*_private.csv
+
+# Aber: Beispiel-Dateien committen
+!data/etf_details/*.csv
+!data/etf_isin_ticker_map.csv
+!data/user_etf_holdings.csv
+!data/ticker_sector_cache.json
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Docker
+.env
+docker-compose.override.yml

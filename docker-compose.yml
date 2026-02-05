@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  clusterrisk:
+    build: .
+    container_name: clusterrisk
+    ports:
+      - "8501:8501"
+    volumes:
+      # Persistente Daten
+      - ./data:/app/data
+      # Optional: XML-Files von einem Netzwerk-Share
+      # - /mnt/user/appdata/portfolio-performance:/app/input:ro
+    environment:
+      - TZ=Europe/Berlin
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

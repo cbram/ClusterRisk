@@ -1,0 +1,43 @@
+# ETF Metadata
+ISIN,LU1681048804
+Name,Amundi S&P 500 Swap UCITS ETF EUR Acc
+Ticker,AUM5
+Type,Stock
+Region,USA
+Currency,EUR
+TER,0.15%
+
+# Country Allocation (%)
+Country,Weight
+United States,100.0
+
+# Sector Allocation (%)
+Sector,Weight
+Technology,33.5
+Financial Services,12.8
+Healthcare,11.2
+Consumer Cyclical,10.5
+Communication Services,9.8
+Industrials,8.4
+Consumer Staples,5.9
+Energy,3.2
+Utilities,2.4
+Real Estate,2.3
+
+# Currency Allocation (%)
+Currency,Weight
+USD,100.0
+
+# Top Holdings
+Name,Weight,Currency,Sector,Country,ISIN
+NVIDIA CORP,7.86,USD,Technology,US,US67066G1040
+APPLE INC,6.42,USD,Technology,US,US0378331005
+MICROSOFT CORP,5.42,USD,Technology,US,US5949181045
+AMAZON.COM INC,3.95,USD,Consumer Cyclical,US,US0231351067
+ALPHABET INC CLASS A,3.31,USD,Communication Services,US,US02079K3059
+META PLATFORMS INC CLASS A,2.70,USD,Communication Services,US,US30303M1027
+ALPHABET INC CLASS C,2.65,USD,Communication Services,US,US02079K1079
+BROADCOM INC,2.63,USD,Technology,US,US11135F1012
+TESLA INC,1.97,USD,Consumer Cyclical,US,US88160R1014
+BERKSHIRE HATHAWAY INC CLASS B,1.47,USD,Financial Services,US,US0846707026
+Other Holdings,61.62,Mixed,Diversified,Mixed,
