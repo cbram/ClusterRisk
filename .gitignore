@@ -54,6 +54,11 @@ MeinDepot*.csv
 *_privat.csv
 *_private.csv
 *_holdings.csv
+AllTaxonomies.json
+test.py
+verify_setup.sh
+TODO.md
+CHANGELOG_*
 
 # Aber: Beispiel-Dateien und ETF-Details committen
 !data/etf_details/*.csv
