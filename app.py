@@ -59,8 +59,16 @@ with st.sidebar:
     
     # ETF Datenquelle
     st.subheader("ETF Datenquellen")
-    use_cache = st.checkbox("Cache verwenden", value=True, help="Nutze gecachte ETF-Daten (schneller)")
-    cache_days = st.slider("Cache-Dauer (Tage)", 1, 30, 7)
+    use_cache = st.checkbox(
+        "Cache verwenden", 
+        value=True, 
+        help="Gecacht werden: ETF-Holdings (von APIs), Währungskurse (ECB), Ticker-Sektor-Mappings. ETF-Detail-Dateien (data/etf_details/) werden NICHT gecacht und sind immer aktuell."
+    )
+    cache_days = st.slider(
+        "Cache-Dauer (Tage)", 
+        1, 30, 7,
+        help="Wie lange sollen abgerufene Daten gecacht werden? ETF-Detail-Dateien sind hiervon nicht betroffen."
+    )
     
     st.divider()
     
