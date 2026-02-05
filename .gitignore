@@ -49,11 +49,13 @@ data/history.db
 Vermögensaufstellung*.csv
 Portfolio*.csv
 Testdepot*.csv
+Testdepot*.xml
 MeinDepot*.csv
 *_privat.csv
 *_private.csv
+*_holdings.csv
 
-# Aber: Beispiel-Dateien committen
+# Aber: Beispiel-Dateien und ETF-Details committen
 !data/etf_details/*.csv
 !data/etf_isin_ticker_map.csv
 !data/user_etf_holdings.csv
