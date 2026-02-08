@@ -236,7 +236,28 @@ def clear_all_history() -> bool:
             cursor = conn.cursor()
             cursor.execute("DELETE FROM analyses")
             conn.commit()
+            # VACUUM um Speicherplatz freizugeben
+            cursor.execute("VACUUM")
+            conn.commit()
             return True
     except Exception as e:
         print(f"Fehler beim Löschen aller Analysen: {e}")
+        return False
+
+
+def vacuum_database() -> bool:
+    """
+    Komprimiert die Datenbank und gibt gelöschten Speicherplatz frei
+    
+    Returns:
+        True wenn erfolgreich, False sonst
+    """
+    try:
+        with sqlite3.connect(_db.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("VACUUM")
+            conn.commit()
+            return True
+    except Exception as e:
+        print(f"Fehler beim VACUUM: {e}")
         return False

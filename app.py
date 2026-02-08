@@ -19,7 +19,7 @@ from src.csv_parser import parse_portfolio_csv
 from src.risk_calculator import calculate_cluster_risks
 from src.visualizer import create_visualizations
 from src.export import export_to_calc
-from src.database import save_to_history, get_history, delete_analysis, clear_all_history
+from src.database import save_to_history, get_history, delete_analysis, clear_all_history, vacuum_database
 from src.diagnostics import get_diagnostics, reset_diagnostics
 
 # Seiten-Konfiguration
@@ -455,7 +455,9 @@ else:
                             if delete_analysis(int(analysis_id)):
                                 deleted_count += 1
                         
-                        st.success(f"✅ {deleted_count} Analyse(n) gelöscht!")
+                        # Nach Löschen: VACUUM um Speicherplatz freizugeben
+                        vacuum_database()
+                        st.success(f"✅ {deleted_count} Analyse(n) gelöscht und Datenbank komprimiert!")
                         st.rerun()
             
             # Statistiken
