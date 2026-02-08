@@ -6,6 +6,7 @@ Type,Stock
 Region,USA
 Currency,EUR
 TER,0.15%
+Last Updated,2026-02-04
 
 # Country Allocation (%)
 Country,Weight
