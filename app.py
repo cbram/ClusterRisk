@@ -5,6 +5,8 @@ Analysiert Portfolios aus Portfolio Performance und visualisiert Klumpenrisiken
 
 import streamlit as st
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 from pathlib import Path
 import sys
 import warnings
@@ -19,7 +21,7 @@ from src.csv_parser import parse_portfolio_csv
 from src.risk_calculator import calculate_cluster_risks
 from src.visualizer import create_visualizations
 from src.export import export_to_calc
-from src.database import save_to_history, get_history, delete_analysis, clear_all_history, vacuum_database
+from src.database import save_to_history, get_history, delete_analysis, clear_all_history, vacuum_database, get_history_timeseries
 from src.diagnostics import get_diagnostics, reset_diagnostics
 
 # Seiten-Konfiguration
@@ -54,6 +56,21 @@ with st.sidebar:
     # Format-Info
     if uploaded_file:
         st.caption(f"📄 Dateiformat: CSV")
+    
+    # Speichern-Button direkt unter dem Upload
+    if st.button(
+        "💾 In Historie speichern", 
+        type="primary", 
+        use_container_width=True,
+        disabled=(uploaded_file is None),
+        help="Speichert die aktuelle Analyse als Schnappschuss in der lokalen Historie-Datenbank (data/history.db). Damit lassen sich im Tab 'Historie' Verlaufsdiagramme erstellen, um Veränderungen im Portfolio über die Zeit nachzuvollziehen."
+    ):
+        if 'portfolio_data' in st.session_state and 'risk_data' in st.session_state:
+            save_to_history(st.session_state['portfolio_data'], st.session_state['risk_data'])
+            st.success("✅ Analyse gespeichert!")
+            st.rerun()
+        else:
+            st.warning("⚠️ Bitte zuerst eine CSV-Datei hochladen und analysieren lassen.")
     
     st.divider()
     
@@ -214,6 +231,9 @@ else:
             
             st.success(f"✅ Portfolio erfolgreich geladen: {portfolio_data['total_positions']} Positionen")
             
+            # In session_state speichern für Sidebar-Button
+            st.session_state['portfolio_data'] = portfolio_data
+            
             # Portfolio Übersicht
             col1, col2, col3, col4 = st.columns(4)
             with col1:
@@ -239,6 +259,9 @@ else:
             )
             
             st.success("✅ Klumpenrisiken erfolgreich berechnet!")
+            
+            # In session_state speichern für Sidebar-Button
+            st.session_state['risk_data'] = risk_data
             
             # Zeige Diagnose-Meldungen (Warnungen und Fehler)
             diagnostics = get_diagnostics()
@@ -353,8 +376,8 @@ else:
     with tab6:
         st.subheader("Detaillierte Daten")
         
-        # Export-Buttons UND Speichern-Button in einer Zeile
-        col1, col2, col3 = st.columns(3)
+        # Export-Buttons
+        col1, col2 = st.columns(2)
         with col1:
             if export_format in ["Excel (.xlsx)", "Beide"]:
                 xlsx_data = export_to_calc(risk_data, format='xlsx')
@@ -377,13 +400,6 @@ else:
                     use_container_width=True
                 )
         
-        with col3:
-            # Speichern-Button prominent neben Export-Buttons
-            if st.button("💾 In Historie speichern", type="primary", use_container_width=True):
-                save_to_history(portfolio_data, risk_data)
-                st.success("✅ Analyse gespeichert!")
-                st.rerun()  # Aktualisiere die Seite damit Historie-Tab sich aktualisiert
-        
         # Daten-Tabellen anzeigen
         st.markdown("---")
         
@@ -398,7 +414,7 @@ else:
             st.dataframe(df, width='stretch', height=400)
     
     with tab7:
-        st.subheader("📈 Analyse-Historie")
+        st.subheader("Analyse-Historie")
         
         history = get_history()
         if not history.empty:
@@ -412,9 +428,13 @@ else:
                     else:
                         st.error("❌ Fehler beim Löschen")
             
-            # Füge Checkbox-Spalte hinzu
+            # Laufende Nummer statt Datenbank-ID anzeigen
             history_with_selection = history.copy()
             history_with_selection.insert(0, '🗑️', False)
+            history_with_selection['#'] = range(1, len(history_with_selection) + 1)
+            # Spaltenreihenfolge: Checkbox, #, Rest (ohne interne ID)
+            display_cols = ['🗑️', '#', 'Datum', 'Gesamt-Wert', 'Positionen', 'ETFs', 'Aktien', 'ID']
+            history_with_selection = history_with_selection[display_cols]
             
             # Interaktive Tabelle mit Checkboxen
             edited_df = st.data_editor(
@@ -427,17 +447,18 @@ else:
                         help="Zum Löschen auswählen",
                         default=False
                     ),
-                    'ID': st.column_config.NumberColumn('ID', disabled=True),
+                    '#': st.column_config.NumberColumn('#', disabled=True, width="small"),
                     'Datum': st.column_config.TextColumn('Datum', disabled=True),
                     'Gesamt-Wert': st.column_config.TextColumn('Gesamt-Wert', disabled=True),
                     'Positionen': st.column_config.NumberColumn('Positionen', disabled=True),
                     'ETFs': st.column_config.NumberColumn('ETFs', disabled=True),
-                    'Aktien': st.column_config.NumberColumn('Aktien', disabled=True)
+                    'Aktien': st.column_config.NumberColumn('Aktien', disabled=True),
+                    'ID': None  # Interne ID ausblenden
                 },
-                disabled=['ID', 'Datum', 'Gesamt-Wert', 'Positionen', 'ETFs', 'Aktien']
+                disabled=['#', 'Datum', 'Gesamt-Wert', 'Positionen', 'ETFs', 'Aktien']
             )
             
-            # Prüfe welche Zeilen ausgewählt wurden
+            # Prüfe welche Zeilen ausgewählt wurden (nutze interne ID zum Löschen)
             selected_ids = edited_df[edited_df['🗑️'] == True]['ID'].tolist()
             
             # Lösch-Button erscheint nur wenn Auswahl vorhanden
@@ -460,6 +481,130 @@ else:
                         st.success(f"✅ {deleted_count} Analyse(n) gelöscht und Datenbank komprimiert!")
                         st.rerun()
             
+            # Verlaufs-Charts (nur wenn >= 2 Einträge)
+            timeseries = get_history_timeseries()
+            if timeseries is not None:
+                
+                # Expander 1: Portfolio-Verlauf
+                with st.expander("📈 Portfolio-Verlauf"):
+                    portfolio_df = timeseries['portfolio']
+                    
+                    # Liniendiagramm: Gesamtwert über Zeit
+                    fig_value = px.line(
+                        portfolio_df,
+                        x='timestamp',
+                        y='Gesamt-Wert (€)',
+                        markers=True
+                    )
+                    fig_value.update_layout(
+                        title="Portfolio-Gesamtwert",
+                        xaxis_title="Datum",
+                        yaxis_title="Wert (€)",
+                        height=350,
+                        margin=dict(t=40, l=10, r=10, b=10),
+                        yaxis_tickformat=',.0f'
+                    )
+                    st.plotly_chart(fig_value, use_container_width=True, key="hist_value")
+                    
+                    # Liniendiagramm: Top-5 Konzentration über Zeit
+                    fig_top5 = px.line(
+                        portfolio_df,
+                        x='timestamp',
+                        y='Top-5 Konzentration (%)',
+                        markers=True
+                    )
+                    fig_top5.update_layout(
+                        title="Top-5 Konzentration",
+                        xaxis_title="Datum",
+                        yaxis_title="Anteil (%)",
+                        height=350,
+                        margin=dict(t=40, l=10, r=10, b=10),
+                        yaxis_range=[0, 100]
+                    )
+                    fig_top5.update_traces(line_color='orange')
+                    st.plotly_chart(fig_top5, use_container_width=True, key="hist_top5")
+                
+                # Expander 2: Allokations-Verlauf
+                with st.expander("📊 Allokations-Verlauf"):
+                    
+                    # Stacked Area Chart: Anlageklassen-Drift
+                    asset_df = timeseries['asset_class']
+                    asset_cols = [c for c in asset_df.columns if c != 'timestamp']
+                    
+                    if asset_cols:
+                        fig_asset = go.Figure()
+                        for col in asset_cols:
+                            fig_asset.add_trace(go.Scatter(
+                                x=asset_df['timestamp'],
+                                y=asset_df[col],
+                                name=col,
+                                mode='lines',
+                                stackgroup='one',
+                                groupnorm='percent'
+                            ))
+                        fig_asset.update_layout(
+                            title="Anlageklassen-Verteilung",
+                            xaxis_title="Datum",
+                            yaxis_title="Anteil (%)",
+                            height=350,
+                            margin=dict(t=40, l=10, r=10, b=10),
+                            yaxis_range=[0, 100],
+                            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                        )
+                        st.plotly_chart(fig_asset, use_container_width=True, key="hist_asset")
+                    
+                    # Stacked Area Chart: Währungs-Drift
+                    currency_df = timeseries['currency']
+                    currency_cols = [c for c in currency_df.columns if c != 'timestamp']
+                    
+                    if currency_cols:
+                        fig_currency = go.Figure()
+                        for col in currency_cols:
+                            fig_currency.add_trace(go.Scatter(
+                                x=currency_df['timestamp'],
+                                y=currency_df[col],
+                                name=col,
+                                mode='lines',
+                                stackgroup='one',
+                                groupnorm='percent'
+                            ))
+                        fig_currency.update_layout(
+                            title="Währungsverteilung",
+                            xaxis_title="Datum",
+                            yaxis_title="Anteil (%)",
+                            height=350,
+                            margin=dict(t=40, l=10, r=10, b=10),
+                            yaxis_range=[0, 100],
+                            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                        )
+                        st.plotly_chart(fig_currency, use_container_width=True, key="hist_currency")
+                    
+                    # Stacked Area Chart: Sektor-Drift
+                    sector_df = timeseries['sector']
+                    sector_cols = [c for c in sector_df.columns if c != 'timestamp']
+                    
+                    if sector_cols:
+                        fig_sector = go.Figure()
+                        for col in sector_cols:
+                            fig_sector.add_trace(go.Scatter(
+                                x=sector_df['timestamp'],
+                                y=sector_df[col],
+                                name=col,
+                                mode='lines',
+                                stackgroup='one',
+                                groupnorm='percent'
+                            ))
+                        fig_sector.update_layout(
+                            title="Sektorverteilung (Top 5 + Sonstige)",
+                            xaxis_title="Datum",
+                            yaxis_title="Anteil (%)",
+                            height=350,
+                            margin=dict(t=40, l=10, r=10, b=10),
+                            yaxis_range=[0, 100],
+                            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                        )
+                        st.plotly_chart(fig_sector, use_container_width=True, key="hist_sector")
+            
             # Statistiken
             st.markdown("---")
             col1, col2, col3 = st.columns(3)
@@ -474,7 +619,7 @@ else:
                     last_date = pd.to_datetime(history['Datum'].iloc[0], format='%d.%m.%Y %H:%M')
                     st.metric("Letzte Analyse", last_date.strftime('%d.%m.%Y'))
         else:
-            st.info("📭 Noch keine Analysen gespeichert. Klicke auf '💾 In Historie speichern' im Tab 'Detaildaten', um Analysen zu speichern.")
+            st.info("📭 Noch keine Analysen gespeichert. Lade eine CSV-Datei hoch und klicke auf '💾 In Historie speichern' in der linken Seitenleiste.")
 
 # Footer
 st.divider()

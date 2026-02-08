@@ -203,6 +203,103 @@ def get_timeline(category: str = 'total_value') -> pd.DataFrame:
     return _db.get_timeline_data(category)
 
 
+def get_history_timeseries() -> Optional[Dict]:
+    """
+    Lädt alle Historie-Einträge und extrahiert strukturierte Zeitreihen-Daten
+    für Charts (Portfolio-Wert, Anlageklassen, Währungen, Top-5-Konzentration).
+    
+    Returns:
+        Dict mit Zeitreihen-DataFrames oder None wenn < 2 Einträge
+    """
+    try:
+        with sqlite3.connect(_db.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT timestamp, total_value, risk_data
+                FROM analyses
+                ORDER BY timestamp ASC
+            """)
+            rows = cursor.fetchall()
+        
+        if len(rows) < 2:
+            return None
+        
+        # Datenstrukturen vorbereiten
+        timestamps = []
+        total_values = []
+        top5_concentrations = []
+        asset_class_rows = []
+        currency_rows = []
+        sector_rows = []
+        
+        for timestamp_str, total_value, risk_data_json in rows:
+            timestamp = pd.to_datetime(timestamp_str)
+            timestamps.append(timestamp)
+            total_values.append(total_value)
+            
+            risk_data = json.loads(risk_data_json)
+            
+            # Top-5 Konzentration aus positions
+            positions = risk_data.get('positions', [])
+            # Sortiere nach Anteil (%) absteigend
+            positions_sorted = sorted(positions, key=lambda x: x.get('Anteil (%)', 0), reverse=True)
+            top5_sum = sum(p.get('Anteil (%)', 0) for p in positions_sorted[:5])
+            top5_concentrations.append(top5_sum)
+            
+            # Anlageklassen
+            asset_row = {'timestamp': timestamp}
+            for entry in risk_data.get('asset_class', []):
+                name = entry.get('Anlageklasse', 'Unknown')
+                asset_row[name] = entry.get('Anteil (%)', 0)
+            asset_class_rows.append(asset_row)
+            
+            # Währungen (Top 4 + Sonstige)
+            currency_entries = risk_data.get('currency', [])
+            currency_sorted = sorted(currency_entries, key=lambda x: x.get('Anteil (%)', 0), reverse=True)
+            currency_row = {'timestamp': timestamp}
+            for i, entry in enumerate(currency_sorted):
+                name = entry.get('Währung', 'Unknown')
+                if i < 4:
+                    currency_row[name] = entry.get('Anteil (%)', 0)
+                else:
+                    currency_row['Sonstige'] = currency_row.get('Sonstige', 0) + entry.get('Anteil (%)', 0)
+            currency_rows.append(currency_row)
+            
+            # Sektoren (Top 5 + Sonstige)
+            sector_entries = risk_data.get('sector', [])
+            sector_sorted = sorted(sector_entries, key=lambda x: x.get('Anteil (%)', 0), reverse=True)
+            sector_row = {'timestamp': timestamp}
+            for i, entry in enumerate(sector_sorted):
+                name = entry.get('Sektor', 'Unknown')
+                if i < 5:
+                    sector_row[name] = entry.get('Anteil (%)', 0)
+                else:
+                    sector_row['Sonstige'] = sector_row.get('Sonstige', 0) + entry.get('Anteil (%)', 0)
+            sector_rows.append(sector_row)
+        
+        # DataFrames erstellen
+        portfolio_df = pd.DataFrame({
+            'timestamp': timestamps,
+            'Gesamt-Wert (€)': total_values,
+            'Top-5 Konzentration (%)': top5_concentrations
+        })
+        
+        asset_class_df = pd.DataFrame(asset_class_rows).fillna(0)
+        currency_df = pd.DataFrame(currency_rows).fillna(0)
+        sector_df = pd.DataFrame(sector_rows).fillna(0)
+        
+        return {
+            'portfolio': portfolio_df,
+            'asset_class': asset_class_df,
+            'currency': currency_df,
+            'sector': sector_df
+        }
+    
+    except Exception as e:
+        print(f"Fehler beim Laden der Zeitreihen: {e}")
+        return None
+
+
 def delete_analysis(analysis_id: int) -> bool:
     """
     Löscht eine Analyse aus der Historie

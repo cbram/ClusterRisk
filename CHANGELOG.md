@@ -1,5 +1,43 @@
 # Changelog - ClusterRisk
 
+## [1.4.0] - 2026-02-08 - Historische Auswertungen & UI-Verbesserungen
+
+### ✨ Neue Features
+
+**Historische Verlaufs-Charts:**
+- ✅ **Portfolio-Gesamtwert**: Liniendiagramm zeigt Wertentwicklung über Zeit
+- ✅ **Top-5 Konzentration**: Liniendiagramm zeigt ob Portfolio "kopflastiger" wird
+- ✅ **Anlageklassen-Drift**: Stacked Area Chart zeigt Verschiebung der Gewichtungen
+- ✅ **Währungs-Drift**: Stacked Area Chart zeigt Entwicklung der Währungsverteilung
+- ✅ **Sektor-Drift**: Stacked Area Chart zeigt Top-5 Sektoren + Sonstige über Zeit
+- ✅ Charts erscheinen nur bei **≥ 2 Historie-Einträgen** (sinnvoller Verlauf)
+- ✅ In geschlossenen **Expandern** untergebracht – Tabelle bleibt im Fokus
+
+**Neue Funktion `get_history_timeseries()`:**
+- Extrahiert strukturierte Zeitreihen aus gespeicherten `risk_data` JSON-Blobs
+- Liefert 4 DataFrames: Portfolio, Anlageklassen, Währungen (Top 4 + Sonstige), Sektoren (Top 5 + Sonstige)
+
+### 🎨 Verbesserungen
+
+- ✅ **Speichern-Button** von Detaildaten-Tab in die **Sidebar** verschoben (direkt unter CSV-Upload)
+- ✅ **Hilfetext (?)** am Button erklärt detailliert was gespeichert wird und wofür
+- ✅ **Laufende Nummer (#)** statt Datenbank-ID in der Historie-Tabelle – zählt nach Löschen neu durch
+- ✅ **Interne ID ausgeblendet** – wird nur intern für Lösch-Operationen verwendet
+- ✅ **Export-Buttons** im Detaildaten-Tab jetzt übersichtlicher in 2 Spalten
+- ✅ **Session State**: `portfolio_data` und `risk_data` werden für Sidebar-Button gecacht
+
+### 📁 Geänderte Dateien
+
+- **`src/database.py`**: Neue Funktion `get_history_timeseries()` für Zeitreihen-Extraktion
+- **`app.py`**:
+  - Import von `plotly.express`, `plotly.graph_objects`, `get_history_timeseries`
+  - Speichern-Button in Sidebar mit Hilfetext
+  - Session State für `portfolio_data` und `risk_data`
+  - Historie-Tab: Laufende Nummer statt DB-ID, Verlaufs-Charts in Expandern
+  - Detaildaten-Tab: Export-Buttons in 2-Spalten-Layout
+
+---
+
 ## [1.3.0] - 2026-02-05 - Kategorie-spezifische Risikoschwellen
 
 ### ✨ Neue Features
