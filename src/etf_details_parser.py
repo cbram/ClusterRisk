@@ -6,6 +6,7 @@ Parst die neuen ETF-Detail-CSV-Dateien mit Metadata, Holdings, Sektor-, Länder-
 import pandas as pd
 from pathlib import Path
 from typing import Dict, Optional
+from datetime import datetime, timedelta
 from .diagnostics import get_diagnostics
 
 
@@ -54,6 +55,11 @@ class ETFDetailsParser:
             # Top Holdings
             holdings = self._parse_holdings(sections.get('holdings', ''))
             
+            # Prüfe "Last Updated" Datum und warne wenn veraltet
+            last_updated = metadata.get('Last Updated')
+            if last_updated:
+                self._check_data_freshness(ticker, metadata.get('Name'), last_updated)
+            
             return {
                 'ticker': ticker,
                 'isin': metadata.get('ISIN'),
@@ -62,6 +68,7 @@ class ETFDetailsParser:
                 'region': metadata.get('Region'),
                 'currency': metadata.get('Currency'),
                 'ter': metadata.get('TER'),
+                'last_updated': last_updated,
                 'country_allocation': country_allocation,
                 'sector_allocation': sector_allocation,
                 'currency_allocation': currency_allocation,
@@ -190,6 +197,39 @@ class ETFDetailsParser:
                     continue
         
         return holdings
+    
+    def _check_data_freshness(self, ticker: str, etf_name: str, last_updated_str: str):
+        """
+        Prüft ob die ETF-Daten aktuell sind (< 90 Tage alt)
+        
+        Args:
+            ticker: Ticker-Symbol des ETFs
+            etf_name: Name des ETFs
+            last_updated_str: Datum-String im Format YYYY-MM-DD
+        """
+        try:
+            last_updated = datetime.strptime(last_updated_str, '%Y-%m-%d')
+            today = datetime.now()
+            days_old = (today - last_updated).days
+            
+            # Warnung wenn älter als 90 Tage (ein Quartal)
+            if days_old > 90:
+                diagnostics = get_diagnostics()
+                diagnostics.add_warning(
+                    'ETF-Daten',
+                    f'Veraltete ETF-Zusammensetzung: {etf_name} ({ticker})',
+                    f'Letzte Aktualisierung: {last_updated_str} ({days_old} Tage alt). '
+                    f'Empfehlung: Aktualisiere data/etf_details/{ticker}.csv mit aktuellen Daten.'
+                )
+                print(f"⚠️  Veraltete ETF-Daten: {ticker} ({days_old} Tage alt)")
+        except ValueError:
+            # Ungültiges Datumsformat
+            diagnostics = get_diagnostics()
+            diagnostics.add_warning(
+                'ETF-Daten',
+                f'Ungültiges "Last Updated" Datum für {etf_name} ({ticker})',
+                f'Datum: "{last_updated_str}". Erwartet: YYYY-MM-DD'
+            )
     
     def get_etf_by_isin(self, isin: str, ticker_map: Dict[str, str]) -> Optional[Dict]:
         """
