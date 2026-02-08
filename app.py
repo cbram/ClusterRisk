@@ -214,7 +214,7 @@ if uploaded_file is None:
     if show_history:
         st.subheader("📈 Analyse-Historie")
         history = get_history()
-        if history:
+        if not history.empty:
             st.dataframe(history, width='stretch')
         else:
             st.info("Noch keine Analysen gespeichert.")
