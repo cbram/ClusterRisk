@@ -104,8 +104,23 @@ class HistoryDatabase:
             df = pd.read_sql_query(query, conn)
             
             if not df.empty:
+                # Timestamp formatieren
                 df['timestamp'] = pd.to_datetime(df['timestamp'])
-                df['total_value'] = df['total_value'].apply(lambda x: f'€ {x:,.2f}')
+                df['Datum'] = df['timestamp'].dt.strftime('%d.%m.%Y %H:%M')
+                
+                # Wert formatieren
+                df['Gesamt-Wert'] = df['total_value'].apply(lambda x: f'€ {x:,.2f}')
+                
+                # Spalten umbenennen und neu ordnen
+                df = df.rename(columns={
+                    'id': 'ID',
+                    'total_positions': 'Positionen',
+                    'etf_count': 'ETFs',
+                    'stock_count': 'Aktien'
+                })
+                
+                # Nur relevante Spalten zurückgeben
+                df = df[['ID', 'Datum', 'Gesamt-Wert', 'Positionen', 'ETFs', 'Aktien']]
             
             return df
     

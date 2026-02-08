@@ -449,13 +449,14 @@ else:
                         if idx < len(history):
                             row = history.iloc[idx]
                             with col:
-                                timestamp_str = row['timestamp'].strftime('%d.%m. %H:%M')
-                                if st.button(f"🗑️ ID {row['id']}\n{timestamp_str}", key=f"delete_{row['id']}", use_container_width=True):
-                                    if delete_analysis(row['id']):
-                                        st.success(f"✅ Analyse {row['id']} gelöscht!")
+                                # Nutze die formatierte Datum-Spalte für Anzeige
+                                label = f"🗑️ ID {row['ID']}\n{row['Datum']}"
+                                if st.button(label, key=f"delete_{row['ID']}", use_container_width=True):
+                                    if delete_analysis(row['ID']):
+                                        st.success(f"✅ Analyse {row['ID']} gelöscht!")
                                         st.rerun()
                                     else:
-                                        st.error(f"❌ Fehler beim Löschen von {row['id']}")
+                                        st.error(f"❌ Fehler beim Löschen von {row['ID']}")
                 
                 # Statistiken
                 st.markdown("---")
@@ -463,12 +464,12 @@ else:
                 with col1:
                     st.metric("Gespeicherte Analysen", len(history))
                 with col2:
-                    if len(history) > 1:
-                        first_date = history['timestamp'].iloc[-1]
+                    if len(history) > 0:
+                        first_date = pd.to_datetime(history['Datum'].iloc[-1], format='%d.%m.%Y %H:%M')
                         st.metric("Erste Analyse", first_date.strftime('%d.%m.%Y'))
                 with col3:
-                    if len(history) > 1:
-                        last_date = history['timestamp'].iloc[0]
+                    if len(history) > 0:
+                        last_date = pd.to_datetime(history['Datum'].iloc[0], format='%d.%m.%Y %H:%M')
                         st.metric("Letzte Analyse", last_date.strftime('%d.%m.%Y'))
             else:
                 st.info("📭 Noch keine Analysen gespeichert. Klicke auf '💾 In Historie speichern' im Tab 'Detaildaten', um Analysen zu speichern.")
