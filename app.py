@@ -181,12 +181,6 @@ with st.sidebar:
         ["Excel (.xlsx)", "LibreOffice (.ods)", "Beide"],
         index=0
     )
-    
-    st.divider()
-    
-    # Historie
-    st.subheader("Historie")
-    show_history = st.checkbox("Historie anzeigen", value=False)
 
 # Hauptbereich
 if uploaded_file is None:
@@ -208,15 +202,6 @@ if uploaded_file is None:
         
         **Hinweis:** CSV ist einfacher und schneller!
         """)
-    
-    # Historie anzeigen wenn gewünscht
-    if show_history:
-        st.subheader("📈 Analyse-Historie")
-        history = get_history()
-        if not history.empty:
-            st.dataframe(history, width='stretch')
-        else:
-            st.info("Noch keine Analysen gespeichert.")
 
 else:
     # Datei verarbeiten (nur CSV)
@@ -416,61 +401,89 @@ else:
     with tab7:
         st.subheader("📈 Analyse-Historie")
         
-        if show_history:
-            history = get_history()
-            if not history.empty:
-                # Aktionen oberhalb der Tabelle
-                col1, col2 = st.columns([3, 1])
-                with col2:
-                    if st.button("🗑️ Alle löschen", type="secondary", use_container_width=True):
-                        if clear_all_history():
-                            st.success("✅ Alle Analysen gelöscht!")
-                            st.rerun()
-                        else:
-                            st.error("❌ Fehler beim Löschen")
-                
-                # Tabelle OHNE Index anzeigen
-                st.dataframe(history, use_container_width=True, hide_index=True)
-                
-                # Lösch-Buttons für einzelne Einträge
+        history = get_history()
+        if not history.empty:
+            # Aktionen oberhalb der Tabelle
+            col1, col2 = st.columns([3, 1])
+            with col2:
+                if st.button("🗑️ Alle löschen", type="secondary", use_container_width=True):
+                    if clear_all_history():
+                        st.success("✅ Alle Analysen gelöscht!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Fehler beim Löschen")
+            
+            # Tabelle OHNE Index anzeigen
+            st.dataframe(history, use_container_width=True, hide_index=True)
+            
+            # Lösch-Auswahl mit Checkboxen
+            st.markdown("---")
+            st.markdown("**Analysen zum Löschen auswählen:**")
+            
+            # Initialisiere Session State für Checkboxen
+            if 'selected_analyses' not in st.session_state:
+                st.session_state.selected_analyses = set()
+            
+            # Checkboxen für jede Analyse (in Spalten)
+            cols_per_row = 4
+            for i in range(0, len(history), cols_per_row):
+                cols = st.columns(cols_per_row)
+                for j, col in enumerate(cols):
+                    idx = i + j
+                    if idx < len(history):
+                        row = history.iloc[idx]
+                        with col:
+                            analysis_id = int(row['ID'])
+                            datum = row['Datum']
+                            wert = row['Gesamt-Wert']
+                            
+                            # Checkbox für diese Analyse
+                            is_selected = st.checkbox(
+                                f"ID {analysis_id}: {datum}\n{wert}",
+                                key=f"select_{analysis_id}",
+                                value=analysis_id in st.session_state.selected_analyses
+                            )
+                            
+                            # Aktualisiere Session State
+                            if is_selected:
+                                st.session_state.selected_analyses.add(analysis_id)
+                            elif analysis_id in st.session_state.selected_analyses:
+                                st.session_state.selected_analyses.remove(analysis_id)
+            
+            # Lösch-Button erscheint nur wenn Auswahl vorhanden
+            if st.session_state.selected_analyses:
                 st.markdown("---")
-                st.markdown("**Einzelne Analysen löschen:**")
-                
-                # Erstelle Buttons für jede Zeile
-                cols_per_row = 5
-                for i in range(0, len(history), cols_per_row):
-                    cols = st.columns(cols_per_row)
-                    for j, col in enumerate(cols):
-                        idx = i + j
-                        if idx < len(history):
-                            row = history.iloc[idx]
-                            with col:
-                                # Nutze die formatierte Datum-Spalte für Anzeige
-                                label = f"🗑️ ID {row['ID']}\n{row['Datum']}"
-                                if st.button(label, key=f"delete_{row['ID']}", use_container_width=True):
-                                    if delete_analysis(row['ID']):
-                                        st.success(f"✅ Analyse {row['ID']} gelöscht!")
-                                        st.rerun()
-                                    else:
-                                        st.error(f"❌ Fehler beim Löschen von {row['ID']}")
-                
-                # Statistiken
-                st.markdown("---")
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.metric("Gespeicherte Analysen", len(history))
+                col1, col2, col3 = st.columns([2, 1, 2])
                 with col2:
-                    if len(history) > 0:
-                        first_date = pd.to_datetime(history['Datum'].iloc[-1], format='%d.%m.%Y %H:%M')
-                        st.metric("Erste Analyse", first_date.strftime('%d.%m.%Y'))
-                with col3:
-                    if len(history) > 0:
-                        last_date = pd.to_datetime(history['Datum'].iloc[0], format='%d.%m.%Y %H:%M')
-                        st.metric("Letzte Analyse", last_date.strftime('%d.%m.%Y'))
-            else:
-                st.info("📭 Noch keine Analysen gespeichert. Klicke auf '💾 In Historie speichern' im Tab 'Detaildaten', um Analysen zu speichern.")
+                    if st.button(
+                        f"🗑️ {len(st.session_state.selected_analyses)} Auswahl löschen",
+                        type="primary",
+                        use_container_width=True
+                    ):
+                        deleted_count = 0
+                        for analysis_id in list(st.session_state.selected_analyses):
+                            if delete_analysis(analysis_id):
+                                deleted_count += 1
+                        
+                        st.session_state.selected_analyses.clear()
+                        st.success(f"✅ {deleted_count} Analyse(n) gelöscht!")
+                        st.rerun()
+            
+            # Statistiken
+            st.markdown("---")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Gespeicherte Analysen", len(history))
+            with col2:
+                if len(history) > 0:
+                    first_date = pd.to_datetime(history['Datum'].iloc[-1], format='%d.%m.%Y %H:%M')
+                    st.metric("Erste Analyse", first_date.strftime('%d.%m.%Y'))
+            with col3:
+                if len(history) > 0:
+                    last_date = pd.to_datetime(history['Datum'].iloc[0], format='%d.%m.%Y %H:%M')
+                    st.metric("Letzte Analyse", last_date.strftime('%d.%m.%Y'))
         else:
-            st.info("👈 Aktiviere 'Historie anzeigen' in der Sidebar, um deine gespeicherten Analysen zu sehen.")
+            st.info("📭 Noch keine Analysen gespeichert. Klicke auf '💾 In Historie speichern' im Tab 'Detaildaten', um Analysen zu speichern.")
 
 # Footer
 st.divider()
