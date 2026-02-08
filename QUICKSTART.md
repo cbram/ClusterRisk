@@ -239,7 +239,6 @@ pip install -r requirements.txt
 ### ETF wird nicht aufgelöst
 
 - **Erstelle ETF-Detail-Datei**: Siehe [README.md](README.md) "ETF-Detail-Dateien"
-- **Fallback**: `data/user_etf_holdings.csv` pflegen
 - **Cache löschen**: `rm -rf data/cache/*`
 
 ### Port bereits belegt

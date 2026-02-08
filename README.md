@@ -264,13 +264,12 @@ DE000A2T0VU5,XGDU,Xtrackers IE Physical Gold ETC Securities
 
 *Hinweis: Die genannten Websites sind unabhängige Informationsquellen. Nutzer müssen Daten manuell übertragen.*
 
-#### Fallback: Legacy-Strukturen
+#### Fallback
 
 Falls ein ETF noch keine Detail-Datei hat, nutzt das Tool automatisch Fallback-Quellen:
 
-1. **User CSV** (`data/user_etf_holdings.csv`) - Manuell gepflegte Holdings
-2. **Mock-Daten** (`src/mock_etf_holdings.py`) - Statische Daten für populäre ETFs
-3. **API-Fetcher** - Automatischer Abruf (meist unzuverlässig für EU-ETFs)
+1. **Mock-Daten** (`src/mock_etf_holdings.py`) - Statische Daten für populäre ETFs
+2. **API-Fetcher** - Automatischer Abruf (meist unzuverlässig für EU-ETFs)
 
 **Empfehlung:** Erstelle für alle deine ETFs ETF-Detail-Dateien für beste Ergebnisse!
 
@@ -290,7 +289,6 @@ In der Sidebar kannst du die Cache-Dauer für ETF-Daten einstellen (1-30 Tage). 
    - Kein API-Cache nötig
    
 2. **Fallback-Quellen** (wenn keine Detail-Datei vorhanden):
-   - User CSV (`data/user_etf_holdings.csv`) - Manuell gepflegt
    - Mock-Daten (`src/mock_etf_holdings.py`) - Statische Daten für wenige populäre ETFs
    - API-Fetcher (Yahoo Finance) - Meist unzuverlässig für EU-ETFs
 
@@ -396,8 +394,7 @@ ClusterRisk/
 │   ├── database.py            # Historie-Verwaltung
 │   ├── exchange_rate.py       # Wechselkurs-Manager (EZB-API)
 │   ├── ticker_sector_mapper.py # Dynamisches Ticker-Sektor-Mapping
-│   ├── mock_etf_holdings.py   # Mock-Daten (Legacy-Fallback)
-│   └── user_etf_holdings.py   # User-CSV Manager (Legacy-Fallback)
+│   └── mock_etf_holdings.py   # Mock-Daten (Legacy-Fallback)
 ├── data/
 │   ├── cache/                 # ETF-Daten & Wechselkurs Cache
 │   ├── etf_details/           # ⭐ Strukturierte ETF-Detail-Dateien (Primär)
@@ -410,7 +407,6 @@ ClusterRisk/
 │   │   ├── XGDU.csv          # Xtrackers Physical Gold ETC
 │   │   └── ...               # Deine weiteren ETFs hier
 │   ├── etf_isin_ticker_map.csv # ISIN-zu-Ticker-Mapping
-│   ├── user_etf_holdings.csv  # Legacy: Manuell gepflegte Holdings
 │   ├── ticker_sector_cache.json # Ticker-Sektor Cache
 │   └── history.db             # SQLite Historie
 └── README.md

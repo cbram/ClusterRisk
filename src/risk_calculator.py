@@ -213,7 +213,7 @@ def _expand_etf_holdings(portfolio_data: Dict, fetcher: ETFDataFetcher, use_cach
                     expanded.append(holding_info)
                     print(f"DEBUG:     Added Other Holdings (Mixed): €{other_holdings_entry['value']:.2f}")
             
-            # PRIORITÄT 2: Fallback zu bisherigem Fetcher (user_etf_holdings.csv, Mock, APIs)
+            # PRIORITÄT 2: Fallback zu bisherigem Fetcher (Mock, APIs)
             else:
                 print(f"DEBUG:   No detail file found, falling back to fetcher...")
                 # ETF auflösen via Fetcher
@@ -268,7 +268,7 @@ def _expand_etf_holdings(portfolio_data: Dict, fetcher: ETFDataFetcher, use_cach
                     diagnostics.add_warning(
                         'ETF-Daten',
                         f'ETF "{position["name"]}" konnte nicht aufgelöst werden',
-                        f'ISIN: {position["isin"]}. Bitte erstelle eine ETF-Detail-Datei in data/etf_details/ oder ergänze user_etf_holdings.csv.'
+                        f'ISIN: {position["isin"]}. Bitte erstelle eine ETF-Detail-Datei in data/etf_details/.'
                     )
                     expanded.append({
                         'name': position['name'],

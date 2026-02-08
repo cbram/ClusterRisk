@@ -53,16 +53,11 @@ ETFs werden in ihre Einzelpositionen aufgelöst mit mehreren Datenquellen:
    - Parser: `src/etf_details_parser.py`
    - **Vorteil:** Vollständige Allokationsdaten für korrekte "Other Holdings" Behandlung
 
-2. **User ETF Holdings** (`data/user_etf_holdings.csv`)
-   - Legacy-Format für manuelle Pflege
-   - Eine Datei für alle ETFs
-   - Parser: `src/user_etf_holdings.py`
-
-3. **Mock-Daten** (`src/mock_etf_holdings.py`)
+2. **Mock-Daten** (`src/mock_etf_holdings.py`)
    - Statische Daten für populäre ETFs
-   - Fallback wenn keine User-Daten vorhanden
+   - Fallback wenn keine Detail-Dateien vorhanden
 
-4. **API-Fetcher** (`src/etf_data_fetcher.py`)
+3. **API-Fetcher** (`src/etf_data_fetcher.py`)
    - Yahoo Finance, OpenFIGI
    - Letzter Fallback, meist für europäische ETFs unzuverlässig
 

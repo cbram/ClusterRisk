@@ -13,7 +13,6 @@ import json
 from datetime import datetime, timedelta
 import time
 from src.mock_etf_holdings import get_mock_holdings
-from src.user_etf_holdings import get_user_holdings_manager
 
 
 class ETFDataFetcher:
@@ -52,13 +51,6 @@ class ETFDataFetcher:
         
         # Verschiedene Quellen probieren
         holdings = None
-        
-        # 0. Prüfe User-definierte Holdings (höchste Priorität!)
-        user_mgr = get_user_holdings_manager()
-        holdings = user_mgr.get_holdings(isin)
-        if holdings:
-            print(f"DEBUG:   ✅ Using user-defined holdings: {len(holdings.get('holdings', []))} holdings")
-            return holdings
         
         # 1. Versuche justETF
         print(f"DEBUG:   Trying justETF...")

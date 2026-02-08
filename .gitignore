@@ -63,7 +63,6 @@ CHANGELOG_*
 # Aber: Beispiel-Dateien und ETF-Details committen
 !data/etf_details/*.csv
 !data/etf_isin_ticker_map.csv
-!data/user_etf_holdings.csv
 !data/ticker_sector_cache.json
 
 # Logs
