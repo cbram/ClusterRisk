@@ -19,7 +19,7 @@ from src.csv_parser import parse_portfolio_csv
 from src.risk_calculator import calculate_cluster_risks
 from src.visualizer import create_visualizations
 from src.export import export_to_calc
-from src.database import save_to_history, get_history
+from src.database import save_to_history, get_history, delete_analysis, clear_all_history
 from src.diagnostics import get_diagnostics, reset_diagnostics
 
 # Seiten-Konfiguration
@@ -419,7 +419,43 @@ else:
         if show_history:
             history = get_history()
             if not history.empty:
-                st.dataframe(history, use_container_width=True)
+                # Aktionen oberhalb der Tabelle
+                col1, col2 = st.columns([3, 1])
+                with col2:
+                    if st.button("🗑️ Alle löschen", type="secondary", use_container_width=True):
+                        if clear_all_history():
+                            st.success("✅ Alle Analysen gelöscht!")
+                            st.rerun()
+                        else:
+                            st.error("❌ Fehler beim Löschen")
+                
+                # Tabelle mit Lösch-Buttons
+                # Erstelle eine Kopie für die Anzeige
+                display_df = history.copy()
+                
+                # Zeige Tabelle
+                st.dataframe(display_df, use_container_width=True)
+                
+                # Lösch-Buttons für einzelne Einträge
+                st.markdown("---")
+                st.markdown("**Einzelne Analysen löschen:**")
+                
+                # Erstelle Buttons für jede Zeile
+                cols_per_row = 5
+                for i in range(0, len(history), cols_per_row):
+                    cols = st.columns(cols_per_row)
+                    for j, col in enumerate(cols):
+                        idx = i + j
+                        if idx < len(history):
+                            row = history.iloc[idx]
+                            with col:
+                                timestamp_str = row['timestamp'].strftime('%d.%m. %H:%M')
+                                if st.button(f"🗑️ ID {row['id']}\n{timestamp_str}", key=f"delete_{row['id']}", use_container_width=True):
+                                    if delete_analysis(row['id']):
+                                        st.success(f"✅ Analyse {row['id']} gelöscht!")
+                                        st.rerun()
+                                    else:
+                                        st.error(f"❌ Fehler beim Löschen von {row['id']}")
                 
                 # Statistiken
                 st.markdown("---")

@@ -186,3 +186,42 @@ def get_timeline(category: str = 'total_value') -> pd.DataFrame:
     Convenience-Funktion für Zeitreihen-Daten
     """
     return _db.get_timeline_data(category)
+
+
+def delete_analysis(analysis_id: int) -> bool:
+    """
+    Löscht eine Analyse aus der Historie
+    
+    Args:
+        analysis_id: ID der zu löschenden Analyse
+        
+    Returns:
+        True wenn erfolgreich gelöscht, False sonst
+    """
+    try:
+        with sqlite3.connect(_db.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM analyses WHERE id = ?", (analysis_id,))
+            conn.commit()
+            return cursor.rowcount > 0
+    except Exception as e:
+        print(f"Fehler beim Löschen der Analyse {analysis_id}: {e}")
+        return False
+
+
+def clear_all_history() -> bool:
+    """
+    Löscht alle Analysen aus der Historie
+    
+    Returns:
+        True wenn erfolgreich, False sonst
+    """
+    try:
+        with sqlite3.connect(_db.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM analyses")
+            conn.commit()
+            return True
+    except Exception as e:
+        print(f"Fehler beim Löschen aller Analysen: {e}")
+        return False
