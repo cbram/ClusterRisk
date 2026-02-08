@@ -186,7 +186,6 @@ with st.sidebar:
     
     # Historie
     st.subheader("Historie")
-    save_history = st.checkbox("Analyse speichern", value=True)
     show_history = st.checkbox("Historie anzeigen", value=False)
 
 # Hauptbereich
@@ -394,6 +393,16 @@ else:
         # Daten-Tabellen anzeigen
         st.markdown("---")
         
+        # Speichern-Button
+        col1, col2 = st.columns([3, 1])
+        with col2:
+            if st.button("💾 In Historie speichern", type="primary", use_container_width=True):
+                save_to_history(portfolio_data, risk_data)
+                st.success("✅ Analyse gespeichert!")
+                st.rerun()  # Aktualisiere die Seite damit Historie-Tab sich aktualisiert
+        
+        st.markdown("---")
+        
         for category in ["asset_class", "sector", "currency", "country", "positions"]:
             with st.expander(f"📊 {category.replace('_', ' ').title()}-Daten"):
                 df = risk_data[category]
@@ -426,13 +435,9 @@ else:
                         last_date = history['timestamp'].iloc[0]
                         st.metric("Letzte Analyse", last_date.strftime('%d.%m.%Y'))
             else:
-                st.info("📭 Noch keine Analysen gespeichert. Aktiviere 'Analyse speichern' in der Sidebar, um Historie aufzubauen.")
+                st.info("📭 Noch keine Analysen gespeichert. Klicke auf '💾 In Historie speichern' im Tab 'Detaildaten', um Analysen zu speichern.")
         else:
             st.info("👈 Aktiviere 'Historie anzeigen' in der Sidebar, um deine gespeicherten Analysen zu sehen.")
-    
-    # Historie speichern
-    if save_history:
-        save_to_history(portfolio_data, risk_data)
 
 # Footer
 st.divider()
