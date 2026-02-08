@@ -413,59 +413,49 @@ else:
                     else:
                         st.error("❌ Fehler beim Löschen")
             
-            # Tabelle OHNE Index anzeigen
-            st.dataframe(history, use_container_width=True, hide_index=True)
+            # Füge Checkbox-Spalte hinzu
+            history_with_selection = history.copy()
+            history_with_selection.insert(0, '🗑️', False)
             
-            # Lösch-Auswahl mit Checkboxen
-            st.markdown("---")
-            st.markdown("**Analysen zum Löschen auswählen:**")
+            # Interaktive Tabelle mit Checkboxen
+            edited_df = st.data_editor(
+                history_with_selection,
+                use_container_width=True,
+                hide_index=True,
+                column_config={
+                    '🗑️': st.column_config.CheckboxColumn(
+                        '🗑️',
+                        help="Zum Löschen auswählen",
+                        default=False
+                    ),
+                    'ID': st.column_config.NumberColumn('ID', disabled=True),
+                    'Datum': st.column_config.TextColumn('Datum', disabled=True),
+                    'Gesamt-Wert': st.column_config.TextColumn('Gesamt-Wert', disabled=True),
+                    'Positionen': st.column_config.NumberColumn('Positionen', disabled=True),
+                    'ETFs': st.column_config.NumberColumn('ETFs', disabled=True),
+                    'Aktien': st.column_config.NumberColumn('Aktien', disabled=True)
+                },
+                disabled=['ID', 'Datum', 'Gesamt-Wert', 'Positionen', 'ETFs', 'Aktien']
+            )
             
-            # Initialisiere Session State für Checkboxen
-            if 'selected_analyses' not in st.session_state:
-                st.session_state.selected_analyses = set()
-            
-            # Checkboxen für jede Analyse (in Spalten)
-            cols_per_row = 4
-            for i in range(0, len(history), cols_per_row):
-                cols = st.columns(cols_per_row)
-                for j, col in enumerate(cols):
-                    idx = i + j
-                    if idx < len(history):
-                        row = history.iloc[idx]
-                        with col:
-                            analysis_id = int(row['ID'])
-                            datum = row['Datum']
-                            wert = row['Gesamt-Wert']
-                            
-                            # Checkbox für diese Analyse
-                            is_selected = st.checkbox(
-                                f"ID {analysis_id}: {datum}\n{wert}",
-                                key=f"select_{analysis_id}",
-                                value=analysis_id in st.session_state.selected_analyses
-                            )
-                            
-                            # Aktualisiere Session State
-                            if is_selected:
-                                st.session_state.selected_analyses.add(analysis_id)
-                            elif analysis_id in st.session_state.selected_analyses:
-                                st.session_state.selected_analyses.remove(analysis_id)
+            # Prüfe welche Zeilen ausgewählt wurden
+            selected_ids = edited_df[edited_df['🗑️'] == True]['ID'].tolist()
             
             # Lösch-Button erscheint nur wenn Auswahl vorhanden
-            if st.session_state.selected_analyses:
+            if selected_ids:
                 st.markdown("---")
                 col1, col2, col3 = st.columns([2, 1, 2])
                 with col2:
                     if st.button(
-                        f"🗑️ {len(st.session_state.selected_analyses)} Auswahl löschen",
+                        f"🗑️ {len(selected_ids)} Auswahl löschen",
                         type="primary",
                         use_container_width=True
                     ):
                         deleted_count = 0
-                        for analysis_id in list(st.session_state.selected_analyses):
-                            if delete_analysis(analysis_id):
+                        for analysis_id in selected_ids:
+                            if delete_analysis(int(analysis_id)):
                                 deleted_count += 1
                         
-                        st.session_state.selected_analyses.clear()
                         st.success(f"✅ {deleted_count} Analyse(n) gelöscht!")
                         st.rerun()
             
