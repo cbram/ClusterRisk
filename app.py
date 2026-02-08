@@ -429,12 +429,8 @@ else:
                         else:
                             st.error("❌ Fehler beim Löschen")
                 
-                # Tabelle mit Lösch-Buttons
-                # Erstelle eine Kopie für die Anzeige
-                display_df = history.copy()
-                
-                # Zeige Tabelle
-                st.dataframe(display_df, use_container_width=True)
+                # Tabelle OHNE Index anzeigen
+                st.dataframe(history, use_container_width=True, hide_index=True)
                 
                 # Lösch-Buttons für einzelne Einträge
                 st.markdown("---")
