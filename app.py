@@ -353,39 +353,38 @@ else:
     with tab6:
         st.subheader("Detaillierte Daten")
         
-        # Export-Buttons
-        col1, col2 = st.columns(2)
+        # Export-Buttons UND Speichern-Button in einer Zeile
+        col1, col2, col3 = st.columns(3)
         with col1:
             if export_format in ["Excel (.xlsx)", "Beide"]:
                 xlsx_data = export_to_calc(risk_data, format='xlsx')
                 st.download_button(
-                    label="📥 Als Excel (.xlsx) herunterladen",
+                    label="📥 Excel (.xlsx)",
                     data=xlsx_data,
                     file_name="portfolio_klumpenrisiko.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    use_container_width=True
                 )
         
         with col2:
             if export_format in ["LibreOffice (.ods)", "Beide"]:
                 ods_data = export_to_calc(risk_data, format='ods')
                 st.download_button(
-                    label="📥 Als LibreOffice (.ods) herunterladen",
+                    label="📥 LibreOffice (.ods)",
                     data=ods_data,
                     file_name="portfolio_klumpenrisiko.ods",
-                    mime="application/vnd.oasis.opendocument.spreadsheet"
+                    mime="application/vnd.oasis.opendocument.spreadsheet",
+                    use_container_width=True
                 )
         
-        # Daten-Tabellen anzeigen
-        st.markdown("---")
-        
-        # Speichern-Button
-        col1, col2 = st.columns([3, 1])
-        with col2:
+        with col3:
+            # Speichern-Button prominent neben Export-Buttons
             if st.button("💾 In Historie speichern", type="primary", use_container_width=True):
                 save_to_history(portfolio_data, risk_data)
                 st.success("✅ Analyse gespeichert!")
                 st.rerun()  # Aktualisiere die Seite damit Historie-Tab sich aktualisiert
         
+        # Daten-Tabellen anzeigen
         st.markdown("---")
         
         for category in ["asset_class", "sector", "currency", "country", "positions"]:
