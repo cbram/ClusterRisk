@@ -1,5 +1,16 @@
 # Changelog - ClusterRisk
 
+## [1.4.1] - 2026-02-08 - Cleanup: Legacy-Fallback entfernt
+
+### 🗑️ Entfernt
+
+- **`data/user_etf_holdings.csv`** und **`src/user_etf_holdings.py`** komplett entfernt
+- Die Datei enthielt fehlerhafte Daten und wird durch ETF-Detail-Dateien (`data/etf_details/`) vollständig ersetzt
+- Fallback-Logik in `src/etf_data_fetcher.py` bereinigt
+- Alle Referenzen in Dokumentation (README, CLAUDE.md, QUICKSTART.md) und `.gitignore` aktualisiert
+
+---
+
 ## [1.4.0] - 2026-02-08 - Historische Auswertungen & UI-Verbesserungen
 
 ### ✨ Neue Features
