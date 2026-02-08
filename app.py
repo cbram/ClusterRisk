@@ -301,13 +301,14 @@ else:
             st.stop()
     
     # Tabs für verschiedene Analysen
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
         "📊 Anlageklasse",
         "🏭 Branche",
         "💱 Währung",
         "🌍 Land",
         "📈 Einzelpositionen",
-        "📋 Detaildaten"
+        "📋 Detaildaten",
+        "🕐 Historie"
     ])
     
     with tab1:
@@ -402,6 +403,32 @@ else:
         with st.expander("📊 Währung (mit Commodities)-Daten"):
             df = risk_data['currency_with_commodities']
             st.dataframe(df, width='stretch', height=400)
+    
+    with tab7:
+        st.subheader("📈 Analyse-Historie")
+        
+        if show_history:
+            history = get_history()
+            if not history.empty:
+                st.dataframe(history, use_container_width=True)
+                
+                # Statistiken
+                st.markdown("---")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.metric("Gespeicherte Analysen", len(history))
+                with col2:
+                    if len(history) > 1:
+                        first_date = history['timestamp'].iloc[-1]
+                        st.metric("Erste Analyse", first_date.strftime('%d.%m.%Y'))
+                with col3:
+                    if len(history) > 1:
+                        last_date = history['timestamp'].iloc[0]
+                        st.metric("Letzte Analyse", last_date.strftime('%d.%m.%Y'))
+            else:
+                st.info("📭 Noch keine Analysen gespeichert. Aktiviere 'Analyse speichern' in der Sidebar, um Historie aufzubauen.")
+        else:
+            st.info("👈 Aktiviere 'Historie anzeigen' in der Sidebar, um deine gespeicherten Analysen zu sehen.")
     
     # Historie speichern
     if save_history:
