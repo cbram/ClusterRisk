@@ -6,7 +6,9 @@ Type,Stock
 Region,USA
 Currency,EUR
 TER,0.15%
+Proxy ISIN,IE000Z9SJA06
 Last Updated,2026-02-04
+Source,justETF (via Proxy: IE000Z9SJA06)
 
 # Country Allocation (%)
 Country,Weight

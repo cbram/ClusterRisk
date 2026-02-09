@@ -264,14 +264,22 @@ DE000A2T0VU5,XGDU,Xtrackers IE Physical Gold ETC Securities
 
 *Hinweis: Die genannten Websites sind unabhängige Informationsquellen. Nutzer müssen Daten manuell übertragen.*
 
+#### Automatische Generierung (NEU)
+
+Anstatt ETF-Detail-Dateien manuell zu erstellen, kannst du sie jetzt **automatisch von justETF generieren**:
+
+1. In der Sidebar unter "🔄 ETF-Details generieren"
+2. ISIN und Ticker eingeben
+3. Optional: "Vorschau" klicken um Daten zu prüfen
+4. "Generieren" klickt → Datei wird erstellt + ISIN-Map wird aktualisiert
+
+**Automatisch erfasst:** Holdings (mit ISINs), Länder-Allokation, Sektor-Allokation, Metadaten (TER, Fondswährung etc.)
+**Automatisch abgeleitet:** Währungs-Allokation (aus Ländern → Währungen)
+**Manuell zu prüfen:** ETF-Typ (Stock/Bond/Money Market/Commodity), Währungs-Allokation
+
 #### Fallback
 
-Falls ein ETF noch keine Detail-Datei hat, nutzt das Tool automatisch Fallback-Quellen:
-
-1. **Mock-Daten** (`src/mock_etf_holdings.py`) - Statische Daten für populäre ETFs
-2. **API-Fetcher** - Automatischer Abruf (meist unzuverlässig für EU-ETFs)
-
-**Empfehlung:** Erstelle für alle deine ETFs ETF-Detail-Dateien für beste Ergebnisse!
+Falls ein ETF noch keine Detail-Datei hat, nutzt das Tool automatisch den API-Fetcher (justETF Scraping, Yahoo Finance). Für beste Ergebnisse empfehlen wir, ETF-Detail-Dateien zu generieren.
 
 ### Cache-Einstellungen
 
@@ -286,10 +294,11 @@ In der Sidebar kannst du die Cache-Dauer für ETF-Daten einstellen (1-30 Tage). 
 1. **ETF-Detail-Dateien** (`data/etf_details/*.csv`) - **Empfohlen!**
    - Strukturierte Dateien pro ETF mit vollständigen Allokationen
    - Beste Datenqualität und Genauigkeit
+   - Automatisch generierbar via justETF oder manuell erstellbar
    - Kein API-Cache nötig
    
 2. **Fallback-Quellen** (wenn keine Detail-Datei vorhanden):
-   - Mock-Daten (`src/mock_etf_holdings.py`) - Statische Daten für wenige populäre ETFs
+   - justETF Scraping - Für EU-ETFs die beste automatische Quelle
    - API-Fetcher (Yahoo Finance) - Meist unzuverlässig für EU-ETFs
 
 **Wechselkurse (automatisch):**
@@ -394,7 +403,7 @@ ClusterRisk/
 │   ├── database.py            # Historie-Verwaltung
 │   ├── exchange_rate.py       # Wechselkurs-Manager (EZB-API)
 │   ├── ticker_sector_mapper.py # Dynamisches Ticker-Sektor-Mapping
-│   └── mock_etf_holdings.py   # Mock-Daten (Legacy-Fallback)
+│   └── etf_detail_generator.py # Auto-Generator für ETF-Detail-Dateien (justETF)
 ├── data/
 │   ├── cache/                 # ETF-Daten & Wechselkurs Cache
 │   ├── etf_details/           # ⭐ Strukturierte ETF-Detail-Dateien (Primär)

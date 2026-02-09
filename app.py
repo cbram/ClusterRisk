@@ -23,6 +23,10 @@ from src.visualizer import create_visualizations
 from src.export import export_to_calc
 from src.database import save_to_history, get_history, delete_analysis, clear_all_history, vacuum_database, get_history_timeseries
 from src.diagnostics import get_diagnostics, reset_diagnostics
+from src.etf_detail_generator import (
+    generate_etf_detail_file, preview_etf_data, 
+    get_etf_detail_status, update_etf_detail_file, batch_update_etf_details
+)
 
 # Seiten-Konfiguration
 st.set_page_config(
@@ -56,6 +60,16 @@ with st.sidebar:
     # Format-Info
     if uploaded_file:
         st.caption(f"📄 Dateiformat: CSV")
+        # Portfolio frühzeitig parsen und in session_state speichern,
+        # damit ETF-Filterung weiter unten in der Sidebar darauf zugreifen kann
+        if 'portfolio_data' not in st.session_state or st.session_state.get('_last_uploaded_file') != uploaded_file.name:
+            try:
+                portfolio_data_early = parse_portfolio_csv(uploaded_file)
+                st.session_state['portfolio_data'] = portfolio_data_early
+                st.session_state['_last_uploaded_file'] = uploaded_file.name
+                uploaded_file.seek(0)  # Zurücksetzen für späteres Lesen im Hauptbereich
+            except Exception:
+                pass  # Fehler werden im Hauptbereich behandelt
     
     # Speichern-Button direkt unter dem Upload
     if st.button(
@@ -191,13 +205,289 @@ with st.sidebar:
     
     st.divider()
     
-    # Export Optionen
-    st.subheader("Export")
-    export_format = st.selectbox(
-        "Format",
-        ["Excel (.xlsx)", "LibreOffice (.ods)", "Beide"],
-        index=0
-    )
+    # ETF Detail Generator
+    st.subheader("🔄 ETF-Details")
+    
+    # --- Bestehende ETFs: Übersicht mit Alter ---
+    # Nur ETFs anzeigen, die im geladenen Portfolio enthalten sind
+    # Alle ISINs aus dem Portfolio sammeln (nicht nur type=='ETF',
+    # da z.B. Geldmarkt-ETFs als 'Cash' klassifiziert werden)
+    portfolio_isins = set()
+    if 'portfolio_data' in st.session_state:
+        for pos in st.session_state['portfolio_data']['positions']:
+            if pos.get('isin'):
+                portfolio_isins.add(pos['isin'])
+    
+    etf_status_all = get_etf_detail_status()
+    
+    if portfolio_isins:
+        etf_status = [e for e in etf_status_all if e['isin'] in portfolio_isins]
+    else:
+        etf_status = etf_status_all
+    
+    if etf_status:
+        # Zähler nach Datenquelle
+        auto_count = sum(1 for e in etf_status if e.get('data_source') == 'auto')
+        proxy_count = sum(1 for e in etf_status if e.get('data_source') == 'proxy')
+        manual_count = sum(1 for e in etf_status if e.get('data_source') == 'manual')
+        updatable = [e for e in etf_status if e.get('data_source') != 'manual']
+        stale_count = sum(1 for e in updatable if e['is_stale'])
+        
+        with st.expander(
+            f"📋 {len(etf_status)} ETF-Dateien vorhanden" + 
+            (f" ({stale_count} veraltet)" if stale_count > 0 else " (alle aktuell)"),
+            expanded=False
+        ):
+            # Legende
+            st.caption("🤖 = auto · 🔗 = Proxy · ✋ = manuell")
+            
+            for etf_info in etf_status:
+                ticker = etf_info['ticker']
+                days = etf_info['days_old']
+                data_source = etf_info.get('data_source', 'manual')
+                
+                # Source-Icon
+                if data_source == 'proxy':
+                    source_icon = '🔗'
+                elif data_source == 'auto':
+                    source_icon = '🤖'
+                else:
+                    source_icon = '✋'
+                
+                # Alters-Anzeige
+                if days is None:
+                    age_text = "⚠️ kein Datum"
+                elif days <= 30:
+                    age_text = f"✅ {days}d"
+                elif days <= 60:
+                    age_text = f"🟡 {days}d"
+                else:
+                    age_text = f"🔴 {days}d"
+                
+                # Proxy-Hinweis
+                proxy_hint = ""
+                if etf_info.get('proxy_isin'):
+                    proxy_hint = f" ↦ {etf_info['proxy_isin']}"
+                
+                col_info, col_btn = st.columns([3, 1])
+                with col_info:
+                    st.caption(
+                        f"{source_icon} **{ticker}** ({etf_info['type']}) — {age_text}{proxy_hint}"
+                    )
+                with col_btn:
+                    # Manuelle ETFs können nicht automatisch aktualisiert werden
+                    if data_source == 'manual':
+                        st.button("—", key=f"update_{ticker}", disabled=True, help=f"{ticker}: Manuell gepflegt")
+                    else:
+                        if st.button("🔄", key=f"update_{ticker}", help=f"{ticker} aktualisieren"):
+                            with st.spinner(f"{ticker} wird aktualisiert..."):
+                                success, msg = update_etf_detail_file(ticker)
+                                if success:
+                                    st.success(f"✅ {ticker}")
+                                    st.rerun()
+                                else:
+                                    st.error(f"❌ {ticker}: {msg}")
+            
+            # Batch-Update Button
+            st.markdown("---")
+            
+            updatable_count = len(updatable)
+            
+            col_batch_stale, col_batch_all = st.columns(2)
+            
+            with col_batch_stale:
+                batch_stale_clicked = st.button(
+                    f"🔄 Veraltete ({stale_count})",
+                    use_container_width=True,
+                    disabled=stale_count == 0,
+                    help="Alle auto/proxy ETFs aktualisieren, die älter als 30 Tage sind (manuelle werden übersprungen)"
+                )
+            
+            with col_batch_all:
+                batch_all_clicked = st.button(
+                    f"🔄 Alle ({updatable_count})",
+                    use_container_width=True,
+                    disabled=updatable_count == 0,
+                    help="Alle auto/proxy ETF-Detail-Dateien neu generieren (manuelle werden übersprungen)"
+                )
+            
+            if manual_count > 0:
+                st.caption(f"ℹ️ {manual_count} manuell gepflegte ETF(s) werden bei Batch-Updates übersprungen.")
+            
+            # Batch-Update Ausführung
+            if batch_stale_clicked and stale_count > 0:
+                progress_bar = st.progress(0, text="Starte Update...")
+                
+                def update_progress(current, total, ticker):
+                    progress_bar.progress(
+                        (current) / total, 
+                        text=f"Aktualisiere {ticker} ({current + 1}/{total})..."
+                    )
+                
+                results = batch_update_etf_details(only_stale=True, progress_callback=update_progress)
+                progress_bar.progress(1.0, text="Fertig!")
+                
+                success_count = sum(1 for r in results if r['success'])
+                fail_count = sum(1 for r in results if not r['success'])
+                
+                if success_count > 0:
+                    st.success(f"✅ {success_count} ETF(s) aktualisiert")
+                if fail_count > 0:
+                    for r in results:
+                        if not r['success']:
+                            st.error(f"❌ {r['ticker']}: {r['message']}")
+                
+                st.rerun()
+            
+            if batch_all_clicked:
+                progress_bar = st.progress(0, text="Starte Update...")
+                
+                def update_progress_all(current, total, ticker):
+                    progress_bar.progress(
+                        (current) / total,
+                        text=f"Aktualisiere {ticker} ({current + 1}/{total})..."
+                    )
+                
+                results = batch_update_etf_details(only_stale=False, progress_callback=update_progress_all)
+                progress_bar.progress(1.0, text="Fertig!")
+                
+                success_count = sum(1 for r in results if r['success'])
+                fail_count = sum(1 for r in results if not r['success'])
+                
+                if success_count > 0:
+                    st.success(f"✅ {success_count} ETF(s) aktualisiert")
+                if fail_count > 0:
+                    for r in results:
+                        if not r['success']:
+                            st.error(f"❌ {r['ticker']}: {r['message']}")
+                
+                st.rerun()
+    
+    # --- Neuen ETF hinzufügen ---
+    with st.expander("➕ Neuen ETF hinzufügen"):
+        gen_isin = st.text_input(
+            "ISIN", 
+            placeholder="z.B. IE00B4L5Y983",
+            help="ISIN des ETFs, für den eine Detail-Datei generiert werden soll"
+        )
+        gen_ticker = st.text_input(
+            "Ticker / Dateiname",
+            placeholder="z.B. EUNL",
+            help="Ticker-Symbol (wird als Dateiname verwendet: {TICKER}.csv)"
+        )
+        
+        gen_type = st.selectbox(
+            "ETF-Typ",
+            ["Stock", "Bond", "Money Market", "Commodity"],
+            index=0,
+            help="Stock = Aktien-ETF, Bond = Anleihen, Money Market = Geldmarkt (→ Cash), Commodity = Rohstoffe"
+        )
+        
+        gen_region = st.text_input(
+            "Region (optional)",
+            placeholder="z.B. World, USA, Europe",
+            help="Regionsbezeichnung für Metadaten"
+        )
+        
+        gen_proxy_isin = st.text_input(
+            "Proxy-ISIN (optional, für Swap-ETFs)",
+            placeholder="z.B. IE00B4L5Y983",
+            help="ISIN eines physisch replizierenden ETFs auf denselben Index. "
+                 "Allokationen und Holdings werden vom Proxy gescrapet, "
+                 "Metadaten bleiben die des eigentlichen ETFs."
+        )
+        
+        col_preview, col_generate = st.columns(2)
+        
+        with col_preview:
+            preview_clicked = st.button(
+                "👁️ Vorschau",
+                use_container_width=True,
+                disabled=not gen_isin,
+                help="Daten von justETF abrufen und anzeigen, ohne Datei zu speichern"
+            )
+        
+        with col_generate:
+            generate_clicked = st.button(
+                "💾 Generieren",
+                type="primary",
+                use_container_width=True,
+                disabled=not (gen_isin and gen_ticker),
+                help="ETF-Detail-Datei generieren und speichern"
+            )
+        
+        # Vorschau-Logik
+        if preview_clicked and gen_isin:
+            with st.spinner("Daten werden von justETF abgerufen..."):
+                preview_data = preview_etf_data(gen_isin.strip())
+                
+                if preview_data:
+                    st.session_state['etf_preview'] = preview_data
+                    st.success(f"✅ {preview_data.get('name', 'Unbekannt')}")
+                else:
+                    st.error("❌ Keine Daten gefunden. Prüfe die ISIN.")
+        
+        # Vorschau anzeigen
+        if 'etf_preview' in st.session_state:
+            preview = st.session_state['etf_preview']
+            with st.expander("📋 Vorschau-Daten", expanded=True):
+                st.markdown(f"**{preview.get('name', 'N/A')}**")
+                
+                meta = preview.get('metadata', {})
+                if meta:
+                    meta_text = " | ".join([f"{k}: {v}" for k, v in meta.items()])
+                    st.caption(meta_text)
+                
+                cols = st.columns(3)
+                with cols[0]:
+                    st.markdown("**Holdings**")
+                    for h in preview.get('holdings', [])[:10]:
+                        st.caption(f"• {h['name']}: {h['weight']:.1f}%")
+                    remaining = len(preview.get('holdings', [])) - 10
+                    if remaining > 0:
+                        st.caption(f"... +{remaining} weitere")
+                
+                with cols[1]:
+                    st.markdown("**Länder**")
+                    for c in preview.get('countries', [])[:8]:
+                        st.caption(f"• {c['name']}: {c['weight']:.1f}%")
+                    remaining = len(preview.get('countries', [])) - 8
+                    if remaining > 0:
+                        st.caption(f"... +{remaining} weitere")
+                
+                with cols[2]:
+                    st.markdown("**Sektoren**")
+                    for s in preview.get('sectors', [])[:8]:
+                        st.caption(f"• {s['name']}: {s['weight']:.1f}%")
+                
+                # Abgeleitete Währungen
+                derived_cur = preview.get('currency_allocation_derived', [])
+                if derived_cur:
+                    st.markdown("**Währungen (abgeleitet)**")
+                    cur_text = " | ".join([f"{c['name']}: {c['weight']:.1f}%" for c in derived_cur[:6]])
+                    st.caption(cur_text)
+                
+                st.info("💡 Bitte prüfe die Daten. ETF-Typ und Währungs-Allokation sind ggf. anzupassen.")
+        
+        # Generierungs-Logik
+        if generate_clicked and gen_isin and gen_ticker:
+            with st.spinner("ETF-Detail-Datei wird generiert..."):
+                success, msg, data = generate_etf_detail_file(
+                    isin=gen_isin.strip(),
+                    ticker=gen_ticker.strip().upper(),
+                    etf_type=gen_type,
+                    region=gen_region.strip(),
+                    proxy_isin=gen_proxy_isin.strip() if gen_proxy_isin else ''
+                )
+                
+                if success:
+                    st.success(f"✅ Datei generiert: data/etf_details/{gen_ticker.strip().upper()}.csv")
+                    # Vorschau löschen nach erfolgreicher Generierung
+                    if 'etf_preview' in st.session_state:
+                        del st.session_state['etf_preview']
+                    st.rerun()
+                else:
+                    st.error(f"❌ {msg}")
 
 # Hauptbereich
 if uploaded_file is None:
@@ -227,12 +517,14 @@ else:
     
     with st.spinner("📂 Portfolio Performance CSV wird gelesen..."):
         try:
-            portfolio_data = parse_portfolio_csv(uploaded_file)
+            # Portfolio aus session_state verwenden falls bereits in Sidebar geparst
+            if 'portfolio_data' in st.session_state and st.session_state.get('_last_uploaded_file') == uploaded_file.name:
+                portfolio_data = st.session_state['portfolio_data']
+            else:
+                portfolio_data = parse_portfolio_csv(uploaded_file)
+                st.session_state['portfolio_data'] = portfolio_data
             
             st.success(f"✅ Portfolio erfolgreich geladen: {portfolio_data['total_positions']} Positionen")
-            
-            # In session_state speichern für Sidebar-Button
-            st.session_state['portfolio_data'] = portfolio_data
             
             # Portfolio Übersicht
             col1, col2, col3, col4 = st.columns(4)
@@ -379,26 +671,24 @@ else:
         # Export-Buttons
         col1, col2 = st.columns(2)
         with col1:
-            if export_format in ["Excel (.xlsx)", "Beide"]:
-                xlsx_data = export_to_calc(risk_data, format='xlsx')
-                st.download_button(
-                    label="📥 Excel (.xlsx)",
-                    data=xlsx_data,
-                    file_name="portfolio_klumpenrisiko.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    use_container_width=True
-                )
+            xlsx_data = export_to_calc(risk_data, format='xlsx')
+            st.download_button(
+                label="📥 Excel (.xlsx)",
+                data=xlsx_data,
+                file_name="portfolio_klumpenrisiko.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True
+            )
         
         with col2:
-            if export_format in ["LibreOffice (.ods)", "Beide"]:
-                ods_data = export_to_calc(risk_data, format='ods')
-                st.download_button(
-                    label="📥 LibreOffice (.ods)",
-                    data=ods_data,
-                    file_name="portfolio_klumpenrisiko.ods",
-                    mime="application/vnd.oasis.opendocument.spreadsheet",
-                    use_container_width=True
-                )
+            ods_data = export_to_calc(risk_data, format='ods')
+            st.download_button(
+                label="📥 LibreOffice (.ods)",
+                data=ods_data,
+                file_name="portfolio_klumpenrisiko.ods",
+                mime="application/vnd.oasis.opendocument.spreadsheet",
+                use_container_width=True
+            )
         
         # Daten-Tabellen anzeigen
         st.markdown("---")

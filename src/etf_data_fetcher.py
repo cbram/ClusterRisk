@@ -12,7 +12,6 @@ from pathlib import Path
 import json
 from datetime import datetime, timedelta
 import time
-from src.mock_etf_holdings import get_mock_holdings
 
 
 class ETFDataFetcher:
@@ -71,13 +70,6 @@ class ETFDataFetcher:
             print(f"DEBUG:   Trying Yahoo Finance...")
             # Nutze Ticker-Symbol aus PP falls vorhanden
             holdings = self._fetch_from_yahoo(isin, ticker_symbol=ticker_symbol)
-        
-        # 5. Fallback: Mock Data für bekannte ETFs
-        if not holdings:
-            print(f"DEBUG:   Trying Mock Data...")
-            holdings = get_mock_holdings(isin)
-            if holdings:
-                print(f"DEBUG:   ✅ Using mock data for {isin}: {len(holdings.get('holdings', []))} holdings")
         
         # Cache speichern
         if holdings:

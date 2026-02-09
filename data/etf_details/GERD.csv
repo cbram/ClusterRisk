@@ -1,73 +1,79 @@
 # ETF Metadata
 ISIN,IE0001UQQ933
-Name,L&G Gerd Kommer Multifactor Equity UCITS ETF (Acc)
+Name,L&G Gerd Kommer Multifactor Equity UCITS ETF USD Accumulating
 Ticker,GERD
 Type,Stock
 Region,World
 Currency,USD
-TER,0.45%
-Last Updated,2026-02-04
+TER,0.92
+Last Updated,2026-02-09
+Source,justETF (auto-generated)
 
 # Country Allocation (%)
 Country,Weight
-United States,46.16
-China,5.38
-Japan,5.22
-United Kingdom,3.87
-Germany,3.81
-Canada,3.21
-France,2.99
-India,2.85
-Switzerland,2.22
-Australia,2.22
-South Korea,2.22
-Taiwan,2.01
-Spain,1.66
-Netherlands,1.63
-Italy,1.47
-Sweden,1.27
-Brazil,1.12
-Hong Kong,0.96
-Denmark,0.91
-Singapore,0.90
-Other,9.91
+United States,43.9
+Japan,5.1
+China,4.3
+United Kingdom,3.9
+Germany,3.8
+France,3.0
+Canada,2.9
+India,2.9
+Switzerland,2.2
+South Korea,2.2
+Australia,2.2
+Taiwan,1.9
+Spain,1.5
+Italy,1.4
+Netherlands,1.3
+Hong Kong,1.2
+Sweden,1.1
+Ireland,1.1
+Other,14.0
 
 # Sector Allocation (%)
 Sector,Weight
-Financial Services,20.51
-Technology,20.26
-Industrials,11.36
-Consumer Cyclical,9.81
-Healthcare,7.50
-Consumer Staples,6.33
-Energy,5.50
-Communication Services,4.73
-Materials,4.16
-Utilities,2.33
-Real Estate,2.42
+Technology,20.3
+Financials,18.2
+Industrials,11.5
+Consumer Discretionary,8.9
+Health Care,8.7
+Telecommunication,8.3
+Basic Materials,5.5
+Consumer Staples,4.6
+Energy,4.0
+Utilities,3.0
+Real Estate,2.0
+Other,5.0
 
-# Currency Allocation (%)
+# Currency Allocation (%) - auto-derived from countries
 Currency,Weight
-USD,46.19
-EUR,13.14
-CNY,5.38
-JPY,5.22
-GBP,3.87
-CAD,3.21
-INR,2.85
-CHF,2.22
-AUD,2.22
-KRW,2.22
-TWD,2.01
-Other,11.27
+USD,43.9
+EUR,12.2
+JPY,5.1
+CNY,4.3
+GBP,3.9
+CAD,2.9
+INR,2.9
+CHF,2.2
+KRW,2.2
+AUD,2.2
+TWD,1.9
+HKD,1.2
+SEK,1.1
+Other,14.0
 
 # Top Holdings
 Name,Weight,Currency,Sector,Country,ISIN
-Taiwan Semiconductor Manufacturing,1.23,TWD,Technology,TW,TW0002330008
-Samsung Electronics,0.87,KRW,Technology,KR,KR7005930003
-Tencent Holdings,0.76,HKD,Communication Services,CN,KYG875721634
-NVIDIA,0.71,USD,Technology,US,US67066G1040
-Apple,0.68,USD,Technology,US,US0378331005
-Alibaba Group,0.66,CNY,Consumer Cyclical,CN,KYG017191142
-Broadcom,0.62,USD,Technology,US,US11135F1012
-Other Holdings,94.47,Mixed,Diversified,Mixed,
+Apple,1.06,USD,Unknown,US,
+"Visa, Inc.",0.93,USD,Unknown,US,
+Microsoft,0.92,USD,Unknown,US,
+"Mastercard, Inc.",0.92,USD,Unknown,US,
+NVIDIA Corp.,0.92,USD,Unknown,US,
+Meta Platforms,0.89,USD,Unknown,US,
+Netflix,0.84,USD,Unknown,US,
+Deutsche Telekom AG,0.81,EUR,Unknown,DE,
+"Taiwan Semiconductor Manufacturing Co., Ltd.",0.80,TWD,Unknown,TW,
+JPMorgan Chase & Co.,0.68,USD,Unknown,US,
+Other Holdings,91.23,Mixed,Diversified,Mixed,
+

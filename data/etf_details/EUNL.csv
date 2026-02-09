@@ -1,4 +1,4 @@
-METADATA
+# ETF Metadata
 ISIN,IE00B4L5Y983
 Name,iShares Core MSCI World UCITS ETF USD (Acc)
 Ticker,EUNL
@@ -6,65 +6,60 @@ Type,Stock
 Region,World
 Currency,USD
 TER,0.20
-Last Updated,2026-02-04
+Last Updated,2026-02-09
+Source,justETF (auto-generated)
 
-COUNTRY_ALLOCATION
+# Country Allocation (%)
 Country,Weight
-US,70.8
-JP,6.2
-GB,3.8
-FR,3.1
-CA,2.9
-CH,2.5
-DE,2.1
-AU,1.9
-NL,1.3
-SE,1.1
-DK,0.9
-HK,0.8
-IT,0.7
-ES,0.7
-Other,1.2
+United States,68.2
+Japan,5.4
+United Kingdom,3.3
+Canada,3.0
+Switzerland,2.5
+France,2.4
+Germany,2.4
+Australia,1.5
+Netherlands,1.4
+Ireland,1.2
+Other,8.6
 
-SECTOR_ALLOCATION
+# Sector Allocation (%)
 Sector,Weight
-Technology,24.5
-Financial Services,15.2
-Healthcare,11.8
-Consumer Cyclical,10.9
-Industrials,10.1
-Communication Services,8.7
-Consumer Staples,6.4
-Energy,4.2
-Basic Materials,3.8
-Real Estate,2.4
-Utilities,2.0
+Technology,28.3
+Financials,14.8
+Industrials,10.2
+Consumer Discretionary,10.1
+Health Care,9.1
+Telecommunication,8.7
+Consumer Staples,4.9
+Energy,3.3
+Basic Materials,2.7
+Utilities,2.5
+Real Estate,1.7
+Other,3.7
 
-CURRENCY_ALLOCATION
+# Currency Allocation (%) - auto-derived from countries
 Currency,Weight
-USD,72.5
-JPY,6.2
-GBP,3.8
-EUR,9.5
-CAD,2.9
+USD,68.2
+EUR,7.5
+JPY,5.4
+GBP,3.3
+CAD,3.0
 CHF,2.5
-Other,2.6
+AUD,1.5
+Other,8.6
 
-TOP_HOLDINGS
-Name,Weight,Currency,Sector,Industry,Country
-Apple Inc,4.98,USD,Technology,Consumer Electronics,US
-NVIDIA Corp,4.67,USD,Technology,Semiconductors,US
-Microsoft Corp,3.95,USD,Technology,Software,US
-Amazon.com Inc,2.28,USD,Consumer Cyclical,Internet Retail,US
-Meta Platforms Inc,1.63,USD,Communication Services,Internet Content & Information,US
-Alphabet Inc Class A,1.41,USD,Communication Services,Internet Content & Information,US
-Alphabet Inc Class C,1.23,USD,Communication Services,Internet Content & Information,US
-Broadcom Inc,1.08,USD,Technology,Semiconductors,US
-Tesla Inc,0.99,USD,Consumer Cyclical,Auto Manufacturers,US
-Berkshire Hathaway Inc,0.95,USD,Financial Services,Insurance,US
-Eli Lilly and Co,0.88,USD,Healthcare,Drug Manufacturers,US
-JPMorgan Chase & Co,0.81,USD,Financial Services,Banks,US
-Walmart Inc,0.74,USD,Consumer Staples,Retail,US
-Visa Inc,0.69,USD,Financial Services,Credit Services,US
-UnitedHealth Group Inc,0.65,USD,Healthcare,Healthcare Plans,US
-Other Holdings,68.94,Mixed,Diversified,Diversified,Mixed
+# Top Holdings
+Name,Weight,Currency,Sector,Country,ISIN
+NVIDIA Corp.,5.21,USD,Unknown,US,
+Apple,5.01,USD,Unknown,US,
+Microsoft,4.21,USD,Unknown,US,
+"Amazon.com, Inc.",2.71,USD,Unknown,US,
+"Alphabet, Inc. A",2.26,USD,Unknown,US,
+Broadcom,2.19,USD,Unknown,US,
+"Alphabet, Inc. C",1.89,USD,Unknown,US,
+Meta Platforms,1.70,USD,Unknown,US,
+Tesla,1.47,USD,Unknown,US,
+Eli Lilly & Co.,1.05,USD,Unknown,US,
+Other Holdings,72.30,Mixed,Diversified,Mixed,
+

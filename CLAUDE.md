@@ -12,8 +12,10 @@ Portfolio Performance CSV
   Risk Calculator ←→ ETF Details Parser
          ↓              ↓
    Visualizer      (ETF-Detail-Dateien)
-         ↓
-   Streamlit App
+         ↓              ↑
+   Streamlit App    ETF Detail Generator
+                        ↑
+                   justETF Scraper
 ```
 
 ## Datenfluss
@@ -52,55 +54,67 @@ ETFs werden in ihre Einzelpositionen aufgelöst mit mehreren Datenquellen:
    - Enthalten: Metadata, Top Holdings, Country/Sector/Currency Allocations
    - Parser: `src/etf_details_parser.py`
    - **Vorteil:** Vollständige Allokationsdaten für korrekte "Other Holdings" Behandlung
+   - Können automatisch via `src/etf_detail_generator.py` aus justETF generiert werden
 
-2. **Mock-Daten** (`src/mock_etf_holdings.py`)
-   - Statische Daten für populäre ETFs
+2. **API-Fetcher** (`src/etf_data_fetcher.py`)
+   - justETF (Scraping), Yahoo Finance, OpenFIGI
    - Fallback wenn keine Detail-Dateien vorhanden
 
-3. **API-Fetcher** (`src/etf_data_fetcher.py`)
-   - Yahoo Finance, OpenFIGI
-   - Letzter Fallback, meist für europäische ETFs unzuverlässig
-
-### 3. ETF-Detail-Dateien (Neue Struktur)
+### 3. ETF-Detail-Dateien
 
 **Format:** `data/etf_details/{TICKER}.csv`
 
-**Sections:**
+**Erstellung:** Manuell oder automatisch via `src/etf_detail_generator.py` (justETF Scraping)
+
+**Sections (zwei Header-Formate werden unterstützt):**
 
 ```csv
-METADATA
+# ETF Metadata
 ISIN,IE00B4L5Y983
 Name,iShares Core MSCI World UCITS ETF USD (Acc)
 Ticker,EUNL
 Type,Stock
+Index,MSCI World               # Automatisch von justETF gescrapet
 Region,World
 Currency,USD
 TER,0.20
+Proxy ISIN,                    # Optional: ISIN eines physischen Proxy-ETFs (für Swap-ETFs)
+Last Updated,2026-02-08
+Source,justETF (auto-generated) # oder: justETF (via Proxy: ...) / leer bei manuell
+Last Updated,2026-02-04
 
-COUNTRY_ALLOCATION
+# Country Allocation (%)
 Country,Weight
 US,70.8
 JP,6.2
 ...
 
-SECTOR_ALLOCATION
+# Sector Allocation (%)
 Sector,Weight
 Technology,24.5
 Financial Services,15.2
 ...
 
-CURRENCY_ALLOCATION
+# Currency Allocation (%)
 Currency,Weight
 USD,72.5
 JPY,6.2
 ...
 
-TOP_HOLDINGS
-Name,Weight,Currency,Sector,Industry,Country
-Apple Inc,4.98,USD,Technology,Consumer Electronics,US
-NVIDIA Corp,4.67,USD,Technology,Semiconductors,US
+# Top Holdings
+Name,Weight,Currency,Sector,Country,ISIN
+Apple Inc,4.98,USD,Technology,US,US0378331005
+NVIDIA Corp,4.67,USD,Technology,US,US67066G1040
 ...
 ```
+
+**Hinweis:** Der Parser unterstützt auch das alternative Format ohne `#` (z.B. `METADATA`, `COUNTRY_ALLOCATION`), sowie verschiedene Spaltenreihenfolgen in Holdings (Header-basiertes Parsing).
+
+**Automatische Generierung via justETF:**
+- Aufruf über Streamlit-Sidebar: ISIN + Ticker eingeben → "Generieren"
+- Scrapt: Holdings (mit ISINs), Länder- und Sektor-Allokation, Metadaten
+- Leitet Währungs-Allokation automatisch aus Ländern ab (Country→Currency Mapping)
+- Aktualisiert `data/etf_isin_ticker_map.csv` automatisch
 
 **ETF-Typ-Behandlung:**
 
@@ -108,6 +122,32 @@ NVIDIA Corp,4.67,USD,Technology,Semiconductors,US
 - `Type: Money Market` → ETF wird als `Cash` in der Anlageklassen-Ansicht behandelt
 - `Type: Bond` → Holdings werden als `Bond` klassifiziert
 - `Type: Commodity` → ETF wird als `Commodity` klassifiziert, **KEIN Währungsrisiko**
+
+**Proxy-ISIN (für Swap-ETFs):**
+
+Swap-ETFs liefern auf justETF keine physischen Holdings, sondern listen andere ETFs/Fonds als Collateral. Um dennoch korrekte Allokationsdaten zu erhalten, kann ein physisch replizierender ETF auf denselben Index als Proxy angegeben werden:
+
+```csv
+# ETF Metadata
+ISIN,LU0292107645
+Name,Xtrackers MSCI Emerging Markets Swap UCITS ETF 1C
+Ticker,XMME
+Type,Stock
+Region,Emerging Markets
+Proxy ISIN,IE00B4L5YC18
+Source,justETF (via Proxy: IE00B4L5YC18)
+```
+
+- `Proxy ISIN` wird in der Metadata-Section der ETF-Detail-Datei gespeichert
+- Beim Generieren/Aktualisieren werden Allokationen/Holdings vom Proxy gescrapet
+- Metadaten (Name, ISIN, TER, Typ) bleiben die des eigentlichen ETFs
+- In der UI mit 🔗 gekennzeichnet
+
+**Datenquellen-Typen:**
+
+- **auto** (`Source` enthält "justETF"/"auto"): Automatisch generiert, aktualisierbar
+- **proxy** (`Proxy ISIN` gesetzt): Via Proxy automatisch generiert, aktualisierbar
+- **manual** (kein Source-Feld oder unbekanntes Format): Manuell gepflegt, wird bei Batch-Updates übersprungen
 
 **ISIN-zu-Ticker-Mapping:**
 
@@ -505,7 +545,7 @@ def export_to_ods(risk_data: Dict) -> bytes:
 ### Testdaten
 
 - `Testdepot.csv`: Minimales Portfolio für Entwicklung
-- Mock-ETFs: Populäre ETFs für Tests ohne API-Calls
+- ETF-Detail-Dateien in `data/etf_details/`: Vorab generierte Detail-Daten für Tests
 
 ### Debug-Modus
 
@@ -552,6 +592,20 @@ volumes:
 
 ## Changelog
 
+### 2026-02-08: justETF Auto-Generator + Proxy-ISIN für Swap-ETFs
+
+- ✅ **ETF-Detail-Generator** (`src/etf_detail_generator.py`): Automatische Generierung von ETF-Detail-Dateien durch Scraping von justETF.com
+- ✅ **justETF-Scraper**: Session-basiertes Scraping mit Wicket AJAX-Calls für vollständige Länder-/Sektor-Allokationen, Holdings mit ISINs, und Metadaten
+- ✅ **Country-to-Currency Mapping**: Automatische Ableitung der Währungs-Allokation aus Länder-Daten (~100 Länder gemappt)
+- ✅ **Streamlit-Integration**: Sidebar mit ISIN/Ticker-Eingabe, Vorschau-Button und Generierungs-Button
+- ✅ **Parser-Fix**: `etf_details_parser.py` unterstützt jetzt beide Section-Header-Formate (`# ETF Metadata` und `METADATA`) sowie Header-basiertes Holdings-Parsing (verschiedene Spaltenreihenfolgen)
+- ✅ **Mock-Daten entfernt**: `mock_etf_holdings.py` gelöscht, da durch ETF-Detail-Dateien und Auto-Generator ersetzt
+- ✅ **ISIN-Map Auto-Update**: Generierte ETFs werden automatisch in `data/etf_isin_ticker_map.csv` eingetragen
+- ✅ **Proxy-ISIN für Swap-ETFs**: Swap-ETFs können eine Proxy-ISIN eines physisch replizierenden ETFs auf denselben Index angeben. Allokationen/Holdings werden vom Proxy gescrapet, Metadaten bleiben die des eigentlichen ETFs.
+- ✅ **Datenquellen-Kennzeichnung**: ETF-Übersicht in der Sidebar zeigt Datenquelle pro ETF (🤖 auto, 🔗 Proxy, ✋ manuell)
+- ✅ **Source-Feld in Metadata**: `Source` und optional `Proxy ISIN` werden in der ETF-Detail-CSV gespeichert
+- ✅ **Batch-Update-Schutz**: Manuelle ETFs werden bei Batch-Updates übersprungen und sind in der UI als nicht-aktualisierbar gekennzeichnet
+
 ### 2026-02-04: Währungsrisiko & Commodities
 
 - ✅ **Korrekte "Other Holdings" Währungsverteilung**: Verwendet ETF Currency Allocation minus Top Holdings (keine Doppelzählung)
@@ -568,7 +622,7 @@ volumes:
 - ✅ ISIN-zu-Ticker-Mapping (`data/etf_isin_ticker_map.csv`)
 - ✅ Korrekte Behandlung von Money Market ETFs als Cash
 - ✅ Vollständige Sektor/Land/Währungs-Allokationen pro ETF
-- ✅ Priorisierung: ETF-Details > User-CSV > Mock > API
+- ✅ Priorisierung: ETF-Details > API-Fetcher
 
 ### 2026-02-03: CSV-Parser
 
