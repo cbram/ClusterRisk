@@ -1,0 +1,13 @@
+Bestand;Name;Symbol;ISIN;Kurs;Marktwert;Anteil in %;Notiz;Branchen (GICS)
+"";Summe;;;;47.531,30;100,00;;
+"";Tagesgeldkonto;;;;5.000,00;10,52;;
+20;iShares Core MSCI World UCITS ETF USD (Acc);EUNL.DE;IE00B4L5Y983;113,60;2.272,00;4,78;;
+15;Vanguard FTSE All-World High Dividend Yield UCITS ETF;VGWD.DE;IE00B8GKDB10;52,40;786,00;1,65;;
+100;Xtrackers II EUR Overnight Rate Swap UCITS ETF 1C;XEON.DE;LU0290358497;100,12;10.012,00;21,07;;
+50;iShares Core EUR Corp Bond UCITS ETF;IEAG.DE;IE00B3F81R35;105,20;5.260,00;11,07;;
+5;Apple Inc;AAPL;US0378331005;USD 269,48;1.347,40;3,62;;Informationstechnologie
+8;Microsoft Corp;MSFT;US5949181045;USD 415,20;3.321,60;8,91;;Informationstechnologie
+10;ASML Holding NV;ASML.AS;NL0010273215;1.200,78;12.007,80;32,23;;Informationstechnologie
+6;Nestlé SA;NESN.SW;CH0038863350;CHF 94,50;567,00;1,52;;Nicht-Basiskonsumgüter
+25;Allianz SE;ALV.DE;DE0008404005;278,30;6.957,50;14,64;;Finanzdienstleistungen
+"";Summe;;;;47.531,30;100,00;;

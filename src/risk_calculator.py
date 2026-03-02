@@ -381,11 +381,11 @@ def _calculate_asset_class_risk(expanded_positions: List[Dict], portfolio_data: 
         # Verwende den Typ aus expanded_positions (ETFs sind bereits aufgelöst)
         asset_class = position.get('type', 'Unknown')
         
-        # "ETF_Holding" wird zu "Stock" (Holdings sind meist Aktien)
+        # ETF-Holdings: Anlageklasse aus etf_type (Bond → Bond, Money Market → Cash, Stock → Stock)
         if asset_class == 'ETF_Holding':
-            asset_class = 'Stock'
+            asset_class = position.get('etf_type', 'Stock')
         
-        # Money Market ETFs werden zu Cash
+        # Money Market ETFs werden als Cash dargestellt
         if position.get('etf_type') == 'Money Market':
             asset_class = 'Cash'
         

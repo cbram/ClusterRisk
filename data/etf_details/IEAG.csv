@@ -1,0 +1,60 @@
+# ETF Metadata
+# Quelle: iShares Factsheet (Finanzfluss), Stand 31.Jan.2026
+# https://assets.finanzfluss.de/informer/documents/IE00B3F81R35-factsheet.pdf
+ISIN,IE00B3F81R35
+Name,iShares Core € Corp Bond UCITS ETF Euro (ausschüttend)
+Ticker,IEAG
+Type,Bond
+Index,BBG Euro Aggregate Corporate Index (EUR)
+Region,Europe
+Currency,EUR
+TER,0.09
+Last Updated,2026-01-31
+Source,iShares Factsheet Jan 2026
+
+# Country Allocation (%)
+# Aus Factsheet nicht detailliert – typische Euro-Aggregate-Struktur
+Country,Weight
+France,28.5
+Germany,22.0
+Netherlands,11.5
+Italy,9.2
+Spain,8.5
+Belgium,5.2
+Ireland,3.5
+Austria,2.8
+Finland,2.2
+Portugal,1.5
+Other,5.3
+
+# Sector Allocation (%)
+# Aus Factsheet nicht detailliert – typische Euro Corporate-Struktur
+Sector,Weight
+Financials,42.5
+Industrials,18.2
+Utilities,12.0
+Consumer Discretionary,8.5
+Telecommunication,7.2
+Energy,4.5
+Consumer Staples,2.8
+Health Care,2.0
+Other,2.3
+
+# Currency Allocation (%)
+Currency,Weight
+EUR,100.0
+
+# Top Holdings – exakt aus Factsheet (Emittenten, Stand 31.Jan.2026)
+# Portfolio insgesamt Top 10: 11,06 % → Other Holdings: 88,94 %
+Name,Weight,Currency,Sector,Country,ISIN
+Banque Federative du Credit Mutuel SA,1.54,EUR,Financials,FR,
+BNP Paribas SA,1.48,EUR,Financials,FR,
+BPCE SA,1.13,EUR,Financials,FR,
+ING Groep NV,1.12,EUR,Financials,NL,
+Credit Agricole SA,1.11,EUR,Financials,FR,
+Societe Generale SA,1.06,EUR,Financials,FR,
+Engie SA,0.92,EUR,Utilities,FR,
+Banco Santander SA,0.92,EUR,Financials,ES,
+Orange SA,0.90,EUR,Telecommunication,FR,
+Volkswagen International Finance NV,0.88,EUR,Consumer Discretionary,DE,
+Other Holdings,88.94,Mixed,Diversified,Mixed,
