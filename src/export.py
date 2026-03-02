@@ -127,8 +127,8 @@ def _create_overview_sheet(risk_data: Dict, writer):
             overview_data.append([
                 category_names[category],
                 len(df),
-                f"{df.iloc[0]['Anteil (%)']:.2f}%",
-                f"{df.head(5)['Anteil (%)'].sum():.2f}%"
+                f"{df.iloc[0]['Anteil (%)']:.1f}%",
+                f"{df.head(5)['Anteil (%)'].sum():.1f}%"
             ])
     
     overview_df = pd.DataFrame(overview_data)

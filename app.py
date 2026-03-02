@@ -616,7 +616,25 @@ else:
     
     with tab2:
         st.subheader("Klumpenrisiko nach Branche/Sektor")
-        create_visualizations(risk_data, "sector", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
+        # Cash in Branchen optional einblenden (Default: aus)
+        col_sector, col_sector_btn = st.columns([3, 1])
+        with col_sector_btn:
+            show_cash_sector = st.checkbox("Cash anzeigen", value=False, key="show_cash_sector")
+        if not show_cash_sector:
+            sector_df = risk_data['sector'][risk_data['sector']['Sektor'] != 'Cash'].copy()
+        else:
+            sector_df = risk_data['sector'].copy()
+        total_sector = sector_df['Wert (€)'].sum()
+        if total_sector > 0:
+            sector_df['Anteil (%)'] = (sector_df['Wert (€)'] / total_sector * 100).round(1)
+        # Branchen unter 0,1 % ausblenden, Anteile neu berechnen
+        sector_df = sector_df[sector_df['Anteil (%)'] >= 0.1].copy()
+        total_sector = sector_df['Wert (€)'].sum()
+        if total_sector > 0:
+            sector_df['Anteil (%)'] = (sector_df['Wert (€)'] / total_sector * 100).round(1)
+        risk_data_sector = risk_data.copy()
+        risk_data_sector['sector'] = sector_df
+        create_visualizations(risk_data_sector, "sector", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
     
     with tab3:
         st.subheader("Klumpenrisiko nach Währung")
@@ -630,17 +648,29 @@ else:
         # Wähle die richtige Datenquelle
         if include_commodities:
             st.info("💡 **Hinweis:** Commodities werden als separate Kategorie 'Commodity (kein Währungsrisiko)' angezeigt.")
-            # Erstelle temporäres risk_data mit Commodities
-            risk_data_with_commodities = risk_data.copy()
-            risk_data_with_commodities['currency'] = risk_data['currency_with_commodities']
-            create_visualizations(risk_data_with_commodities, "currency", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
+            currency_df = risk_data['currency_with_commodities'].copy()
         else:
-            create_visualizations(risk_data, "currency", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
+            currency_df = risk_data['currency'].copy()
+        # Währungen unter 0,1 % ausblenden, Anteile neu berechnen
+        currency_df = currency_df[currency_df['Anteil (%)'] >= 0.1].copy()
+        total_currency = currency_df['Wert (€)'].sum()
+        if total_currency > 0:
+            currency_df['Anteil (%)'] = (currency_df['Wert (€)'] / total_currency * 100).round(1)
+        risk_data_currency = risk_data.copy()
+        risk_data_currency['currency'] = currency_df
+        create_visualizations(risk_data_currency, "currency", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
     
     with tab4:
         st.subheader("Klumpenrisiko nach Land")
         st.markdown("*Basierend auf ISIN-Ländercode (erste 2 Zeichen)*")
-        create_visualizations(risk_data, "country", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
+        # Länder unter 0,1 % ausblenden, Anteile der verbleibenden neu berechnen
+        country_df = risk_data['country'][risk_data['country']['Anteil (%)'] >= 0.1].copy()
+        total_country = country_df['Wert (€)'].sum()
+        if total_country > 0:
+            country_df['Anteil (%)'] = (country_df['Wert (€)'] / total_country * 100).round(1)
+        risk_data_country = risk_data.copy()
+        risk_data_country['country'] = country_df
+        create_visualizations(risk_data_country, "country", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
     
     with tab5:
         st.subheader("Klumpenrisiko nach Einzelpositionen")
@@ -651,19 +681,23 @@ else:
         with col2:
             exclude_cash = st.checkbox("Cash ausblenden", value=False, key="exclude_cash_positions")
         
-        # Filtere Cash wenn gewünscht
+        # Basis: alle Positionen oder ohne Cash
+        positions_filtered = risk_data['positions'].copy()
         if exclude_cash:
-            positions_filtered = risk_data['positions'][risk_data['positions']['Position'] != 'Cash'].copy()
-            # Neuberechnung der Prozente ohne Cash (pandas-safe)
-            total_without_cash = positions_filtered['Wert (€)'].sum()
-            positions_filtered.loc[:, 'Anteil (%)'] = (positions_filtered['Wert (€)'] / total_without_cash * 100).round(2)
-            
-            # Erstelle temporäres risk_data für Visualisierung
-            risk_data_filtered = risk_data.copy()
-            risk_data_filtered['positions'] = positions_filtered
-            create_visualizations(risk_data_filtered, "positions", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
-        else:
-            create_visualizations(risk_data, "positions", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
+            positions_filtered = positions_filtered[positions_filtered['Position'] != 'Cash'].copy()
+            total_temp = positions_filtered['Wert (€)'].sum()
+            if total_temp > 0:
+                positions_filtered['Anteil (%)'] = (positions_filtered['Wert (€)'] / total_temp * 100).round(1)
+        
+        # Positionen unter 0,1 % ausblenden, Anteile der verbleibenden neu berechnen
+        positions_filtered = positions_filtered[positions_filtered['Anteil (%)'] >= 0.1].copy()
+        total_display = positions_filtered['Wert (€)'].sum()
+        if total_display > 0:
+            positions_filtered['Anteil (%)'] = (positions_filtered['Wert (€)'] / total_display * 100).round(1)
+        
+        risk_data_positions = risk_data.copy()
+        risk_data_positions['positions'] = positions_filtered
+        create_visualizations(risk_data_positions, "positions", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
     
     with tab6:
         st.subheader("Detaillierte Daten")

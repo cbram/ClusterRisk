@@ -10,6 +10,37 @@ import pandas as pd
 from typing import Dict, Optional
 from config import RISK_THRESHOLDS
 
+# Einheitliche Farbgebung in Treemap, Pie und Bar-Chart (Wiedererkennungswert)
+OTHER_HOLDINGS_COLOR = '#87CEEB'   # Hellblau für "Other Holdings"
+# Bunte Palette für alle übrigen Items (gleiche Reihenfolge = gleiche Farbe in allen Charts)
+ITEM_PALETTE = [
+    '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
+    '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5', '#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5',
+]
+
+
+def _build_unified_color_map(df: pd.DataFrame, label_col: str) -> Dict[str, str]:
+    """
+    Baut eine einheitliche Label→Farbe-Zuordnung aus den Daten.
+    "Other Holdings" immer hellblau, alle anderen bunt aus der Palette (deterministisch).
+    """
+    # Reihenfolge: so wie im DataFrame, damit konsistent
+    seen = set()
+    unique_ordered = []
+    for v in df[label_col]:
+        if v not in seen:
+            seen.add(v)
+            unique_ordered.append(v)
+    color_map = {}
+    palette_idx = 0
+    for label in unique_ordered:
+        if 'Other Holdings' in str(label):
+            color_map[label] = OTHER_HOLDINGS_COLOR
+        else:
+            color_map[label] = ITEM_PALETTE[palette_idx % len(ITEM_PALETTE)]
+            palette_idx += 1
+    return color_map
+
 
 def create_visualizations(risk_data: Dict, category: str, max_treemap: int = 30, max_pie: int = 10, max_bar: int = 30, risk_thresholds: Optional[Dict] = None):
     """
@@ -36,46 +67,41 @@ def create_visualizations(risk_data: Dict, category: str, max_treemap: int = 30,
         st.warning(f"Keine Daten für {category} verfügbar.")
         return
     
+    label_col, _ = _get_column_names(category)
+    color_map = _build_unified_color_map(df, label_col)
+    
     # Layout: 2 Spalten
     col1, col2 = st.columns([2, 1])
     
     with col1:
         # Treemap
         st.subheader("Treemap Visualisierung")
-        _create_treemap(df, category, max_items=max_treemap)
+        _create_treemap(df, category, max_items=max_treemap, color_map=color_map)
     
     with col2:
         # Pie Chart
         st.subheader("Verteilung")
-        _create_pie_chart(df, category, max_items=max_pie)
+        _create_pie_chart(df, category, max_items=max_pie, color_map=color_map)
     
     # Volle Breite für Balkendiagramm
     st.subheader("Detaillierte Übersicht")
-    _create_bar_chart(df, category, thresholds, max_items=max_bar)
+    _create_bar_chart(df, category, thresholds, max_items=max_bar, color_map=color_map)
     
     # Tabelle
     st.subheader("Daten-Tabelle")
     _display_table(df, category, thresholds)
 
 
-def _create_treemap(df: pd.DataFrame, category: str, max_items: int = 30):
+def _create_treemap(df: pd.DataFrame, category: str, max_items: int = 30, color_map: Optional[Dict[str, str]] = None):
     """
-    Erstellt eine Treemap-Visualisierung
-    
-    Args:
-        df: DataFrame mit Daten
-        category: Kategorie der Daten
-        max_items: Maximale Anzahl anzuzeigender Items
+    Erstellt eine Treemap-Visualisierung.
+    color_map: Einheitliche Label→Farbe (aus _build_unified_color_map).
     """
-    # Spalten-Namen mapping
     label_col, value_col = _get_column_names(category)
     
-    # Nur Top N für bessere Übersicht
     df_plot = df.head(max_items).copy()
     
-    # Für Einzelpositionen: Verwende Ticker statt langer Namen
     if category == 'positions' and 'Ticker' in df_plot.columns:
-        # Erstelle Label: Ticker (falls vorhanden), sonst Name (gekürzt)
         df_plot['Display_Label'] = df_plot.apply(
             lambda row: row['Ticker'] if row['Ticker'] and row['Ticker'].strip() else row['Position'][:25], 
             axis=1
@@ -84,14 +110,9 @@ def _create_treemap(df: pd.DataFrame, category: str, max_items: int = 30):
     else:
         plot_label = label_col
     
-    # Farben: "Other Holdings" = hellblau, sonst bunte Plotly-Farben
-    color_discrete_map = {}
-    for idx, row in df_plot.iterrows():
-        label = row[label_col]
-        if 'Other Holdings' in str(label):
-            color_discrete_map[label] = 'lightblue'
+    # Farben aus einheitlicher Map (nur Keys die in df_plot vorkommen)
+    color_discrete_map = {k: v for k, v in (color_map or {}).items() if k in df_plot[label_col].values}
     
-    # IMMER discrete colors verwenden (buntes Design wie bei Einzelpositionen)
     if category == 'positions' and color_discrete_map:
         # Für Positionen mit Other Holdings: Verwende Original-Namen für Farb-Mapping
         df_plot['Color_Key'] = df_plot[label_col]
@@ -104,28 +125,27 @@ def _create_treemap(df: pd.DataFrame, category: str, max_items: int = 30):
             hover_data={
                 label_col: True,  # Zeige vollen Namen im Hover
                 value_col: ':,.2f',
-                'Anteil (%)': ':.2f',
+                'Anteil (%)': ':.1f',
                 'Ticker': True if 'Ticker' in df_plot.columns else False
             }
         )
     else:
-        # Buntes Design für alle Kategorien (kein Risiko-Farbschema)
         fig = px.treemap(
             df_plot,
             path=[plot_label],
             values=value_col,
-            color=label_col if not color_discrete_map else label_col,
-            color_discrete_map=color_discrete_map if color_discrete_map else None,
+            color=label_col,
+            color_discrete_map=color_discrete_map,
             hover_data={
                 label_col: True if category == 'positions' else False,
                 value_col: ':,.2f',
-                'Anteil (%)': ':.2f'
+                'Anteil (%)': ':.1f'
             }
         )
     
     # Formatierung: Name, Wert (2 Dezimalstellen), Prozent (2 Dezimalstellen)
     fig.update_traces(
-        texttemplate="<b>%{label}</b><br>€ %{value:,.2f}<br>%{percentRoot:.2%}",
+        texttemplate="<b>%{label}</b><br>€ %{value:,.2f}<br>%{percentRoot:.1%}",
         textfont_size=12
     )
     
@@ -138,18 +158,13 @@ def _create_treemap(df: pd.DataFrame, category: str, max_items: int = 30):
     st.plotly_chart(fig, width='stretch', key=f"treemap_{category}")
 
 
-def _create_pie_chart(df: pd.DataFrame, category: str, max_items: int = 10):
+def _create_pie_chart(df: pd.DataFrame, category: str, max_items: int = 10, color_map: Optional[Dict[str, str]] = None):
     """
-    Erstellt ein Kreisdiagramm
-    
-    Args:
-        df: DataFrame mit Daten
-        category: Kategorie der Daten
-        max_items: Maximale Anzahl anzuzeigender Items (Rest wird als "Sonstige" zusammengefasst)
+    Erstellt ein Kreisdiagramm.
+    color_map: Einheitliche Label→Farbe (aus _build_unified_color_map).
     """
     label_col, value_col = _get_column_names(category)
     
-    # Top N + "Sonstige"
     df_plot = df.head(max_items).copy()
     
     if len(df) > max_items:
@@ -163,9 +178,7 @@ def _create_pie_chart(df: pd.DataFrame, category: str, max_items: int = 10):
             others_row['Ticker'] = ''
         df_plot = pd.concat([df_plot, others_row], ignore_index=True)
     
-    # Für Einzelpositionen: Verwende Ticker statt langer Namen
     if category == 'positions' and 'Ticker' in df_plot.columns:
-        # Erstelle Label: Ticker (falls vorhanden), sonst Name (gekürzt)
         df_plot['Display_Label'] = df_plot.apply(
             lambda row: row['Ticker'] if row['Ticker'] and row['Ticker'].strip() else row['Position'][:20], 
             axis=1
@@ -176,15 +189,17 @@ def _create_pie_chart(df: pd.DataFrame, category: str, max_items: int = 10):
         plot_label = label_col
         original_label = label_col
     
-    # Erstelle Farbzuordnung für "Other Holdings"
-    color_map = {}
-    for label in df_plot[original_label]:
-        if 'Other Holdings' in str(label):
-            color_map[label] = '#87CEEB'  # Sky Blue / Hellblau
+    # Einheitliche Farben: aus color_map; "Sonstige" ggf. ergänzen
+    pie_color_map = dict(color_map) if color_map else {}
+    if 'Sonstige' in df_plot[original_label].values and 'Sonstige' not in pie_color_map:
+        n = len(pie_color_map)
+        pie_color_map['Sonstige'] = ITEM_PALETTE[n % len(ITEM_PALETTE)]
+    for label in df_plot[original_label].unique():
+        if label not in pie_color_map:
+            pie_color_map[label] = OTHER_HOLDINGS_COLOR if 'Other Holdings' in str(label) else ITEM_PALETTE[len(pie_color_map) % len(ITEM_PALETTE)]
     
     # Erstelle Pie Chart
-    if color_map and category == 'positions':
-        # Mit speziellen Farben für Other Holdings (Positionen)
+    if pie_color_map and category == 'positions':
         df_plot['Color_Key'] = df_plot[original_label]
         fig = px.pie(
             df_plot,
@@ -192,21 +207,20 @@ def _create_pie_chart(df: pd.DataFrame, category: str, max_items: int = 10):
             values=value_col,
             hole=0.4,
             color='Color_Key',
-            color_discrete_map=color_map
+            color_discrete_map=pie_color_map
         )
         # Hover-Daten manuell hinzufügen mit vollem Namen
         fig.update_traces(
             hovertemplate='<b>%{label}</b><br>Name: ' + df_plot[original_label].astype(str) + '<br>Wert: €%{value:,.2f}<br>Anteil: %{percent}<extra></extra>'
         )
-    elif color_map:
-        # Mit speziellen Farben für Other Holdings (andere Kategorien)
+    elif pie_color_map:
         fig = px.pie(
             df_plot,
             names=plot_label,
             values=value_col,
             hole=0.4,
             color=original_label,
-            color_discrete_map=color_map
+            color_discrete_map=pie_color_map
         )
         # Hover-Daten manuell hinzufügen
         fig.update_traces(
@@ -219,7 +233,7 @@ def _create_pie_chart(df: pd.DataFrame, category: str, max_items: int = 10):
             names=plot_label,
             values=value_col,
             hole=0.4,
-            hover_data={'Anteil (%)': ':.2f'}
+            hover_data={'Anteil (%)': ':.1f'}
         )
     
     fig.update_traces(
@@ -237,39 +251,18 @@ def _create_pie_chart(df: pd.DataFrame, category: str, max_items: int = 10):
     st.plotly_chart(fig, width='stretch', key=f"pie_{category}")
 
 
-def _create_bar_chart(df: pd.DataFrame, category: str, thresholds: Dict, max_items: int = 30):
+def _create_bar_chart(df: pd.DataFrame, category: str, thresholds: Dict, max_items: int = 30, color_map: Optional[Dict[str, str]] = None):
     """
-    Erstellt ein horizontales Balkendiagramm
-    
-    Args:
-        df: DataFrame mit Daten
-        category: Kategorie der Daten
-        thresholds: Risiko-Schwellenwerte (dict mit 'high' und 'medium')
-        max_items: Maximale Anzahl anzuzeigender Items
+    Erstellt ein horizontales Balkendiagramm.
+    color_map: Einheitliche Label→Farbe (aus _build_unified_color_map).
     """
     label_col, value_col = _get_column_names(category)
     
-    # Top N
     df_plot = df.head(max_items).copy()
     
-    # Hole Schwellenwerte
-    high_threshold = thresholds.get('high', 10.0)
-    medium_threshold = thresholds.get('medium', 5.0)
-    
-    # Farbe basierend auf Risiko UND "Other Holdings"
-    colors = []
-    for idx, row in df_plot.iterrows():
-        label = row[label_col]
-        anteil = row['Anteil (%)']
-        
-        if 'Other Holdings' in str(label):
-            colors.append('#87CEEB')  # Sky Blue / Hellblau für Other Holdings
-        elif anteil > high_threshold:
-            colors.append('red')  # Rot für hohes Risiko
-        elif anteil > medium_threshold:
-            colors.append('orange')  # Orange für mittleres Risiko
-        else:
-            colors.append('lightgray')  # Grau für normale Positionen
+    # Einheitliche Farben aus color_map (wie Treemap + Pie)
+    color_map = color_map or {}
+    colors = [color_map.get(row[label_col], ITEM_PALETTE[i % len(ITEM_PALETTE)]) for i, (_, row) in enumerate(df_plot.iterrows())]
     
     fig = go.Figure(data=[
         go.Bar(
@@ -277,9 +270,9 @@ def _create_bar_chart(df: pd.DataFrame, category: str, thresholds: Dict, max_ite
             x=df_plot['Anteil (%)'],
             orientation='h',
             marker_color=colors,
-            text=df_plot['Anteil (%)'].apply(lambda x: f'{x:.2f}%'),
+            text=df_plot['Anteil (%)'].apply(lambda x: f'{x:.1f}%'),
             textposition='auto',
-            hovertemplate='<b>%{y}</b><br>Anteil: %{x:.2f}%<br>Wert: €%{customdata:,.2f}<extra></extra>',
+            hovertemplate='<b>%{y}</b><br>Anteil: %{x:.1f}%<br>Wert: €%{customdata:,.2f}<extra></extra>',
             customdata=df_plot[value_col]
         )
     ])
@@ -289,18 +282,9 @@ def _create_bar_chart(df: pd.DataFrame, category: str, thresholds: Dict, max_ite
         yaxis_title="",
         height=max(400, len(df_plot) * 20),
         showlegend=False,
-        yaxis={'categoryorder': 'total ascending'}
+        yaxis={'categoryorder': 'total ascending'},
+        margin=dict(t=10, l=10, r=10, b=10)
     )
-    
-    # Risiko-Linien (beide Schwellenwerte)
-    fig.add_vline(x=high_threshold, line_dash="dash", line_color="red", 
-                  annotation_text=f"{high_threshold:.0f}% Hohes Risiko", 
-                  annotation_position="top right")
-    
-    if medium_threshold > 0 and medium_threshold < high_threshold:
-        fig.add_vline(x=medium_threshold, line_dash="dot", line_color="orange", 
-                      annotation_text=f"{medium_threshold:.0f}% Mittleres Risiko", 
-                      annotation_position="bottom right")
     
     st.plotly_chart(fig, width='stretch', key=f"bar_{category}")
 
@@ -323,7 +307,7 @@ def _display_table(df: pd.DataFrame, category: str, thresholds: Dict):
     
     # Wert formatieren
     df_display['Wert (€)'] = df['Wert (€)'].apply(lambda x: f'€ {x:,.2f}')
-    df_display['Anteil (%)'] = df['Anteil (%)'].apply(lambda x: f'{x:.2f}%')
+    df_display['Anteil (%)'] = df['Anteil (%)'].apply(lambda x: f'{x:.1f}%')
     
     # Hole Schwellenwerte
     high_threshold = thresholds.get('high', 10.0)

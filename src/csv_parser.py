@@ -296,6 +296,7 @@ def _normalize_sector_name(sector_name: str) -> str:
         ('TECHNOLOGIE', 'Technology'),
         ('IT', 'Technology'),
         # Financial Services
+        ('FINANZDIENSTLEISTUNGEN', 'Financial Services'),
         ('FINANZWESEN', 'Financial Services'),
         ('FINANCIALS', 'Financial Services'),
         ('FINANZEN', 'Financial Services'),

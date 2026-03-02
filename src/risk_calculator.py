@@ -399,7 +399,7 @@ def _calculate_asset_class_risk(expanded_positions: List[Dict], portfolio_data: 
         {
             'Anlageklasse': asset_class,
             'Wert (€)': value,
-            'Anteil (%)': (value / total_value) * 100
+            'Anteil (%)': round((value / total_value) * 100, 1)
         }
         for asset_class, value in asset_classes.items()
     ])
@@ -433,7 +433,7 @@ def _calculate_sector_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
         {
             'Sektor': sector,
             'Wert (€)': value,
-            'Anteil (%)': (value / total_value) * 100
+            'Anteil (%)': round((value / total_value) * 100, 1)
         }
         for sector, value in sectors.items()
     ])
@@ -472,7 +472,7 @@ def _calculate_currency_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
         {
             'Währung': currency,
             'Wert (€)': value,
-            'Anteil (%)': (value / total_value_with_currency_risk) * 100 if total_value_with_currency_risk > 0 else 0
+            'Anteil (%)': round((value / total_value_with_currency_risk) * 100, 1) if total_value_with_currency_risk > 0 else 0.0
         }
         for currency, value in currencies.items()
     ])
@@ -511,7 +511,7 @@ def _calculate_currency_risk_with_commodities(expanded_positions: List[Dict]) ->
         {
             'Währung': currency,
             'Wert (€)': value,
-            'Anteil (%)': (value / total_value) * 100
+            'Anteil (%)': round((value / total_value) * 100, 1)
         }
         for currency, value in currencies.items()
     ]
@@ -521,7 +521,7 @@ def _calculate_currency_risk_with_commodities(expanded_positions: List[Dict]) ->
         rows.append({
             'Währung': 'Commodity (kein Währungsrisiko)',
             'Wert (€)': commodity_value,
-            'Anteil (%)': (commodity_value / total_value) * 100
+            'Anteil (%)': round((commodity_value / total_value) * 100, 1)
         })
     
     df = pd.DataFrame(rows)
@@ -580,7 +580,7 @@ def _calculate_country_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
         {
             'Land': country,
             'Wert (€)': value,
-            'Anteil (%)': (value / total_value) * 100
+            'Anteil (%)': round((value / total_value) * 100, 1)
         }
         for country, value in countries.items()
     ])
@@ -756,7 +756,7 @@ def _calculate_position_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
             'Position': data['display_name'],
             'Ticker': data.get('ticker', ''),  # Ticker-Symbol
             'Wert (€)': data['value'],
-            'Anteil (%)': (data['value'] / total_value) * 100,
+            'Anteil (%)': round((data['value'] / total_value) * 100, 1),
             'Sektor': data['sector'],
             'Typ': data['type'],
             'Quellen': ', '.join(data['sources']) if data['sources'] else 'Direkt'
@@ -914,6 +914,7 @@ def _normalize_sector_name(sector: str) -> str:
         ('media', 'Communication Services'),
         ('medien', 'Communication Services'),
         # Finanzen
+        ('finanzdienstleistungen', 'Financial Services'),
         ('finanzwesen', 'Financial Services'),
         ('financial services', 'Financial Services'),
         ('financials', 'Financial Services'),
