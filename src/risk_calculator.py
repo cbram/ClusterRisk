@@ -95,6 +95,9 @@ def _expand_etf_holdings(portfolio_data: Dict, fetcher: ETFDataFetcher, use_cach
                 # Sammle Währungsverteilung der Top Holdings (zur späteren Berechnung von "Other Holdings")
                 top_holdings_currency_distribution = {}
                 other_holdings_entry = None
+                sector_allocation = etf_details.get('sector_allocation') or []
+                # Holdings mit Unknown/Diversified Sektor für spätere Zuordnung aus sector_allocation sammeln
+                unknown_sector_holdings = []
                 
                 # Holdings aus Detail-Datei verarbeiten
                 for holding in etf_details['holdings']:
@@ -143,75 +146,89 @@ def _expand_etf_holdings(portfolio_data: Dict, fetcher: ETFDataFetcher, use_cach
                         'sector_source': 'etf_details',  # MITTLERE PRIORITÄT
                         'etf_type': etf_details.get('type', 'Stock')  # ETF-Typ (Money Market, Stock, etc.)
                     }
-                    
-                    expanded.append(holding_info)
-                    print(f"DEBUG:     Added holding: {holding_name} = €{holding_value:.2f} ({holding_currency}, {holding_sector})")
-                
-                # Verarbeite "Other Holdings" mit Currency Allocation
-                if other_holdings_entry and etf_details.get('currency_allocation'):
-                    print(f"DEBUG:     Processing Other Holdings with currency allocation")
-                    
-                    # Berechne Währungsverteilung für "Other Holdings"
-                    # = ETF Gesamt-Währungsverteilung - Top Holdings Währungen
-                    for currency_alloc in etf_details['currency_allocation']:
-                        currency_name = currency_alloc['name']
-                        # Gewicht der Währung im GESAMTEN ETF
-                        total_currency_weight = currency_alloc['weight']
-                        
-                        # Gewicht der Währung in den Top Holdings
-                        top_holdings_weight = top_holdings_currency_distribution.get(currency_name, 0.0)
-                        
-                        # Gewicht für "Other Holdings" = Gesamt - Top Holdings
-                        other_currency_weight = total_currency_weight - top_holdings_weight
-                        
-                        # Überspringe wenn negativ oder sehr klein
-                        if other_currency_weight <= 0.001:  # < 0.1%
-                            continue
-                        
-                        # Berechne Wert für diese Währung in "Other Holdings"
-                        # other_currency_weight ist bereits als Anteil am GESAMTEN ETF
-                        # other_holdings_entry['value'] ist der Gesamtwert von "Other Holdings"
-                        # Anteil dieser Währung an "Other Holdings"
-                        currency_weight_in_other = other_currency_weight / other_holdings_entry['weight']
-                        currency_value = other_holdings_entry['value'] * currency_weight_in_other
-                        
-                        holding_info = {
-                            'name': other_holdings_entry['name'],
-                            'type': etf_details.get('type', 'Stock'),
-                            'value': currency_value,
-                            'weight_in_portfolio': currency_value / portfolio_data['total_value'],
-                            'currency': currency_name,
-                            'country': other_holdings_entry['country'] if other_holdings_entry['country'] else 'Mixed',
-                            'source_etf': position['name'],
-                            'original_type': 'ETF_Holding',
-                            'sector': other_holdings_entry['sector'],
-                            'industry': other_holdings_entry['sector'],
-                            'sector_source': 'etf_details',
-                            'etf_type': etf_details.get('type', 'Stock')
-                        }
-                        
+                    # Wenn Sektor unbekannt/diversified und Sector Allocation vorhanden: später zuordnen
+                    if sector_allocation and holding_sector in ('Unknown', 'Diversified'):
+                        unknown_sector_holdings.append((holding_value, holding_info))
+                    else:
                         expanded.append(holding_info)
-                        print(f"DEBUG:     Added Other Holdings ({currency_name}): €{currency_value:.2f} ({other_currency_weight*100:.1f}% of total ETF, {currency_weight_in_other*100:.1f}% of Other Holdings)")
+                        print(f"DEBUG:     Added holding: {holding_name} = €{holding_value:.2f} ({holding_currency}, {holding_sector})")
                 
-                elif other_holdings_entry:
-                    # Kein Currency Allocation vorhanden, nutze "Mixed"
-                    print(f"DEBUG:     ⚠️  No currency allocation found, using Mixed for Other Holdings")
-                    holding_info = {
-                        'name': other_holdings_entry['name'],
-                        'type': etf_details.get('type', 'Stock'),
-                        'value': other_holdings_entry['value'],
-                        'weight_in_portfolio': other_holdings_entry['value'] / portfolio_data['total_value'],
-                        'currency': 'Mixed',
-                        'country': other_holdings_entry['country'] if other_holdings_entry['country'] else 'Mixed',
-                        'source_etf': position['name'],
-                        'original_type': 'ETF_Holding',
-                        'sector': other_holdings_entry['sector'],
-                        'industry': other_holdings_entry['sector'],
-                        'sector_source': 'etf_details',
-                        'etf_type': etf_details.get('type', 'Stock')
-                    }
-                    expanded.append(holding_info)
-                    print(f"DEBUG:     Added Other Holdings (Mixed): €{other_holdings_entry['value']:.2f}")
+                # Sektor aus sector_allocation für Holdings mit Unknown/Diversified zuweisen
+                if sector_allocation and unknown_sector_holdings:
+                    assigned_sectors = _assign_sectors_from_allocation(
+                        unknown_sector_holdings, sector_allocation, position['value']
+                    )
+                    for (_, holding_info), sector_name in zip(unknown_sector_holdings, assigned_sectors):
+                        holding_info['sector'] = sector_name
+                        holding_info['industry'] = sector_name
+                        expanded.append(holding_info)
+                        print(f"DEBUG:     Added holding (sector from allocation): {holding_info['name']} = €{holding_info['value']:.2f} ({holding_info['currency']}, {sector_name})")
+                
+                # Verarbeite "Other Holdings": einheitlich nach Sektor, Währung und Land aus Allokationen
+                if other_holdings_entry:
+                    sector_alloc_list = etf_details.get('sector_allocation') or []
+                    currency_alloc_list = etf_details.get('currency_allocation') or []
+                    country_alloc_list = etf_details.get('country_allocation') or []
+                    other_value = other_holdings_entry['value']
+
+                    # Sektor-Gewichte: aus Sector Allocation oder ein Eintrag "Diversified"
+                    if sector_alloc_list:
+                        sector_weights = [
+                            (_normalize_sector_name(s['name']), s['weight'])
+                            for s in sector_alloc_list if s.get('weight', 0) > 0
+                        ]
+                    else:
+                        sector_weights = [('Diversified', 1.0)]
+
+                    # Währungs-Gewichte für "Other": Gesamt-ETF minus Top-Holdings, normalisiert
+                    if currency_alloc_list:
+                        other_currency_weights = {}
+                        for c in currency_alloc_list:
+                            total_c = c['weight']
+                            top_c = top_holdings_currency_distribution.get(c['name'], 0.0)
+                            other_c = max(0.0, total_c - top_c)
+                            if other_c > 0.001:
+                                other_currency_weights[c['name']] = other_c
+                        total_other_currency = sum(other_currency_weights.values())
+                        if total_other_currency > 0:
+                            currency_weights = [(cur, w / total_other_currency) for cur, w in other_currency_weights.items()]
+                        else:
+                            currency_weights = [('Mixed', 1.0)]
+                    else:
+                        currency_weights = [('Mixed', 1.0)]
+
+                    # Länder-Gewichte: aus Country Allocation (Name → ISO-Code für Auswertung)
+                    if country_alloc_list:
+                        country_weights = [
+                            (_allocation_country_name_to_code(c['name']), c['weight'])
+                            for c in country_alloc_list if c.get('weight', 0) > 0
+                        ]
+                    else:
+                        country_weights = [('Other', 1.0)]
+
+                    # Eine Zeile pro (Sektor, Währung, Land) – alle drei Ansichten (Branche, Währung, Land) korrekt
+                    print(f"DEBUG:     Processing Other Holdings: {len(sector_weights)}×{len(currency_weights)}×{len(country_weights)} Kombinationen (Sektor×Währung×Land)")
+                    for (sector_name_norm, s_w) in sector_weights:
+                        for (currency_name, c_w) in currency_weights:
+                            for (country_code, country_w) in country_weights:
+                                part_value = other_value * s_w * c_w * country_w
+                                if part_value < 0.01:  # Rundungsrausch vermeiden
+                                    continue
+                                holding_info = {
+                                    'name': other_holdings_entry['name'],
+                                    'type': etf_details.get('type', 'Stock'),
+                                    'value': part_value,
+                                    'weight_in_portfolio': part_value / portfolio_data['total_value'],
+                                    'currency': currency_name,
+                                    'country': country_code,
+                                    'source_etf': position['name'],
+                                    'original_type': 'ETF_Holding',
+                                    'sector': sector_name_norm,
+                                    'industry': sector_name_norm,
+                                    'sector_source': 'etf_details',
+                                    'etf_type': etf_details.get('type', 'Stock')
+                                }
+                                expanded.append(holding_info)
             
             # PRIORITÄT 2: Fallback zu bisherigem Fetcher (Mock, APIs)
             else:
@@ -605,12 +622,37 @@ def _currency_to_country(currency: str) -> str:
     return currency_country_map.get(currency, 'Unbekannt')
 
 
+def _allocation_country_name_to_code(name: str) -> str:
+    """
+    Mappt Ländernamen aus ETF-Allocation (justETF/CSV, z.B. 'United States')
+    auf ISO 3166-1 Alpha-2 Codes für einheitliche Country-Risk-Auswertung.
+    """
+    if not name or not name.strip():
+        return 'Other'
+    name_clean = name.strip()
+    allocation_to_code = {
+        'United States': 'US', 'USA': 'US', 'US': 'US',
+        'Japan': 'JP', 'JP': 'JP',
+        'United Kingdom': 'GB', 'UK': 'GB', 'GB': 'GB', 'Großbritannien': 'GB',
+        'Canada': 'CA', 'CA': 'CA',
+        'Switzerland': 'CH', 'CH': 'CH', 'Schweiz': 'CH',
+        'France': 'FR', 'FR': 'FR', 'Frankreich': 'FR',
+        'Germany': 'DE', 'DE': 'DE', 'Deutschland': 'DE',
+        'Australia': 'AU', 'AU': 'AU', 'Australien': 'AU',
+        'Netherlands': 'NL', 'NL': 'NL', 'Niederlande': 'NL',
+        'Ireland': 'IE', 'IE': 'IE', 'Irland': 'IE',
+        'Other': 'Other', 'Mixed': 'Other',
+    }
+    return allocation_to_code.get(name_clean, name_clean[:2] if len(name_clean) >= 2 else name_clean)
+
+
 def _country_code_to_name(code: str) -> str:
     """
     Konvertiert ISO 3166-1 Alpha-2 Ländercode zu Ländername
     """
     country_map = {
         'US': 'USA',
+        'Other': 'Sonstige',
         'DE': 'Deutschland',
         'GB': 'Großbritannien',
         'FR': 'Frankreich',
@@ -797,109 +839,153 @@ def _get_stock_currency(isin: str, default_currency: str) -> str:
     return currency_map.get(country_code, default_currency)
 
 
+def _assign_sectors_from_allocation(
+    holdings_with_values: List[tuple],
+    sector_allocation: List[Dict],
+    etf_total_value: float
+) -> List[str]:
+    """
+    Ordnet Holdings ohne Sektor (Unknown/Diversified) den Sektoren aus sector_allocation
+    per Greedy-Zuordnung zu, sodass die Sektor-Summen ungefähr den Allokationsgewichten entsprechen.
+    holdings_with_values: Liste von (value, ...) – nur value wird genutzt
+    Returns: Liste der zugewiesenen Sektornamen (gleiche Reihenfolge wie holdings_with_values)
+    """
+    if not sector_allocation or not holdings_with_values:
+        return ['Unknown'] * len(holdings_with_values)
+    # Ziel pro Sektor (Anteil * Gesamtwert der Holdings)
+    total_unknown_value = sum(h[0] for h in holdings_with_values)
+    sector_targets = [
+        (s['name'], s['weight'] * total_unknown_value)
+        for s in sector_allocation
+        if s.get('weight', 0) > 0
+    ]
+    sector_targets.sort(key=lambda x: -x[1])  # absteigend nach Zielwert
+    # Greedy: Holding (nach Wert absteigend) dem Sektor zuordnen, der am meisten fehlt
+    holdings_sorted = sorted(enumerate(holdings_with_values), key=lambda x: -x[1][0])
+    sector_sums = {s[0]: 0.0 for s in sector_targets}
+    assigned = ['Unknown'] * len(holdings_with_values)
+    for idx, (value, _) in holdings_sorted:
+        best_sector = None
+        best_gap = -1
+        for s_name, s_target in sector_targets:
+            gap = s_target - sector_sums[s_name]
+            if gap > best_gap:
+                best_gap = gap
+                best_sector = s_name
+        if best_sector:
+            assigned[idx] = _normalize_sector_name(best_sector)
+            sector_sums[best_sector] += value
+    return assigned
+
+
 def _normalize_sector_name(sector: str) -> str:
     """
     Normalisiert Branchennamen zu einheitlichen Kategorien
-    
+
     Mappt verschiedene Bezeichnungen (deutsch/englisch, verschiedene Standards)
     auf einheitliche Namen.
     """
     if not sector or sector == 'Unknown':
         return 'Unknown'
     
-    sector_lower = sector.lower().strip()
+    # Eingabe bereinigen (Leerzeichen, &/und)
+    s = sector.strip()
+    while '  ' in s:
+        s = s.replace('  ', ' ')
+    s = s.replace('&', ' und ').replace('–', '-').replace('—', '-')
+    sector_lower = s.lower()
+    sector_lower_ascii = sector_lower.replace('ü', 'ue').replace('ä', 'ae').replace('ö', 'oe')
     
-    # Mapping: Verschiedene Namen -> Einheitlicher Name
-    sector_mapping = {
+    # Mapping: Verschiedene Namen -> Einheitlicher Name (längere Keys zuerst für Teilstring-Match)
+    sector_mapping = [
         # Technologie / IT
-        'informationstechnologie': 'Technology',
-        'technology': 'Technology',
-        'information technology': 'Technology',
-        'tech': 'Technology',
-        'software': 'Technology',
-        'semiconductors': 'Technology',
-        
+        ('informationstechnologie', 'Technology'),
+        ('information technology', 'Technology'),
+        ('technology', 'Technology'),
+        ('tech', 'Technology'),
+        ('software', 'Technology'),
+        ('semiconductors', 'Technology'),
         # Kommunikation
-        'kommunikationsdienste': 'Communication Services',
-        'communication services': 'Communication Services',
-        'telekommunikation': 'Communication Services',
-        'telecommunications': 'Communication Services',
-        'media': 'Communication Services',
-        'medien': 'Communication Services',
-        
+        ('kommunikationsdienste', 'Communication Services'),
+        ('communication services', 'Communication Services'),
+        ('telekommunikation', 'Communication Services'),
+        ('telecommunication', 'Communication Services'),
+        ('telecommunications', 'Communication Services'),
+        ('media', 'Communication Services'),
+        ('medien', 'Communication Services'),
         # Finanzen
-        'finanzwesen': 'Financial Services',
-        'financial services': 'Financial Services',
-        'financials': 'Financial Services',
-        'finanzen': 'Financial Services',
-        'banks': 'Financial Services',
-        'banken': 'Financial Services',
-        'insurance': 'Financial Services',
-        'versicherungen': 'Financial Services',
-        
+        ('finanzwesen', 'Financial Services'),
+        ('financial services', 'Financial Services'),
+        ('financials', 'Financial Services'),
+        ('finanzen', 'Financial Services'),
+        ('banks', 'Financial Services'),
+        ('banken', 'Financial Services'),
+        ('insurance', 'Financial Services'),
+        ('versicherungen', 'Financial Services'),
         # Gesundheit
-        'gesundheitswesen': 'Healthcare',
-        'healthcare': 'Healthcare',
-        'health care': 'Healthcare',
-        'gesundheit': 'Healthcare',
-        'pharma': 'Healthcare',
-        'biotechnology': 'Healthcare',
-        'biotechnologie': 'Healthcare',
-        
-        # Konsumgüter zyklisch
-        'zyklische konsumgüter': 'Consumer Cyclical',
-        'consumer cyclical': 'Consumer Cyclical',
-        'consumer discretionary': 'Consumer Cyclical',
-        'nicht-basiskonsumgüter': 'Consumer Cyclical',
-        'retail': 'Consumer Cyclical',
-        'einzelhandel': 'Consumer Cyclical',
-        
+        ('gesundheitswesen', 'Healthcare'),
+        ('healthcare', 'Healthcare'),
+        ('health care', 'Healthcare'),
+        ('gesundheit', 'Healthcare'),
+        ('pharma', 'Healthcare'),
+        ('biotechnology', 'Healthcare'),
+        ('biotechnologie', 'Healthcare'),
+        # Konsumgüter zyklisch (Nicht-Basiskonsumgüter)
+        ('zyklische konsumgüter', 'Consumer Cyclical'),
+        ('zyklische konsumgueter', 'Consumer Cyclical'),
+        ('nicht-basiskonsumgüter', 'Consumer Cyclical'),
+        ('nicht-basiskonsumgueter', 'Consumer Cyclical'),
+        ('nicht basiskonsumgüter', 'Consumer Cyclical'),
+        ('nicht basiskonsumgueter', 'Consumer Cyclical'),
+        ('consumer cyclical', 'Consumer Cyclical'),
+        ('consumer discretionary', 'Consumer Cyclical'),
+        ('retail', 'Consumer Cyclical'),
+        ('einzelhandel', 'Consumer Cyclical'),
         # Konsumgüter nicht-zyklisch
-        'basiskonsumgüter': 'Consumer Staples',
-        'consumer staples': 'Consumer Staples',
-        'consumer defensive': 'Consumer Staples',
-        'nahrungsmittel': 'Consumer Staples',
-        'food': 'Consumer Staples',
-        
+        ('basiskonsumgüter', 'Consumer Staples'),
+        ('basiskonsumgueter', 'Consumer Staples'),
+        ('consumer staples', 'Consumer Staples'),
+        ('consumer defensive', 'Consumer Staples'),
+        ('nahrungsmittel', 'Consumer Staples'),
+        ('food', 'Consumer Staples'),
         # Industrie
-        'industrie': 'Industrials',
-        'industrials': 'Industrials',
-        'industrial': 'Industrials',
-        
+        ('industrie', 'Industrials'),
+        ('industrials', 'Industrials'),
+        ('industrial', 'Industrials'),
         # Energie
-        'energie': 'Energy',
-        'energy': 'Energy',
-        'öl & gas': 'Energy',
-        'oil & gas': 'Energy',
-        
-        # Materialien / Grundstoffe
-        'materialien': 'Materials',
-        'materials': 'Materials',
-        'grundstoffe': 'Materials',
-        'basic materials': 'Materials',
-        
+        ('energie', 'Energy'),
+        ('energy', 'Energy'),
+        ('öl & gas', 'Energy'),
+        ('oil & gas', 'Energy'),
+        # Materialien / Roh-, Hilfs- & Betriebsstoffe
+        ('roh-, hilfs- und betriebsstoffe', 'Materials'),
+        ('roh-, hilfs- & betriebsstoffe', 'Materials'),
+        ('hilfs- und betriebsstoffe', 'Materials'),
+        ('betriebsstoffe', 'Materials'),
+        ('hilfsstoffe', 'Materials'),
+        ('rohstoffe', 'Materials'),
+        ('materialien', 'Materials'),
+        ('materials', 'Materials'),
+        ('grundstoffe', 'Materials'),
+        ('basic materials', 'Materials'),
+        ('werkstoffe', 'Materials'),
         # Immobilien
-        'immobilien': 'Real Estate',
-        'real estate': 'Real Estate',
-        
+        ('immobilien', 'Real Estate'),
+        ('real estate', 'Real Estate'),
         # Versorgung
-        'versorgungsbetriebe': 'Utilities',
-        'utilities': 'Utilities',
-        'versorger': 'Utilities',
-        
-        # Sonstiges
-        'diversified': 'Diversified',
-        'diversifiziert': 'Diversified',
-        'cash': 'Cash',
-        'etf': 'ETF',
-        'commodity': 'Commodity',
-        'rohstoffe': 'Commodity',
-    }
+        ('versorgungsbetriebe', 'Utilities'),
+        ('utilities', 'Utilities'),
+        ('versorger', 'Utilities'),
+        # Sonstiges (rohstoffe hier nur wenn nicht schon Materials)
+        ('diversified', 'Diversified'),
+        ('diversifiziert', 'Diversified'),
+        ('cash', 'Cash'),
+        ('etf', 'ETF'),
+        ('commodity', 'Commodity'),
+    ]
     
-    # Suche nach Mapping
-    for key, value in sector_mapping.items():
-        if key in sector_lower:
+    for key, value in sector_mapping:
+        if key in sector_lower or key in sector_lower_ascii:
             return value
     
-    # Fallback: Kapitalisiere ersten Buchstaben
-    return sector.title()
+    return sector.strip().title() if sector else 'Unknown'

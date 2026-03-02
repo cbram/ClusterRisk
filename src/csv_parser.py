@@ -29,6 +29,11 @@ def parse_portfolio_csv(filepath: str) -> Dict:
     
     print(f"DEBUG: CSV geladen - {len(df)} Zeilen")
     
+    # Branchen-Spalte flexibel ermitteln (verschiedene PP-Export-Formate)
+    sector_column = _find_sector_column(df.columns.tolist())
+    if sector_column:
+        print(f"DEBUG: Branchen-Spalte erkannt: '{sector_column}'")
+    
     # Portfolio-Daten initialisieren
     portfolio_data = {
         'positions': [],
@@ -126,22 +131,13 @@ def parse_portfolio_csv(filepath: str) -> Dict:
                 sec_type = 'Cash'
                 print(f"DEBUG:   Notiz-Override: {name} -> Cash (Notiz: {notiz})")
             
-            # Sektor/Branche aus CSV auslesen (Priorität 1)
+            # Sektor/Branche aus CSV auslesen (Priorität 1) – nutzt flexibel erkannte Spalte
             sector = None
-            sector_column_names = [
-                'Branchen (GICS, Sektoren) (Ebene 1)',
-                'Branchen (GICS, Sektoren)',  # Variante ohne "(Ebene 1)"
-                'Branche',
-                'Sektor',
-                'Sector'
-            ]
-            for col_name in sector_column_names:
-                if col_name in row and pd.notna(row[col_name]):
-                    sector_value = str(row[col_name]).strip()
-                    if sector_value and sector_value != '':
-                        sector = _normalize_sector_name(sector_value)
-                        print(f"DEBUG:   Branche aus CSV: {name} -> {sector} (Original: {sector_value})")
-                        break
+            if sector_column and sector_column in row.index and pd.notna(row.get(sector_column)):
+                sector_value = str(row[sector_column]).strip()
+                if sector_value and sector_value != '':
+                    sector = _normalize_sector_name(sector_value)
+                    print(f"DEBUG:   Branche aus CSV: {name} -> {sector} (Original: {sector_value})")
             
             # Fallback: Sektor aus Ticker ableiten (nur für Aktien, nicht für ETFs)
             if not sector and sec_type == 'Stock':
@@ -183,6 +179,33 @@ def parse_portfolio_csv(filepath: str) -> Dict:
     print(f"DEBUG:   Gesamtwert: €{portfolio_data['total_value']:.2f}")
     
     return portfolio_data
+
+
+def _find_sector_column(column_names: List[str]) -> str:
+    """
+    Ermittelt die Branchen/Sektor-Spalte flexibel aus den CSV-Spaltennamen.
+    Unterstützt verschiedene Portfolio-Performance-Export-Formate und Varianten.
+    """
+    if not column_names:
+        return ''
+    # Exakte Kandidaten (Reihenfolge: spezifisch → allgemein)
+    exact_candidates = [
+        'Branchen (GICS, Sektoren) (Ebene 1)',
+        'Branchen (GICS, Sektoren)',
+        'Branchen (GICS)',           # aktuelle Test-CSV / kürzere PP-Variante
+        'Branche',
+        'Sektor',
+        'Sector',
+    ]
+    for cand in exact_candidates:
+        if cand in column_names:
+            return cand
+    # Fallback: Spalte, deren Name "Branche", "Sektor", "Sector" oder "GICS" enthält (case-insensitive)
+    keywords = ('branche', 'sektor', 'sector', 'gics')
+    for col in column_names:
+        if col and isinstance(col, str) and any(kw in col.lower() for kw in keywords):
+            return col
+    return ''
 
 
 def _determine_security_type(name: str, symbol: str) -> str:
@@ -235,68 +258,108 @@ def _get_sector_from_ticker(ticker: str) -> str:
     return sector if sector != 'Unknown' else None
 
 
+def _normalize_sector_input(s: str) -> str:
+    """
+    Bereinigt Sektor-Eingabe für robusten Abgleich: Leerzeichen, Zeichenvarianten.
+    """
+    if not s or not isinstance(s, str):
+        return ''
+    s = s.strip()
+    # Mehrfach-Leerzeichen auf eines
+    while '  ' in s:
+        s = s.replace('  ', ' ')
+    # Typografische Varianten vereinheitlichen (für Abgleich)
+    s = s.replace('\u00a0', ' ')   # geschütztes Leer
+    s = s.replace('–', '-').replace('—', '-')  # En/Em-Dash -> Bindestrich
+    s = s.replace('&', ' UND ').replace(' und ', ' UND ')
+    s = s.strip()
+    return s
+
+
 def _normalize_sector_name(sector_name: str) -> str:
     """
-    Normalisiert Sektornamen von Portfolio Performance (deutsch) 
-    zu englischen Standardnamen.
+    Normalisiert Sektornamen von Portfolio Performance (deutsch/verschiedene Formate)
+    zu englischen Standardnamen. Robust gegen Leerzeichen, &/und, Umlaute-Varianten.
     """
-    sector_upper = sector_name.upper()
+    if not sector_name or not isinstance(sector_name, str):
+        return sector_name or ''
+    normalized = _normalize_sector_input(sector_name)
+    sector_upper = normalized.upper()
+    # Umlaut-Varianten für Abgleich (z. B. Export als "ue" statt "ü")
+    sector_upper_ascii = sector_upper.replace('Ü', 'UE').replace('Ä', 'AE').replace('Ö', 'OE')
     
-    # Mapping deutscher GICS-Sektoren (aus Portfolio Performance) zu englischen Namen
-    sector_mapping = {
-        # Exakte Namen aus Portfolio Performance Screenshot
-        'INFORMATIONSTECHNOLOGIE': 'Technology',
-        'TECHNOLOGIE': 'Technology',
-        'IT': 'Technology',
-        
-        'FINANZWESEN': 'Financial Services',
-        'FINANZEN': 'Financial Services',
-        'FINANCIALS': 'Financial Services',
-        
-        'GESUNDHEITSWESEN': 'Healthcare',
-        'GESUNDHEIT': 'Healthcare',
-        'HEALTH CARE': 'Healthcare',
-        
-        'NICHT-BASISKONSUMGÜTER': 'Consumer Cyclical',
-        'ZYKLISCHE KONSUMGÜTER': 'Consumer Cyclical',
-        'CONSUMER DISCRETIONARY': 'Consumer Cyclical',
-        'KONSUMGÜTER': 'Consumer Cyclical',
-        
-        'BASISKONSUMGÜTER': 'Consumer Staples',
-        'VERBRAUCHSGÜTER': 'Consumer Staples',
-        'CONSUMER STAPLES': 'Consumer Staples',
-        
-        'ENERGIE': 'Energy',
-        'ENERGY': 'Energy',
-        
-        'KOMMUNIKATIONSDIENSTE': 'Communication Services',
-        'KOMMUNIKATION': 'Communication Services',
-        'COMMUNICATION SERVICES': 'Communication Services',
-        'TELEKOMMUNIKATION': 'Communication Services',
-        
-        'INDUSTRIE': 'Industrials',
-        'INDUSTRIALS': 'Industrials',
-        
-        # "Roh-, Hilfs- & Betriebsstoffe" aus dem Screenshot
-        'ROH-, HILFS- & BETRIEBSSTOFFE': 'Materials',
-        'ROHSTOFFE': 'Materials',
-        'WERKSTOFFE': 'Materials',
-        'MATERIALIEN': 'Materials',
-        'MATERIALS': 'Materials',
-        
-        # "Versorgungsbetriebe" aus dem Screenshot
-        'VERSORGUNGSBETRIEBE': 'Utilities',
-        'VERSORGER': 'Utilities',
-        'UTILITIES': 'Utilities',
-        
-        'IMMOBILIEN': 'Real Estate',
-        'REAL ESTATE': 'Real Estate',
-    }
+    # Mapping: deutsche/englische Bezeichnungen -> Standard (längere Keys zuerst für Teilstring-Match)
+    sector_mapping = [
+        # Technology
+        ('INFORMATIONSTECHNOLOGIE', 'Technology'),
+        ('INFORMATION TECHNOLOGY', 'Technology'),
+        ('TECHNOLOGIE', 'Technology'),
+        ('IT', 'Technology'),
+        # Financial Services
+        ('FINANZWESEN', 'Financial Services'),
+        ('FINANCIALS', 'Financial Services'),
+        ('FINANZEN', 'Financial Services'),
+        # Healthcare
+        ('GESUNDHEITSWESEN', 'Healthcare'),
+        ('HEALTH CARE', 'Healthcare'),
+        ('GESUNDHEIT', 'Healthcare'),
+        # Consumer Cyclical (Nicht-Basiskonsumgüter)
+        ('NICHT-BASISKONSUMGÜTER', 'Consumer Cyclical'),
+        ('NICHT-BASISKONSUMGUETER', 'Consumer Cyclical'),
+        ('NICHT BASISKONSUMGÜTER', 'Consumer Cyclical'),
+        ('NICHT BASISKONSUMGUETER', 'Consumer Cyclical'),
+        ('ZYKLISCHE KONSUMGÜTER', 'Consumer Cyclical'),
+        ('ZYKLISCHE KONSUMGUETER', 'Consumer Cyclical'),
+        ('CONSUMER DISCRETIONARY', 'Consumer Cyclical'),
+        ('KONSUMGÜTER', 'Consumer Cyclical'),
+        ('KONSUMGUETER', 'Consumer Cyclical'),
+        # Consumer Staples
+        ('BASISKONSUMGÜTER', 'Consumer Staples'),
+        ('BASISKONSUMGUETER', 'Consumer Staples'),
+        ('VERBRAUCHSGÜTER', 'Consumer Staples'),
+        ('CONSUMER STAPLES', 'Consumer Staples'),
+        # Energy
+        ('ENERGIE', 'Energy'),
+        ('ENERGY', 'Energy'),
+        # Communication
+        ('KOMMUNIKATIONSDIENSTE', 'Communication Services'),
+        ('COMMUNICATION SERVICES', 'Communication Services'),
+        ('KOMMUNIKATION', 'Communication Services'),
+        ('TELEKOMMUNIKATION', 'Communication Services'),
+        # Industrials
+        ('INDUSTRIE', 'Industrials'),
+        ('INDUSTRIALS', 'Industrials'),
+        # Materials – Roh-, Hilfs- & Betriebsstoffe (mehrere Schreibweisen)
+        ('ROH-, HILFS- UND BETRIEBSSTOFFE', 'Materials'),
+        ('ROH-, HILFS- & BETRIEBSSTOFFE', 'Materials'),
+        ('ROH HILFS BETRIEBSSTOFFE', 'Materials'),
+        ('HILFS- UND BETRIEBSSTOFFE', 'Materials'),
+        ('ROH- HILFS- UND BETRIEBSSTOFFE', 'Materials'),
+        ('BETRIEBSSTOFFE', 'Materials'),
+        ('HILFSSTOFFE', 'Materials'),
+        ('ROHSTOFFE', 'Materials'),
+        ('WERKSTOFFE', 'Materials'),
+        ('MATERIALIEN', 'Materials'),
+        ('MATERIALS', 'Materials'),
+        ('GRUNDSTOFFE', 'Materials'),
+        ('BASIC MATERIALS', 'Materials'),
+        # Utilities
+        ('VERSORGUNGSBETRIEBE', 'Utilities'),
+        ('VERSORGER', 'Utilities'),
+        ('UTILITIES', 'Utilities'),
+        # Real Estate
+        ('IMMOBILIEN', 'Real Estate'),
+        ('REAL ESTATE', 'Real Estate'),
+    ]
     
-    # Suche nach exakter Übereinstimmung
-    if sector_upper in sector_mapping:
-        return sector_mapping[sector_upper]
+    # 1) Exakter Abgleich (Original und ASCII-Umlaut-Variante)
+    for key, value in sector_mapping:
+        if sector_upper == key or sector_upper_ascii == key:
+            return value
+    # 2) Teilstring: Key kommt in Eingabe vor (längere Keys zuerst)
+    for key, value in sector_mapping:
+        if key in sector_upper or key in sector_upper_ascii:
+            return value
     
-    # Fallback: Originalnamen zurückgeben (in Title Case)
-    return sector_name.title()
+    return sector_name.strip().title() if sector_name else ''
 
