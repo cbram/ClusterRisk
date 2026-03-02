@@ -1,5 +1,40 @@
 # Changelog - ClusterRisk
 
+## [1.6.0] - 2026-03-02 - UI/UX: Einheitliche Farben, Filter, Rundung
+
+### ✨ Neue Features
+
+**Beispiel & Bond-ETF:**
+- ✅ **Beispiel-Portfolio** `data/Beispiel_Vermoegensaufstellung.csv`: 2 Aktien-ETFs, Geldmarkt-ETF, Bond-ETF, Tagesgeldkonto, 5 Einzelaktien
+- ✅ **Bond-ETF IEAG**: ETF-Details für iShares Core EUR Corp Bond (Factsheet), Eintrag in ISIN-Ticker-Map
+- ✅ **Anlageklasse Bond**: Bond-ETFs und ihre Holdings erscheinen korrekt unter "Bond" in allen Auswertungen (etf_type wird genutzt)
+
+### 🎨 UI/UX Verbesserungen
+
+**Visualisierungen:**
+- ✅ **Risiko-Linien entfernt**: Keine vertikalen Schwellenlinien mehr in Bar-Charts (Detaillierte Übersicht)
+- ✅ **Bar-Chart**: Reduzierter Abstand zwischen Überschrift und erstem Balken (margin)
+- ✅ **Einheitliche Farbgebung**: Treemap, Pie und Bar-Chart nutzen dieselbe Zuordnung – "Other Holdings" hellblau, alle anderen Items bunt (gleiche Farbe pro Item in allen drei Views)
+- ✅ **Bar-Chart**: Keine Risiko-Farben (rot/orange) mehr, nur noch einheitliche Palette
+
+**Filter & Optionen:**
+- ✅ **Branche**: Cash optional per Checkbox "Cash anzeigen" (Default: aus)
+- ✅ **Anteile &lt; 0,1 % ausblenden**: Branche, Währung, Land, Einzelpositionen – nur Einträge ≥ 0,1 % werden angezeigt, Anteile der verbleibenden neu auf 100 % berechnet
+
+**Darstellung:**
+- ✅ **Prozentzahlen**: Überall auf 1 Dezimalstelle gerundet (risk_calculator, app, visualizer, export)
+- ✅ **Branchen-Normalisierung**: "Finanzdienstleistungen" wird mit "Financial Services" zusammengeführt (csv_parser + risk_calculator)
+
+### 📁 Geänderte Dateien
+
+- **`app.py`**: Cash-Checkbox Branche, 0,1 %-Filter für Branche/Währung/Land/Einzelpositionen
+- **`src/risk_calculator.py`**: Bond in Anlageklassen (etf_type), Anteil-Rundung 1 Dezimalstelle, Finanzdienstleistungen-Mapping
+- **`src/visualizer.py`**: Risiko-Linien entfernt, Margin, einheitliche Farbpalette, Anteil-Format 1 Dezimalstelle
+- **`src/csv_parser.py`**: Finanzdienstleistungen → Financial Services
+- **`src/export.py`**: Prozent-Format 1 Dezimalstelle
+
+---
+
 ## [1.4.1] - 2026-02-08 - Cleanup: Legacy-Fallback entfernt
 
 ### 🗑️ Entfernt
