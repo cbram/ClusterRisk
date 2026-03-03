@@ -266,6 +266,27 @@ class ETFDetailsParser:
         
         return holdings
     
+    def is_file_stale(self, ticker: str, max_days: int) -> bool:
+        """
+        True wenn die ETF-Detail-Datei nicht existiert oder älter als max_days ist.
+        """
+        filepath = self.etf_details_dir / f"{ticker}.csv"
+        if not filepath.exists():
+            return True
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                for line in f:
+                    if 'Last Updated' in line and ',' in line:
+                        parts = line.split(',', 1)
+                        if len(parts) >= 2:
+                            date_str = parts[1].strip()
+                            last_updated = datetime.strptime(date_str, '%Y-%m-%d')
+                            return (datetime.now() - last_updated).days > max_days
+                        break
+        except (ValueError, OSError):
+            pass
+        return True  # Bei Fehler als veraltet behandeln
+
     def _check_data_freshness(self, ticker: str, etf_name: str, last_updated_str: str):
         """
         Prüft ob die ETF-Daten aktuell sind (< 30 Tage alt)

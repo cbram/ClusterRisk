@@ -210,37 +210,35 @@ def _find_sector_column(column_names: List[str]) -> str:
 
 def _determine_security_type(name: str, symbol: str) -> str:
     """
-    Bestimmt den Typ eines Wertpapiers basierend auf Name und Symbol
+    Bestimmt den Typ eines Wertpapiers basierend auf Name und Symbol.
+    ETF-Erkennung zuerst, damit Geldmarkt-ETFs (XEON) und Commodity-ETCs (XGDU)
+    als ETF expandiert werden – der tatsächliche Typ kommt aus den ETF-Details.
     """
     name_upper = name.upper()
     symbol_upper = symbol.upper() if symbol else ''
-    
-    # Geldmarkt-ETFs als Cash behandeln
-    money_market_keywords = [
-        'MONEY MARKET', 'GELDMARKT', 'OVERNIGHT', 'LIQUIDITY', 
-        'LIQUIDITÄT', 'TAGESGELD', 'CASH FUND', 'XEON'
-    ]
-    if any(keyword in name_upper for keyword in money_market_keywords):
-        return 'Cash'
-    
-    # ETF-Erkennung
+
+    # ETF-Erkennung zuerst (inkl. XEON, XGDU – Typ aus ETF-Details)
     etf_keywords = [
-        'ETF', 'UCITS', 'INDEX FUND', 'TRACKER',
-        'ISHARES', 'ISHSIII', 'ISHS', 'EUNL',
+        'ETF', 'ETC', 'UCITS', 'INDEX FUND', 'TRACKER',
+        'ISHARES', 'ISHSIII', 'ISHS', 'EUNL', 'XEON', 'XGDU',
         'VANGUARD', 'XTRACKERS', 'LYXOR', 'AMUNDI',
         'SPDR', 'INVESCO', 'WISDOMTREE', 'FRANKLIN',
         'MSCI WORLD', 'MSCI EM', 'MSCI EUROPE',
-        'S&P 500', 'NASDAQ', 'DAX', 'STOXX'
+        'S&P 500', 'NASDAQ', 'DAX', 'STOXX',
     ]
-    
     if any(keyword in name_upper or keyword in symbol_upper for keyword in etf_keywords):
         return 'ETF'
-    elif 'GOLD' in name_upper or 'SILVER' in name_upper or 'COMMODITY' in name_upper:
+
+    # Reine Cash-Konten (keine Wertpapiere)
+    money_market_keywords = ['LIQUIDITÄT', 'TAGESGELD', 'OVERNIGHT', 'MONEY MARKET', 'GELDMARKT', 'CASH FUND']
+    if any(keyword in name_upper for keyword in money_market_keywords):
+        return 'Cash'
+
+    if 'GOLD' in name_upper or 'SILVER' in name_upper or 'COMMODITY' in name_upper:
         return 'Commodity'
-    elif 'BOND' in name_upper or 'ANLEIHE' in name_upper:
+    if 'BOND' in name_upper or 'ANLEIHE' in name_upper:
         return 'Bond'
-    else:
-        return 'Stock'
+    return 'Stock'
 
 
 def _get_sector_from_ticker(ticker: str) -> str:

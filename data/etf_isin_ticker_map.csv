@@ -1,9 +1,10 @@
 ISIN,Ticker,Name
 LU1681045370,AEEM,Amundi MSCI Emerging Markets Swap UCITS ETF EUR Acc
-LU1681048804,AUM5,Amundi S&P 500 Swap UCITS ETF EUR Acc
-IE0001UQQ933,GERD,L&G Gerd Kommer Multifactor Equity UCITS ETF USD Accumulating
-IE00B8GKDB10,VGWD,Vanguard FTSE All-World High Dividend Yield UCITS ETF Distributing
-IE00B4L5Y983,EUNL,iShares Core MSCI World UCITS ETF USD (Acc)
-IE00B3F81R35,IEAG,iShares Core EUR Corp Bond UCITS ETF
-LU0290358497,XEON,Xtrackers II EUR Overnight Rate Swap UCITS ETF 1C
+LU1681048804,AUM5,Amundi S&P 500 Swap ETF EUR Acc
+IE0001UQQ933,GERD,L&G Gerd Kommer Mltfct Eq ETF USD Acc
+IE00B8GKDB10,VGWD,Vanguard FTSE AllWld HiDivYld ETF $Dis
+IE00B4L5Y983,EUNL,iShares Core MSCI World ETF USD Acc
+IE00B3F81R35,IEAG,iShares Core € Corp Bond ETF EUR Dist
+IE00B4WXJJ64,IEGA,iShares Core € Govt Bond ETF EUR Dist
+LU0290358497,XEON,Xtrackers EUR Overnight Rate Swap ETF 1C
 DE000A2T0VU5,XGDU,Xtrackers IE Physical Gold ETC Securities

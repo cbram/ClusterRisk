@@ -42,6 +42,15 @@
   - Einfaches Deployment auf Unraid oder anderen Servern
   - Persistente Daten-Volumes
 
+## 📸 Galerie
+
+| Hauptansicht | Anlageklasse | Branche/Sektor |
+|:---:|:---:|:---:|
+| ![Übersicht](docs/screenshots/Screenshot%201.png) | ![Anlageklasse](docs/screenshots/Screenshot%202.png) | ![Branche](docs/screenshots/Screenshot%203.png) |
+| *Portfolio-Übersicht* | *Treemap nach Asset-Typ* | *Sektor-Verteilung* |
+
+> **Screenshots aktualisieren:** App starten, auf „Beispiel-Portfolio laden“ klicken und neue Screenshots erstellen. Details: [docs/screenshots/README.md](docs/screenshots/README.md)
+
 ## 🚀 Installation
 
 ### Lokale Installation (macOS)
@@ -297,8 +306,13 @@ In der Sidebar kannst du die Cache-Dauer für ETF-Daten einstellen (1-30 Tage). 
    - Automatisch generierbar via justETF oder manuell erstellbar
    - Kein API-Cache nötig
    
-2. **Fallback-Quellen** (wenn keine Detail-Datei vorhanden):
-   - justETF Scraping - Für EU-ETFs die beste automatische Quelle
+2. **Morningstar API** (wenn keine Detail-Datei oder veraltet):
+   - Automatischer Abruf von ETF-Details (Holdings, Länder, Sektoren)
+   - Basiert auf [pp-portfolio-classifier](https://github.com/Alfons1Qto12/pp-portfolio-classifier) (Alfons1Qto12)
+   - Daten werden in ETF-Detail-Dateien gespeichert
+   
+3. **Fallback-Quellen** (wenn Morningstar fehlschlägt):
+   - justETF Scraping - Für EU-ETFs
    - API-Fetcher (Yahoo Finance) - Meist unzuverlässig für EU-ETFs
 
 **Wechselkurse (automatisch):**
@@ -403,6 +417,7 @@ ClusterRisk/
 │   ├── database.py            # Historie-Verwaltung
 │   ├── exchange_rate.py       # Wechselkurs-Manager (EZB-API)
 │   ├── ticker_sector_mapper.py # Dynamisches Ticker-Sektor-Mapping
+│   ├── morningstar_fetcher.py   # Morningstar API (Basis: pp-portfolio-classifier)
 │   └── etf_detail_generator.py # Auto-Generator für ETF-Detail-Dateien (justETF)
 ├── data/
 │   ├── cache/                 # ETF-Daten & Wechselkurs Cache
@@ -450,6 +465,12 @@ ClusterRisk/
 - **Web-Scraping**: Kann brechen wenn Websites ihre Struktur ändern
 
 **✅ Empfohlene Lösung:** Erstelle ETF-Detail-Dateien für alle deine ETFs (siehe oben)
+
+## 🙏 Credits & Referenzen
+
+**Morningstar-Integration:**
+
+Der Morningstar-Fetcher (`src/morningstar_fetcher.py`) basiert auf dem Projekt **[pp-portfolio-classifier](https://github.com/Alfons1Qto12/pp-portfolio-classifier)** (Branch `new-api-branch`) von [Alfons1Qto12](https://github.com/Alfons1Qto12). Vielen Dank für die Vorarbeit und die Bereitstellung der API-Integration! Das Projekt nutzt die Morningstar Direct Web Services API zur Klassifikation von Fonds und ETFs in Portfolio Performance. ClusterRisk hat die API-Integration und Datenstrukturen als Grundlage für den automatischen Abruf von ETF-Details (Holdings, Länder, Sektoren, Bond-Klassifikation) übernommen und angepasst.
 
 ## 🤝 Beitragen
 

@@ -1,25 +1,27 @@
-METADATA
+# ETF Metadata
 ISIN,LU0290358497
-Name,Xtrackers II EUR Overnight Rate Swap UCITS ETF 1C
+Name,Xtrackers EUR Overnight Rate Swap ETF 1C
 Ticker,XEON
 Type,Money Market
-Region,Europe
+Region,
 Currency,EUR
-TER,0.10
-Last Updated,2026-02-04
+TER,0.1
+Last Updated,2026-03-03
+Source,Morningstar (auto)
 
-COUNTRY_ALLOCATION
+# Country Allocation (%)
 Country,Weight
-EU,100.0
+USA,100.0
 
-SECTOR_ALLOCATION
+# Sector Allocation (%)
 Sector,Weight
-Cash,100.0
+Unknown,100.0
 
-CURRENCY_ALLOCATION
+# Currency Allocation (%)
 Currency,Weight
-EUR,100.0
+USD,100.0
 
-TOP_HOLDINGS
-Name,Weight,Currency,Sector,Industry,Country
-EUR Overnight Rate Swap,100.0,EUR,Cash,Money Market,EU
+# Top Holdings
+Name,Weight,Currency,Sector,Country,ISIN
+TRS Solactive €STR +8.5 Daily TR EUR,100.00,,Unknown,USA,
+

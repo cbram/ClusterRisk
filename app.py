@@ -23,10 +23,6 @@ from src.visualizer import create_visualizations
 from src.export import export_to_calc
 from src.database import save_to_history, get_history, delete_analysis, clear_all_history, vacuum_database, get_history_timeseries
 from src.diagnostics import get_diagnostics, reset_diagnostics
-from src.etf_detail_generator import (
-    generate_etf_detail_file, preview_etf_data, 
-    get_etf_detail_status, update_etf_detail_file, batch_update_etf_details
-)
 
 # Seiten-Konfiguration
 st.set_page_config(
@@ -46,6 +42,9 @@ Analysiere dein Investment-Portfolio auf Klumpenrisiken über verschiedene Dimen
 - **Einzelpositionen** (mit ETF-Durchschau)
 """)
 
+# Beispiel-Portfolio Pfad (für "Beispiel laden" Button)
+EXAMPLE_CSV = Path(__file__).parent / "data" / "Beispiel_Vermoegensaufstellung.csv"
+
 # Sidebar
 with st.sidebar:
     st.header("⚙️ Einstellungen")
@@ -57,17 +56,43 @@ with st.sidebar:
         help="Exportiere dein Portfolio aus Portfolio Performance als CSV (Vermögensaufstellung)"
     )
     
-    # Format-Info
+    # Beispiel laden (wenn keine Datei hochgeladen)
+    use_example = st.session_state.get('use_example_portfolio', False)
     if uploaded_file:
+        if use_example:
+            st.session_state['use_example_portfolio'] = False  # User hat neu hochgeladen
+        use_example = False
+    elif EXAMPLE_CSV.exists():
+        if st.button("📂 Beispiel-Portfolio laden", use_container_width=True, help="Lädt das Beispiel-Portfolio für eine Vorschau"):
+            st.session_state['use_example_portfolio'] = True
+            st.rerun()
+        use_example = st.session_state.get('use_example_portfolio', False)
+    
+    # Effektive Datei: Upload oder Beispiel
+    if uploaded_file:
+        effective_file = uploaded_file
+        effective_name = uploaded_file.name
+    elif use_example and EXAMPLE_CSV.exists():
+        effective_file = str(EXAMPLE_CSV)
+        effective_name = "Beispiel_Vermoegensaufstellung.csv"
+    else:
+        effective_file = None
+        effective_name = None
+    
+    # Format-Info
+    if effective_file:
         st.caption(f"📄 Dateiformat: CSV")
         # Portfolio frühzeitig parsen und in session_state speichern,
         # damit ETF-Filterung weiter unten in der Sidebar darauf zugreifen kann
-        if 'portfolio_data' not in st.session_state or st.session_state.get('_last_uploaded_file') != uploaded_file.name:
+        if 'portfolio_data' not in st.session_state or st.session_state.get('_last_uploaded_file') != effective_name:
             try:
-                portfolio_data_early = parse_portfolio_csv(uploaded_file)
+                portfolio_data_early = parse_portfolio_csv(effective_file)
                 st.session_state['portfolio_data'] = portfolio_data_early
-                st.session_state['_last_uploaded_file'] = uploaded_file.name
-                uploaded_file.seek(0)  # Zurücksetzen für späteres Lesen im Hauptbereich
+                st.session_state['_last_uploaded_file'] = effective_name
+                if 'risk_data' in st.session_state:
+                    del st.session_state['risk_data']  # Neu berechnen bei neuer Datei
+                if hasattr(effective_file, 'seek'):
+                    effective_file.seek(0)  # Zurücksetzen für UploadedFile
             except Exception:
                 pass  # Fehler werden im Hauptbereich behandelt
     
@@ -76,7 +101,7 @@ with st.sidebar:
         "💾 In Historie speichern", 
         type="primary", 
         use_container_width=True,
-        disabled=(uploaded_file is None),
+        disabled=(effective_file is None),
         help="Speichert die aktuelle Analyse als Schnappschuss in der lokalen Historie-Datenbank (data/history.db). Damit lassen sich im Tab 'Historie' Verlaufsdiagramme erstellen, um Veränderungen im Portfolio über die Zeit nachzuvollziehen."
     ):
         if 'portfolio_data' in st.session_state and 'risk_data' in st.session_state:
@@ -88,18 +113,49 @@ with st.sidebar:
     
     st.divider()
     
-    # ETF Datenquelle
+    # ETF Datenquelle (muss vor Risk-Berechnung stehen)
     st.subheader("ETF Datenquellen")
-    use_cache = st.checkbox(
-        "Cache verwenden", 
-        value=True, 
-        help="Gecacht werden: ETF-Holdings (von APIs), Währungskurse (ECB), Ticker-Sektor-Mappings. ETF-Detail-Dateien (data/etf_details/) werden NICHT gecacht und sind immer aktuell."
+    etf_update_interval_days = st.slider(
+        "ETF-Daten aktualisieren alle (Tage)",
+        1, 90, 30,
+        help="Nach Ablauf werden ETF-Detail-Dateien und API-Caches neu geladen. 1 = täglich, 30 = monatlich, 90 = quartalsweise."
     )
-    cache_days = st.slider(
-        "Cache-Dauer (Tage)", 
-        1, 30, 7,
-        help="Wie lange sollen abgerufene Daten gecacht werden? ETF-Detail-Dateien sind hiervon nicht betroffen."
-    )
+    
+    # Risk-Berechnung frühzeitig ausführen (für ETF-Auflösungs-Anzeige)
+    if effective_file and 'portfolio_data' in st.session_state:
+        try:
+            reset_diagnostics()
+            risk_data_early = calculate_cluster_risks(
+                st.session_state['portfolio_data'],
+                etf_update_interval_days=etf_update_interval_days,
+            )
+            st.session_state['risk_data'] = risk_data_early
+        except Exception:
+            pass  # Fehler werden im Hauptbereich behandelt
+    
+    # ETF-Auflösung: erkannte ETFs und Download-Status
+    if 'risk_data' in st.session_state and 'etf_resolution' in st.session_state['risk_data']:
+        etf_res = st.session_state['risk_data']['etf_resolution']
+        if etf_res:
+            st.subheader("📡 ETF-Auflösung")
+            with st.expander(f"✅ {len(etf_res)} ETF(s) erkannt", expanded=True):
+                for r in etf_res:
+                    ticker = r.get('ticker', '?')
+                    name = r.get('name', '') or ''
+                    name_short = (name[:25] + '…') if len(name) > 15 else name
+                    src = r.get('source', '')
+                    if src == 'file':
+                        status = f"📁 {name_short}" if name_short else "📁 Datei"
+                    elif src == 'morningstar':
+                        status = "✅ Morningstar"
+                    elif src == 'fetcher':
+                        status = "🌐 Fetcher"
+                    else:
+                        status = "❌ Fehlgeschlagen"
+                    st.caption(f"**{ticker}** — {status}")
+        else:
+            st.subheader("📡 ETF-Auflösung")
+            st.caption("Keine ETFs im Portfolio.")
     
     st.divider()
     
@@ -204,293 +260,9 @@ with st.sidebar:
             }
     
     st.divider()
-    
-    # ETF Detail Generator
-    st.subheader("🔄 ETF-Details")
-    
-    # --- Bestehende ETFs: Übersicht mit Alter ---
-    # Nur ETFs anzeigen, die im geladenen Portfolio enthalten sind
-    # Alle ISINs aus dem Portfolio sammeln (nicht nur type=='ETF',
-    # da z.B. Geldmarkt-ETFs als 'Cash' klassifiziert werden)
-    portfolio_isins = set()
-    if 'portfolio_data' in st.session_state:
-        for pos in st.session_state['portfolio_data']['positions']:
-            if pos.get('isin'):
-                portfolio_isins.add(pos['isin'])
-    
-    etf_status_all = get_etf_detail_status()
-    
-    if portfolio_isins:
-        etf_status = [e for e in etf_status_all if e['isin'] in portfolio_isins]
-    else:
-        etf_status = etf_status_all
-    
-    if etf_status:
-        # Zähler nach Datenquelle
-        auto_count = sum(1 for e in etf_status if e.get('data_source') == 'auto')
-        proxy_count = sum(1 for e in etf_status if e.get('data_source') == 'proxy')
-        manual_count = sum(1 for e in etf_status if e.get('data_source') == 'manual')
-        updatable = [e for e in etf_status if e.get('data_source') != 'manual']
-        stale_count = sum(1 for e in updatable if e['is_stale'])
-        
-        with st.expander(
-            f"📋 {len(etf_status)} ETF-Dateien vorhanden" + 
-            (f" ({stale_count} veraltet)" if stale_count > 0 else " (alle aktuell)"),
-            expanded=False
-        ):
-            # Legende
-            st.caption("🤖 = auto · 🔗 = Proxy · ✋ = manuell")
-            
-            for etf_info in etf_status:
-                ticker = etf_info['ticker']
-                days = etf_info['days_old']
-                data_source = etf_info.get('data_source', 'manual')
-                
-                # Source-Icon
-                if data_source == 'proxy':
-                    source_icon = '🔗'
-                elif data_source == 'auto':
-                    source_icon = '🤖'
-                else:
-                    source_icon = '✋'
-                
-                # Alters-Anzeige
-                if days is None:
-                    age_text = "⚠️ kein Datum"
-                elif days <= 30:
-                    age_text = f"✅ {days}d"
-                elif days <= 60:
-                    age_text = f"🟡 {days}d"
-                else:
-                    age_text = f"🔴 {days}d"
-                
-                # Proxy-Hinweis
-                proxy_hint = ""
-                if etf_info.get('proxy_isin'):
-                    proxy_hint = f" ↦ {etf_info['proxy_isin']}"
-                
-                col_info, col_btn = st.columns([3, 1])
-                with col_info:
-                    st.caption(
-                        f"{source_icon} **{ticker}** ({etf_info['type']}) — {age_text}{proxy_hint}"
-                    )
-                with col_btn:
-                    # Manuelle ETFs können nicht automatisch aktualisiert werden
-                    if data_source == 'manual':
-                        st.button("—", key=f"update_{ticker}", disabled=True, help=f"{ticker}: Manuell gepflegt")
-                    else:
-                        if st.button("🔄", key=f"update_{ticker}", help=f"{ticker} aktualisieren"):
-                            with st.spinner(f"{ticker} wird aktualisiert..."):
-                                success, msg = update_etf_detail_file(ticker)
-                                if success:
-                                    st.success(f"✅ {ticker}")
-                                    st.rerun()
-                                else:
-                                    st.error(f"❌ {ticker}: {msg}")
-            
-            # Batch-Update Button
-            st.markdown("---")
-            
-            updatable_count = len(updatable)
-            
-            col_batch_stale, col_batch_all = st.columns(2)
-            
-            with col_batch_stale:
-                batch_stale_clicked = st.button(
-                    f"🔄 Veraltete ({stale_count})",
-                    use_container_width=True,
-                    disabled=stale_count == 0,
-                    help="Alle auto/proxy ETFs aktualisieren, die älter als 30 Tage sind (manuelle werden übersprungen)"
-                )
-            
-            with col_batch_all:
-                batch_all_clicked = st.button(
-                    f"🔄 Alle ({updatable_count})",
-                    use_container_width=True,
-                    disabled=updatable_count == 0,
-                    help="Alle auto/proxy ETF-Detail-Dateien neu generieren (manuelle werden übersprungen)"
-                )
-            
-            if manual_count > 0:
-                st.caption(f"ℹ️ {manual_count} manuell gepflegte ETF(s) werden bei Batch-Updates übersprungen.")
-            
-            # Batch-Update Ausführung
-            if batch_stale_clicked and stale_count > 0:
-                progress_bar = st.progress(0, text="Starte Update...")
-                
-                def update_progress(current, total, ticker):
-                    progress_bar.progress(
-                        (current) / total, 
-                        text=f"Aktualisiere {ticker} ({current + 1}/{total})..."
-                    )
-                
-                results = batch_update_etf_details(only_stale=True, progress_callback=update_progress)
-                progress_bar.progress(1.0, text="Fertig!")
-                
-                success_count = sum(1 for r in results if r['success'])
-                fail_count = sum(1 for r in results if not r['success'])
-                
-                if success_count > 0:
-                    st.success(f"✅ {success_count} ETF(s) aktualisiert")
-                if fail_count > 0:
-                    for r in results:
-                        if not r['success']:
-                            st.error(f"❌ {r['ticker']}: {r['message']}")
-                
-                st.rerun()
-            
-            if batch_all_clicked:
-                progress_bar = st.progress(0, text="Starte Update...")
-                
-                def update_progress_all(current, total, ticker):
-                    progress_bar.progress(
-                        (current) / total,
-                        text=f"Aktualisiere {ticker} ({current + 1}/{total})..."
-                    )
-                
-                results = batch_update_etf_details(only_stale=False, progress_callback=update_progress_all)
-                progress_bar.progress(1.0, text="Fertig!")
-                
-                success_count = sum(1 for r in results if r['success'])
-                fail_count = sum(1 for r in results if not r['success'])
-                
-                if success_count > 0:
-                    st.success(f"✅ {success_count} ETF(s) aktualisiert")
-                if fail_count > 0:
-                    for r in results:
-                        if not r['success']:
-                            st.error(f"❌ {r['ticker']}: {r['message']}")
-                
-                st.rerun()
-    
-    # --- Neuen ETF hinzufügen ---
-    with st.expander("➕ Neuen ETF hinzufügen"):
-        gen_isin = st.text_input(
-            "ISIN", 
-            placeholder="z.B. IE00B4L5Y983",
-            help="ISIN des ETFs, für den eine Detail-Datei generiert werden soll"
-        )
-        gen_ticker = st.text_input(
-            "Ticker / Dateiname",
-            placeholder="z.B. EUNL",
-            help="Ticker-Symbol (wird als Dateiname verwendet: {TICKER}.csv)"
-        )
-        
-        gen_type = st.selectbox(
-            "ETF-Typ",
-            ["Stock", "Bond", "Money Market", "Commodity"],
-            index=0,
-            help="Stock = Aktien-ETF, Bond = Anleihen, Money Market = Geldmarkt (→ Cash), Commodity = Rohstoffe"
-        )
-        
-        gen_region = st.text_input(
-            "Region (optional)",
-            placeholder="z.B. World, USA, Europe",
-            help="Regionsbezeichnung für Metadaten"
-        )
-        
-        gen_proxy_isin = st.text_input(
-            "Proxy-ISIN (optional, für Swap-ETFs)",
-            placeholder="z.B. IE00B4L5Y983",
-            help="ISIN eines physisch replizierenden ETFs auf denselben Index. "
-                 "Allokationen und Holdings werden vom Proxy gescrapet, "
-                 "Metadaten bleiben die des eigentlichen ETFs."
-        )
-        
-        col_preview, col_generate = st.columns(2)
-        
-        with col_preview:
-            preview_clicked = st.button(
-                "👁️ Vorschau",
-                use_container_width=True,
-                disabled=not gen_isin,
-                help="Daten von justETF abrufen und anzeigen, ohne Datei zu speichern"
-            )
-        
-        with col_generate:
-            generate_clicked = st.button(
-                "💾 Generieren",
-                type="primary",
-                use_container_width=True,
-                disabled=not (gen_isin and gen_ticker),
-                help="ETF-Detail-Datei generieren und speichern"
-            )
-        
-        # Vorschau-Logik
-        if preview_clicked and gen_isin:
-            with st.spinner("Daten werden von justETF abgerufen..."):
-                preview_data = preview_etf_data(gen_isin.strip())
-                
-                if preview_data:
-                    st.session_state['etf_preview'] = preview_data
-                    st.success(f"✅ {preview_data.get('name', 'Unbekannt')}")
-                else:
-                    st.error("❌ Keine Daten gefunden. Prüfe die ISIN.")
-        
-        # Vorschau anzeigen
-        if 'etf_preview' in st.session_state:
-            preview = st.session_state['etf_preview']
-            with st.expander("📋 Vorschau-Daten", expanded=True):
-                st.markdown(f"**{preview.get('name', 'N/A')}**")
-                
-                meta = preview.get('metadata', {})
-                if meta:
-                    meta_text = " | ".join([f"{k}: {v}" for k, v in meta.items()])
-                    st.caption(meta_text)
-                
-                cols = st.columns(3)
-                with cols[0]:
-                    st.markdown("**Holdings**")
-                    for h in preview.get('holdings', [])[:10]:
-                        st.caption(f"• {h['name']}: {h['weight']:.1f}%")
-                    remaining = len(preview.get('holdings', [])) - 10
-                    if remaining > 0:
-                        st.caption(f"... +{remaining} weitere")
-                
-                with cols[1]:
-                    st.markdown("**Länder**")
-                    for c in preview.get('countries', [])[:8]:
-                        st.caption(f"• {c['name']}: {c['weight']:.1f}%")
-                    remaining = len(preview.get('countries', [])) - 8
-                    if remaining > 0:
-                        st.caption(f"... +{remaining} weitere")
-                
-                with cols[2]:
-                    st.markdown("**Sektoren**")
-                    for s in preview.get('sectors', [])[:8]:
-                        st.caption(f"• {s['name']}: {s['weight']:.1f}%")
-                
-                # Abgeleitete Währungen
-                derived_cur = preview.get('currency_allocation_derived', [])
-                if derived_cur:
-                    st.markdown("**Währungen (abgeleitet)**")
-                    cur_text = " | ".join([f"{c['name']}: {c['weight']:.1f}%" for c in derived_cur[:6]])
-                    st.caption(cur_text)
-                
-                st.info("💡 Bitte prüfe die Daten. ETF-Typ und Währungs-Allokation sind ggf. anzupassen.")
-        
-        # Generierungs-Logik
-        if generate_clicked and gen_isin and gen_ticker:
-            with st.spinner("ETF-Detail-Datei wird generiert..."):
-                success, msg, data = generate_etf_detail_file(
-                    isin=gen_isin.strip(),
-                    ticker=gen_ticker.strip().upper(),
-                    etf_type=gen_type,
-                    region=gen_region.strip(),
-                    proxy_isin=gen_proxy_isin.strip() if gen_proxy_isin else ''
-                )
-                
-                if success:
-                    st.success(f"✅ Datei generiert: data/etf_details/{gen_ticker.strip().upper()}.csv")
-                    # Vorschau löschen nach erfolgreicher Generierung
-                    if 'etf_preview' in st.session_state:
-                        del st.session_state['etf_preview']
-                    st.rerun()
-                else:
-                    st.error(f"❌ {msg}")
 
 # Hauptbereich
-if uploaded_file is None:
+if effective_file is None:
     st.info("👆 Bitte lade eine Portfolio Performance CSV-Datei hoch, um zu beginnen.")
     
     # Beispiel zeigen
@@ -518,10 +290,10 @@ else:
     with st.spinner("📂 Portfolio Performance CSV wird gelesen..."):
         try:
             # Portfolio aus session_state verwenden falls bereits in Sidebar geparst
-            if 'portfolio_data' in st.session_state and st.session_state.get('_last_uploaded_file') == uploaded_file.name:
+            if 'portfolio_data' in st.session_state and st.session_state.get('_last_uploaded_file') == effective_name:
                 portfolio_data = st.session_state['portfolio_data']
             else:
-                portfolio_data = parse_portfolio_csv(uploaded_file)
+                portfolio_data = parse_portfolio_csv(effective_file)
                 st.session_state['portfolio_data'] = portfolio_data
             
             st.success(f"✅ Portfolio erfolgreich geladen: {portfolio_data['total_positions']} Positionen")
@@ -541,63 +313,62 @@ else:
             st.error(f"❌ Fehler beim Lesen der Datei: {str(e)}")
             st.stop()
     
-    # ETF-Daten abrufen und Risiken berechnen
-    with st.spinner("🔍 ETF-Zusammensetzungen werden abgerufen und Klumpenrisiken berechnet..."):
-        try:
-            risk_data = calculate_cluster_risks(
-                portfolio_data,
-                use_cache=use_cache,
-                cache_days=cache_days
-            )
+    # ETF-Daten abrufen und Risiken berechnen (oder aus Sidebar-Berechnung übernehmen)
+    if 'risk_data' in st.session_state:
+        risk_data = st.session_state['risk_data']
+        st.success("✅ Klumpenrisiken erfolgreich berechnet!")
+    else:
+        with st.spinner("🔍 ETF-Zusammensetzungen werden abgerufen und Klumpenrisiken berechnet..."):
+            try:
+                risk_data = calculate_cluster_risks(
+                    portfolio_data,
+                    etf_update_interval_days=etf_update_interval_days,
+                )
+                st.session_state['risk_data'] = risk_data
+                st.success("✅ Klumpenrisiken erfolgreich berechnet!")
+            except Exception as e:
+                st.error(f"❌ Fehler bei der Risikoberechnung: {str(e)}")
+                st.stop()
+    
+    # Zeige Diagnose-Meldungen (Warnungen und Fehler)
+    diagnostics = get_diagnostics()
+    summary = diagnostics.get_summary()
+    
+    if summary['warnings'] > 0 or summary['errors'] > 0:
+        st.divider()
+        
+        # Erstelle Expander für Diagnosen
+        with st.expander(f"⚠️ {summary['warnings']} Warnung(en) und {summary['errors']} Fehler gefunden - Hier klicken für Details", expanded=(summary['errors'] > 0)):
+            # Fehler anzeigen (falls vorhanden)
+            errors = diagnostics.get_errors()
+            if errors:
+                st.error(f"**{len(errors)} Fehler:**")
+                for err in errors:
+                    st.markdown(f"**{err['category']}:** {err['message']}")
+                    if err['details']:
+                        st.caption(err['details'])
             
-            st.success("✅ Klumpenrisiken erfolgreich berechnet!")
-            
-            # In session_state speichern für Sidebar-Button
-            st.session_state['risk_data'] = risk_data
-            
-            # Zeige Diagnose-Meldungen (Warnungen und Fehler)
-            diagnostics = get_diagnostics()
-            summary = diagnostics.get_summary()
-            
-            if summary['warnings'] > 0 or summary['errors'] > 0:
-                st.divider()
+            # Warnungen anzeigen
+            warnings = diagnostics.get_warnings()
+            if warnings:
+                st.warning(f"**{len(warnings)} Warnung(en):**")
                 
-                # Erstelle Expander für Diagnosen
-                with st.expander(f"⚠️ {summary['warnings']} Warnung(en) und {summary['errors']} Fehler gefunden - Hier klicken für Details", expanded=(summary['errors'] > 0)):
-                    # Fehler anzeigen (falls vorhanden)
-                    errors = diagnostics.get_errors()
-                    if errors:
-                        st.error(f"**{len(errors)} Fehler:**")
-                        for err in errors:
-                            st.markdown(f"**{err['category']}:** {err['message']}")
-                            if err['details']:
-                                st.caption(err['details'])
-                    
-                    # Warnungen anzeigen
-                    warnings = diagnostics.get_warnings()
-                    if warnings:
-                        st.warning(f"**{len(warnings)} Warnung(en):**")
-                        
-                        # Gruppiere Warnungen nach Kategorie
-                        warnings_by_category = {}
-                        for warn in warnings:
-                            cat = warn['category']
-                            if cat not in warnings_by_category:
-                                warnings_by_category[cat] = []
-                            warnings_by_category[cat].append(warn)
-                        
-                        # Zeige Warnungen gruppiert
-                        for category, warns in warnings_by_category.items():
-                            st.markdown(f"**{category}** ({len(warns)} Problem(e)):")
-                            for warn in warns:
-                                st.markdown(f"- {warn['message']}")
-                                if warn['details']:
-                                    st.caption(f"  ℹ️ {warn['details']}")
-                            st.markdown("")  # Leerzeile zwischen Kategorien
-            
-        except Exception as e:
-            st.error(f"❌ Fehler bei der Risikoberechnung: {str(e)}")
-            st.stop()
+                # Gruppiere Warnungen nach Kategorie
+                warnings_by_category = {}
+                for warn in warnings:
+                    cat = warn['category']
+                    if cat not in warnings_by_category:
+                        warnings_by_category[cat] = []
+                    warnings_by_category[cat].append(warn)
+                
+                # Zeige Warnungen gruppiert
+                for category, warns in warnings_by_category.items():
+                    st.markdown(f"**{category}** ({len(warns)} Problem(e)):")
+                    for warn in warns:
+                        st.markdown(f"- {warn['message']}")
+                        if warn['details']:
+                            st.caption(f"  ℹ️ {warn['details']}")
+                    st.markdown("")  # Leerzeile zwischen Kategorien
     
     # Tabs für verschiedene Analysen
     tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
@@ -616,22 +387,52 @@ else:
     
     with tab2:
         st.subheader("Klumpenrisiko nach Branche/Sektor")
-        # Cash in Branchen optional einblenden (Default: aus)
-        col_sector, col_sector_btn = st.columns([3, 1])
-        with col_sector_btn:
+        sector_df_base = risk_data['sector'].copy()
+        bond_sectors = sector_df_base['Sektor'].str.startswith('Bonds:', na=False)
+        has_aktien = (sector_df_base['Sektor'] != 'Cash') & ~bond_sectors
+        has_bonds = bond_sectors
+        show_aktien_enabled = has_aktien.any()
+        show_bonds_enabled = has_bonds.any()
+        # Alle Checkboxen in einer Zeile: Cash links, Aktien/Bonds rechts zusammengehörig
+        col_cash, col_aktien_bonds = st.columns([1, 1])
+        with col_cash:
             show_cash_sector = st.checkbox("Cash anzeigen", value=False, key="show_cash_sector")
+        with col_aktien_bonds:
+            col_aktien, col_bonds = st.columns([1, 1])
+            with col_aktien:
+                show_aktien = st.checkbox(
+                    "Aktien",
+                    value=True,
+                    disabled=not show_aktien_enabled,
+                    key="show_aktien_sector",
+                    help="Aktien-Sektoren (Technology, Financial Services, etc.)" if show_aktien_enabled else "Keine Aktien-Sektoren im Portfolio"
+                )
+            with col_bonds:
+                show_bonds = st.checkbox(
+                    "Bonds",
+                    value=True,
+                    disabled=not show_bonds_enabled,
+                    key="show_bonds_sector",
+                    help="Bond-Sektoren (Corporate, Government, etc.)" if show_bonds_enabled else "Keine Bond-Sektoren im Portfolio"
+                )
         if not show_cash_sector:
-            sector_df = risk_data['sector'][risk_data['sector']['Sektor'] != 'Cash'].copy()
-        else:
-            sector_df = risk_data['sector'].copy()
-        total_sector = sector_df['Wert (€)'].sum()
-        if total_sector > 0:
-            sector_df['Anteil (%)'] = (sector_df['Wert (€)'] / total_sector * 100).round(1)
-        # Branchen unter 0,1 % ausblenden, Anteile neu berechnen
-        sector_df = sector_df[sector_df['Anteil (%)'] >= 0.1].copy()
-        total_sector = sector_df['Wert (€)'].sum()
-        if total_sector > 0:
-            sector_df['Anteil (%)'] = (sector_df['Wert (€)'] / total_sector * 100).round(1)
+            sector_df_base = sector_df_base[sector_df_base['Sektor'] != 'Cash'].copy()
+        bond_sectors = sector_df_base['Sektor'].str.startswith('Bonds:', na=False)
+        # Filter anwenden
+        if show_aktien_enabled and show_bonds_enabled:
+            if show_aktien and not show_bonds:
+                sector_df_base = sector_df_base[~bond_sectors].copy()
+            elif show_bonds and not show_aktien:
+                sector_df_base = sector_df_base[bond_sectors].copy()
+            elif not show_aktien and not show_bonds:
+                sector_df_base = sector_df_base.iloc[0:0].copy()
+        portfolio_total = risk_data['total_value']
+        if portfolio_total > 0:
+            sector_df_base['Anteil (%)'] = (sector_df_base['Wert (€)'] / portfolio_total * 100).round(1)
+        # Branchen unter 0,1 % ausblenden (Anteile bleiben relativ zum Gesamt-Portfolio)
+        sector_df = sector_df_base[sector_df_base['Anteil (%)'] >= 0.1].copy()
+        if portfolio_total > 0:
+            sector_df['Anteil (%)'] = (sector_df['Wert (€)'] / portfolio_total * 100).round(1)
         risk_data_sector = risk_data.copy()
         risk_data_sector['sector'] = sector_df
         create_visualizations(risk_data_sector, "sector", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
@@ -651,11 +452,11 @@ else:
             currency_df = risk_data['currency_with_commodities'].copy()
         else:
             currency_df = risk_data['currency'].copy()
-        # Währungen unter 0,1 % ausblenden, Anteile neu berechnen
+        # Währungen unter 0,1 % ausblenden (Anteile relativ zum Gesamt-Portfolio)
+        portfolio_total = risk_data['total_value']
         currency_df = currency_df[currency_df['Anteil (%)'] >= 0.1].copy()
-        total_currency = currency_df['Wert (€)'].sum()
-        if total_currency > 0:
-            currency_df['Anteil (%)'] = (currency_df['Wert (€)'] / total_currency * 100).round(1)
+        if portfolio_total > 0:
+            currency_df['Anteil (%)'] = (currency_df['Wert (€)'] / portfolio_total * 100).round(1)
         risk_data_currency = risk_data.copy()
         risk_data_currency['currency'] = currency_df
         create_visualizations(risk_data_currency, "currency", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
@@ -663,11 +464,11 @@ else:
     with tab4:
         st.subheader("Klumpenrisiko nach Land")
         st.markdown("*Basierend auf ISIN-Ländercode (erste 2 Zeichen)*")
-        # Länder unter 0,1 % ausblenden, Anteile der verbleibenden neu berechnen
+        # Länder unter 0,1 % ausblenden (Anteile relativ zum Gesamt-Portfolio)
+        portfolio_total = risk_data['total_value']
         country_df = risk_data['country'][risk_data['country']['Anteil (%)'] >= 0.1].copy()
-        total_country = country_df['Wert (€)'].sum()
-        if total_country > 0:
-            country_df['Anteil (%)'] = (country_df['Wert (€)'] / total_country * 100).round(1)
+        if portfolio_total > 0:
+            country_df['Anteil (%)'] = (country_df['Wert (€)'] / portfolio_total * 100).round(1)
         risk_data_country = risk_data.copy()
         risk_data_country['country'] = country_df
         create_visualizations(risk_data_country, "country", max_treemap=max_positions_treemap, max_pie=max_positions_pie, max_bar=max_positions_bar, risk_thresholds=risk_thresholds)
@@ -682,18 +483,16 @@ else:
             exclude_cash = st.checkbox("Cash ausblenden", value=False, key="exclude_cash_positions")
         
         # Basis: alle Positionen oder ohne Cash
+        # WICHTIG: Anteile beziehen sich immer auf Gesamt-Portfolio (total_value), nicht auf gefilterte Summe
+        portfolio_total = risk_data['total_value']
         positions_filtered = risk_data['positions'].copy()
         if exclude_cash:
             positions_filtered = positions_filtered[positions_filtered['Position'] != 'Cash'].copy()
-            total_temp = positions_filtered['Wert (€)'].sum()
-            if total_temp > 0:
-                positions_filtered['Anteil (%)'] = (positions_filtered['Wert (€)'] / total_temp * 100).round(1)
         
-        # Positionen unter 0,1 % ausblenden, Anteile der verbleibenden neu berechnen
+        # Positionen unter 0,1 % ausblenden (Anteile bleiben relativ zum Gesamt-Portfolio)
         positions_filtered = positions_filtered[positions_filtered['Anteil (%)'] >= 0.1].copy()
-        total_display = positions_filtered['Wert (€)'].sum()
-        if total_display > 0:
-            positions_filtered['Anteil (%)'] = (positions_filtered['Wert (€)'] / total_display * 100).round(1)
+        if portfolio_total > 0:
+            positions_filtered['Anteil (%)'] = (positions_filtered['Wert (€)'] / portfolio_total * 100).round(1)
         
         risk_data_positions = risk_data.copy()
         risk_data_positions['positions'] = positions_filtered

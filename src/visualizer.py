@@ -327,9 +327,9 @@ def _display_table(df: pd.DataFrame, category: str, thresholds: Dict):
     
     st.dataframe(styled_df, width='stretch', height=400)
     
-    # Statistiken
+    # Statistiken (ohne Risiko-Ausweis)
     st.markdown("---")
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
     
     with col1:
         st.metric(
@@ -338,16 +338,6 @@ def _display_table(df: pd.DataFrame, category: str, thresholds: Dict):
         )
     
     with col2:
-        # Positionen über Schwellenwert
-        high_risk = len(df[df['Anteil (%)'] > high_threshold])
-        st.metric(
-            f"Positionen > {high_threshold:.0f}%",
-            high_risk,
-            delta=f"{'⚠️ Hohes Risiko' if high_risk > 0 else '✅ OK'}"
-        )
-    
-    with col3:
-        # Top 5 Konzentration
         top5_concentration = df.head(5)['Anteil (%)'].sum()
         st.metric(
             "Top-5 Konzentration",

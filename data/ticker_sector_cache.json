@@ -168,5 +168,60 @@
     "sector": "Unknown",
     "timestamp": "2026-02-04T20:07:29.420792",
     "source": "unknown"
+  },
+  "ASME.DE": {
+    "sector": "Unknown",
+    "timestamp": "2026-03-02T11:32:07.002055",
+    "source": "unknown"
+  },
+  "TSM": {
+    "sector": "Equity",
+    "timestamp": "2026-03-02T11:32:08.152837",
+    "source": "yahoo"
+  },
+  "ATD.TO": {
+    "sector": "Unknown",
+    "timestamp": "2026-03-02T14:34:37.954546",
+    "source": "unknown"
+  },
+  "ACT.DE": {
+    "sector": "Unknown",
+    "timestamp": "2026-03-02T14:34:39.127386",
+    "source": "unknown"
+  },
+  "AWR": {
+    "sector": "Equity",
+    "timestamp": "2026-03-02T14:34:40.225772",
+    "source": "yahoo"
+  },
+  "APH": {
+    "sector": "Equity",
+    "timestamp": "2026-03-02T14:34:41.317094",
+    "source": "yahoo"
+  },
+  "CHD": {
+    "sector": "Equity",
+    "timestamp": "2026-03-02T14:34:42.506578",
+    "source": "yahoo"
+  },
+  "IBE1.DE": {
+    "sector": "Unknown",
+    "timestamp": "2026-03-02T14:34:43.728437",
+    "source": "unknown"
+  },
+  "NEE": {
+    "sector": "Equity",
+    "timestamp": "2026-03-02T14:34:44.941288",
+    "source": "yahoo"
+  },
+  "ROL": {
+    "sector": "Equity",
+    "timestamp": "2026-03-02T14:34:46.153873",
+    "source": "yahoo"
+  },
+  "S92.DE": {
+    "sector": "Unknown",
+    "timestamp": "2026-03-02T14:34:47.325415",
+    "source": "unknown"
   }
 }

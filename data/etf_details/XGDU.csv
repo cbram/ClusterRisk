@@ -1,25 +1,27 @@
-METADATA
+# ETF Metadata
 ISIN,DE000A2T0VU5
 Name,Xtrackers IE Physical Gold ETC Securities
 Ticker,XGDU
 Type,Commodity
-Region,Global
-Currency,USD
-TER,0.11
-Last Updated,2026-02-04
+Region,
+Currency,EUR
+TER,
+Last Updated,2026-03-03
+Source,justETF (Fallback)
 
-COUNTRY_ALLOCATION
+# Country Allocation (%)
 Country,Weight
-Global,100.0
+Other,100.0
 
-SECTOR_ALLOCATION
+# Sector Allocation (%)
 Sector,Weight
 Commodity,100.0
 
-CURRENCY_ALLOCATION
+# Currency Allocation (%)
 Currency,Weight
-None,100.0
+Other,100.0
 
-TOP_HOLDINGS
-Name,Weight,Currency,Sector,Industry,Country
-Physical Gold (LBMA),100.0,None,Commodity,Precious Metals,Global
+# Top Holdings
+Name,Weight,Currency,Sector,Country,ISIN
+Physical Gold (LBMA),100.00,None,Commodity,,
+

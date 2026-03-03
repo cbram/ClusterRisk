@@ -88,38 +88,24 @@ class ETFDataFetcher:
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
             }
-            
+
             response = requests.get(url, headers=headers, timeout=10)
             response.raise_for_status()
-            
+
             soup = BeautifulSoup(response.content, 'html.parser')
-            
-            # ETF-Name
-            name_elem = soup.find('h1', {'class': 'h2'})
-            etf_name = name_elem.text.strip() if name_elem else "Unknown"
-            
-            # Holdings extrahieren
-            holdings = []
-            holdings_table = soup.find('table', {'class': 'table'})
-            
-            if holdings_table:
-                rows = holdings_table.find_all('tr')[1:]  # Header überspringen
-                
-                for row in rows[:50]:  # Top 50 Holdings
-                    cols = row.find_all('td')
-                    if len(cols) >= 2:
-                        company = cols[0].text.strip()
-                        weight_text = cols[1].text.strip().replace('%', '').replace(',', '.')
-                        
-                        try:
-                            weight = float(weight_text)
-                            holdings.append({
-                                'name': company,
-                                'weight': weight / 100.0  # Als Dezimal
-                            })
-                        except ValueError:
-                            continue
-            
+
+            # ETF-Name (justETF-Struktur kann variieren)
+            name_elem = soup.find('h1', class_='h2') or soup.find('h1')
+            etf_name = name_elem.get_text(strip=True) if name_elem else "Unknown"
+
+            # Gold/Commodity-ETC: justETF hat oft keine echte Holdings-Tabelle
+            if self._is_commodity_etf(soup, etf_name):
+                holdings = [{'name': 'Physical Gold (LBMA)', 'weight': 1.0}]
+            elif self._is_money_market_etf(soup, etf_name):
+                holdings = [{'name': 'EUR Overnight Rate Swap', 'weight': 1.0}]
+            else:
+                holdings = self._parse_justetf_holdings(soup)
+
             if holdings:
                 return {
                     'isin': isin,
@@ -128,11 +114,58 @@ class ETFDataFetcher:
                     'source': 'justETF',
                     'fetch_date': datetime.now().isoformat()
                 }
-        
+
         except Exception as e:
             print(f"justETF fetch failed for {isin}: {str(e)}")
-        
+
         return None
+
+    def _parse_justetf_holdings(self, soup: BeautifulSoup) -> List[Dict]:
+        """Parst Holdings aus justETF – filtert Metadaten und falsche Tabellen."""
+        holdings = []
+        # Keywords die keine echten Holdings sind
+        skip_keywords = (
+            'volatilität', 'rendite', 'drawdown', 'ter', 'gesamtkosten',
+            'fondsgröße', 'auflagedatum', 'replikation', 'währung', 'index',
+            'anlageschwerpunkt', 'rechtliche', 'strategie', 'nachhaltigkeit',
+        )
+        tables = soup.find_all('table', class_='table')
+        for table in tables:
+            rows = table.find_all('tr')[1:]
+            for row in rows[:50]:
+                cols = row.find_all('td')
+                if len(cols) >= 2:
+                    company = cols[0].text.strip()
+                    weight_text = cols[1].text.strip().replace('%', '').replace(',', '.')
+                    if any(kw in company.lower() for kw in skip_keywords):
+                        continue
+                    try:
+                        weight = float(weight_text)
+                        if 0 < weight <= 100:
+                            holdings.append({'name': company, 'weight': weight / 100.0})
+                    except ValueError:
+                        continue
+            if holdings:
+                break
+        return holdings
+
+    def _is_commodity_etf(self, soup: BeautifulSoup, etf_name: str) -> bool:
+        """Erkennt Gold/Commodity-ETCs (justETF hat oft keine Holdings-Tabelle)."""
+        name_lower = (etf_name or '').lower()
+        if any(kw in name_lower for kw in ('gold', 'physical gold', 'etc ', 'silber', 'commodity')):
+            return True
+        for row in soup.find_all('tr'):
+            cells = row.find_all(['td', 'th'])
+            if len(cells) >= 2 and 'anlageschwerpunkt' in (cells[0].get_text() or '').lower():
+                val = (cells[1].get_text() or '').lower()
+                if 'gold' in val or 'edelmetall' in val or 'commodity' in val:
+                    return True
+        return False
+
+    def _is_money_market_etf(self, soup: BeautifulSoup, etf_name: str) -> bool:
+        """Erkennt Geldmarkt-ETFs (justETF hat oft Rendite-Tabelle statt Holdings)."""
+        name_lower = (etf_name or '').lower()
+        return any(kw in name_lower for kw in ('overnight', 'money market', 'geldmarkt', 'swap', 'xeon'))
     
     def _fetch_from_extraetf(self, isin: str) -> Optional[Dict]:
         """

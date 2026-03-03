@@ -55,6 +55,7 @@ ETFs werden in ihre Einzelpositionen aufgelöst mit mehreren Datenquellen:
    - Parser: `src/etf_details_parser.py`
    - **Vorteil:** Vollständige Allokationsdaten für korrekte "Other Holdings" Behandlung
    - Können automatisch via `src/etf_detail_generator.py` aus justETF generiert werden
+   - Oder via **Morningstar (pp-portfolio-classifier):** `src/morningstar_csv_importer.py` importiert `pp_data_fetched.csv` und erzeugt dasselbe CSV-Format (Option A, manueller Abruf bei Morningstar)
 
 2. **API-Fetcher** (`src/etf_data_fetcher.py`)
    - justETF (Scraping), Yahoo Finance, OpenFIGI
@@ -64,7 +65,7 @@ ETFs werden in ihre Einzelpositionen aufgelöst mit mehreren Datenquellen:
 
 **Format:** `data/etf_details/{TICKER}.csv`
 
-**Erstellung:** Manuell oder automatisch via `src/etf_detail_generator.py` (justETF Scraping)
+**Erstellung:** Manuell, via `src/etf_detail_generator.py` (justETF Scraping) oder via `src/morningstar_csv_importer.py` aus pp-portfolio-classifier-Ausgabe (`pp_data_fetched.csv`)
 
 **Sections (zwei Header-Formate werden unterstützt):**
 
@@ -591,6 +592,15 @@ volumes:
 4. Visualisierung in `visualizer.py`
 
 ## Changelog
+
+### 2026-03-02: Morningstar CSV-Importer (Option A)
+
+- ✅ **`src/morningstar_csv_importer.py`:** Liest `pp_data_fetched.csv` (Ausgabe von [pp-portfolio-classifier](https://github.com/Alfons1Qto12/pp-portfolio-classifier/tree/new-api-branch)), gruppiert nach ISIN, mappt Taxonomien (Asset Type, Country, Stock/Bond Sector, Holding) ins ClusterRisk-Format und schreibt `data/etf_details/{TICKER}.csv`.
+- ✅ Nur ISINs mit Eintrag in `data/etf_isin_ticker_map.csv` werden geschrieben; fehlende werden übersprungen und gemeldet.
+- ✅ Währungs-Allokation wird aus Länder-Allokation abgeleitet (wie beim justETF-Generator).
+- ✅ Streamlit: Sidebar „🔄 ETF-Details“ → Expander „📥 Aus Morningstar (pp-portfolio-classifier) importieren“ mit Datei-Upload und Import-Button.
+- ✅ CLI: `python -m src.morningstar_csv_importer [pp_data_fetched.csv]` mit Optionen `-o`, `-m`.
+- Konzept: `docs/KONZEPT_Morningstar_Integration.md`.
 
 ### 2026-02-08: justETF Auto-Generator + Proxy-ISIN für Swap-ETFs
 

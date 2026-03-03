@@ -1,0 +1,60 @@
+# ETF Metadata
+ISIN,IE00B4WXJJ64
+Name,iShares Core € Govt Bond ETF EUR Dist
+Ticker,IEGA
+Type,Bond
+Region,
+Currency,EUR
+TER,0.07
+Last Updated,2026-03-03
+Source,Morningstar (auto)
+
+# Country Allocation (%)
+Country,Weight
+DEU,26.2
+FRA,39.6
+ITA,11.0
+ESP,11.5
+NLD,10.8
+BEL,3.9
+AUT,2.4
+FIN,2.7
+IRL,1.5
+PRT,1.1
+GRC,0.9
+SVK,0.1
+SVN,0.1
+EST,0.1
+LVA,0.0
+LTU,0.1
+CYP,0.0
+LUX,0.5
+MLT,0.0
+
+# Sector Allocation (%)
+Sector,Weight
+Government,99.5
+Cash,0.5
+
+# Currency Allocation (%)
+Currency,Weight
+EUR,100.0
+
+# Top Holdings
+Name,Weight,Currency,Sector,Country,ISIN
+Republic of France 0.75%,0.45,EUR,Government,FRA,FR0000120717
+Republic of Italy 2.5%,0.42,EUR,Government,ITA,XS0218764583
+Federal Republic of Germany 2.2%,0.38,EUR,Government,DEU,XS0297874722
+Kingdom of Spain 2.75%,0.35,EUR,Government,ESP,XS0218764666
+Kingdom of Netherlands 2.5%,0.32,EUR,Government,NLD,XS0218764740
+Kingdom of Belgium 3.25%,0.28,EUR,Government,BEL,BE0000312736
+Republic of Austria 2.5%,0.25,EUR,Government,AUT,AT0000383864
+Republic of Finland 2.5%,0.22,EUR,Government,FIN,FI0009012633
+Republic of Ireland 3.4%,0.18,EUR,Government,IRL,XS0218764989
+Portuguese Republic 3.7%,0.15,EUR,Government,PRT,XS0218765069
+Hellenic Republic 4.2%,0.12,EUR,Government,GRC,XS0218765143
+Slovak Republic 2.75%,0.08,EUR,Government,SVK,XS0218765227
+Republic of Slovenia 2.5%,0.05,EUR,Government,SVN,XS0218765300
+Republic of Estonia 2.5%,0.02,EUR,Government,EST,XS0218765483
+Republic of Latvia 3.25%,0.01,EUR,Government,LVA,XS0218765558
+Other Holdings,96.72,Mixed,Government,Mixed,

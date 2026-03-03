@@ -9,6 +9,8 @@ from pathlib import Path
 from src.etf_data_fetcher import ETFDataFetcher, get_stock_info
 from src.etf_details_parser import get_etf_details_parser
 from src.diagnostics import get_diagnostics
+from src.morningstar_fetcher import get_etf_details_from_morningstar
+from src.etf_detail_writer import save_etf_detail_file
 
 
 def _load_isin_ticker_map() -> Dict[str, str]:
@@ -27,26 +29,37 @@ def _load_isin_ticker_map() -> Dict[str, str]:
         return {}
 
 
-def calculate_cluster_risks(portfolio_data: Dict, use_cache: bool = True, cache_days: int = 7) -> Dict:
+def calculate_cluster_risks(
+    portfolio_data: Dict,
+    etf_update_interval_days: int = 30,
+) -> Dict:
     """
     Berechnet Klumpenrisiken über alle Dimensionen
-    
+
     Args:
         portfolio_data: Geparste Portfolio-Daten
-        use_cache: Cache für ETF-Daten verwenden
-        cache_days: Cache-Alter in Tagen
-    
+        etf_update_interval_days: Nach wie vielen Tagen ETF-Daten (Dateien + API-Cache)
+            aktualisiert werden (1–90). Steuert sowohl ETF-Detail-Dateien als auch Fetcher-Cache.
+
     Returns:
         Dict mit Risiko-Analysen für alle Dimensionen
     """
-    
-    fetcher = ETFDataFetcher(cache_days=cache_days)
-    
-    # ISIN-zu-Ticker-Mapping laden
+    fetcher = ETFDataFetcher(cache_days=etf_update_interval_days)
     isin_ticker_map = _load_isin_ticker_map()
+    expanded_positions, etf_resolution = _expand_etf_holdings(
+        portfolio_data, fetcher, isin_ticker_map, etf_update_interval_days
+    )
     
-    # Alle Positionen mit ETF-Durchschau aufschlüsseln
-    expanded_positions = _expand_etf_holdings(portfolio_data, fetcher, use_cache, isin_ticker_map)
+    # Validierung: Summe der expandierten Positionen = Portfolio-Gesamtwert
+    expanded_sum = sum(p['value'] for p in expanded_positions)
+    portfolio_total = portfolio_data['total_value']
+    if abs(expanded_sum - portfolio_total) > max(1.0, portfolio_total * 0.001):
+        diagnostics = get_diagnostics()
+        diagnostics.add_warning(
+            'Berechnung',
+            f'Expansion-Summe weicht vom Portfolio ab',
+            f'Expandiert: €{expanded_sum:,.2f} vs Portfolio: €{portfolio_total:,.2f}. Prüfe ETF-Detail-Dateien.'
+        )
     
     # Klumpenrisiken berechnen
     risk_data = {
@@ -56,249 +69,132 @@ def calculate_cluster_risks(portfolio_data: Dict, use_cache: bool = True, cache_
         'currency_with_commodities': _calculate_currency_risk_with_commodities(expanded_positions),
         'country': _calculate_country_risk(expanded_positions),
         'positions': _calculate_position_risk(expanded_positions),
-        'total_value': portfolio_data['total_value']
+        'total_value': portfolio_data['total_value'],
+        'etf_resolution': etf_resolution,
     }
     
     return risk_data
 
 
-def _expand_etf_holdings(portfolio_data: Dict, fetcher: ETFDataFetcher, use_cache: bool, isin_ticker_map: Dict[str, str]) -> List[Dict]:
+def _expand_etf_holdings(
+    portfolio_data: Dict,
+    fetcher: ETFDataFetcher,
+    isin_ticker_map: Dict[str, str],
+    etf_update_interval_days: int = 30,
+) -> tuple:
     """
-    Expandiert ETF-Positionen in ihre einzelnen Holdings
-    
+    Expandiert ETF-Positionen in ihre einzelnen Holdings.
+
+    Datei-First: Lokale ETF-Detail-CSV wird genutzt. Wenn veraltet oder fehlend,
+    werden Daten von Morningstar (oder Fetcher als Fallback) geholt und in eine
+    CSV-Datei gespeichert.
+
     Returns:
-        Liste aller Einzelpositionen (inkl. aufgeschlüsselte ETFs)
+        (expanded: List[Dict], etf_resolution: List[Dict])
+        etf_resolution: [{'isin','ticker','name','source'}] mit source in file|morningstar|fetcher|failed
     """
     expanded = []
+    etf_resolution: List[Dict] = []
     etf_parser = get_etf_details_parser()
-    
-    print(f"DEBUG: Expanding {len(portfolio_data['positions'])} positions...")
-    
+
     for position in portfolio_data['positions']:
-        print(f"DEBUG: Processing {position['name']} (Type: {position['type']})")
-        
-        if position['type'] == 'ETF' and position['isin']:
-            print(f"DEBUG:   ETF detected with ISIN: {position['isin']}")
-            
-            # PRIORITÄT 1: Versuche ETF-Detail-Datei zu laden
-            ticker = isin_ticker_map.get(position['isin'])
+        if position['type'] == 'ETF' and position.get('isin'):
+            isin = position['isin']
+            ticker = isin_ticker_map.get(isin) or position.get('ticker_symbol', '') or '?'
+            name = position.get('name', '')
+            ticker_for_file = ticker if ticker and ticker != '?' else f"ETF_{isin.replace(' ', '')[:12]}"
+
             etf_details = None
-            
-            if ticker:
-                print(f"DEBUG:   Trying ETF detail file for ticker: {ticker}")
-                etf_details = etf_parser.parse_etf_file(ticker)
-            
-            # Falls ETF-Detail-Datei vorhanden, verwende diese
-            if etf_details:
-                print(f"DEBUG:   ✅ ETF resolved via detail file! {len(etf_details['holdings'])} holdings found")
-                
-                # Sammle Währungsverteilung der Top Holdings (zur späteren Berechnung von "Other Holdings")
-                top_holdings_currency_distribution = {}
-                other_holdings_entry = None
-                sector_allocation = etf_details.get('sector_allocation') or []
-                # Holdings mit Unknown/Diversified Sektor für spätere Zuordnung aus sector_allocation sammeln
-                unknown_sector_holdings = []
-                
-                # Holdings aus Detail-Datei verarbeiten
-                for holding in etf_details['holdings']:
-                    holding_value = position['value'] * holding['weight']
-                    
-                    holding_currency = holding.get('currency', 'USD')
-                    holding_sector = holding.get('sector', 'Unknown')
-                    holding_country = holding.get('country', '')
-                    
-                    # Normalisiere Sektor-Namen
-                    holding_sector = _normalize_sector_name(holding_sector)
-                    
-                    # Holding-Name: Bei "Other Holdings" den ETF-Namen hinzufügen
-                    holding_name = holding['name']
-                    is_other_holdings = 'Other Holdings' in holding_name or 'other holdings' in holding_name.lower()
-                    
-                    if is_other_holdings:
-                        # "Other Holdings" speichern für spätere Verarbeitung
-                        holding_name = f"Other Holdings - {position['name']}"
-                        other_holdings_entry = {
-                            'name': holding_name,
-                            'weight': holding['weight'],
-                            'value': holding_value,
-                            'sector': holding_sector,
-                            'country': holding_country
-                        }
-                        continue  # Erstmal überspringen, später verarbeiten
-                    
-                    # Sammle Währung der Top Holdings
-                    if holding_currency not in top_holdings_currency_distribution:
-                        top_holdings_currency_distribution[holding_currency] = 0.0
-                    top_holdings_currency_distribution[holding_currency] += holding['weight']
-                    
-                    # Reguläre Holding-Verarbeitung (nicht "Other Holdings")
-                    holding_info = {
-                        'name': holding_name,
-                        'type': etf_details.get('type', 'Stock'),  # Type aus Metadata
-                        'value': holding_value,
-                        'weight_in_portfolio': holding_value / portfolio_data['total_value'],
-                        'currency': holding_currency,
-                        'country': holding_country,
-                        'source_etf': position['name'],
-                        'original_type': 'ETF_Holding',
-                        'sector': holding_sector,
-                        'industry': holding_sector,
-                        'sector_source': 'etf_details',  # MITTLERE PRIORITÄT
-                        'etf_type': etf_details.get('type', 'Stock')  # ETF-Typ (Money Market, Stock, etc.)
-                    }
-                    # Wenn Sektor unbekannt/diversified und Sector Allocation vorhanden: später zuordnen
-                    if sector_allocation and holding_sector in ('Unknown', 'Diversified'):
-                        unknown_sector_holdings.append((holding_value, holding_info))
-                    else:
-                        expanded.append(holding_info)
-                        print(f"DEBUG:     Added holding: {holding_name} = €{holding_value:.2f} ({holding_currency}, {holding_sector})")
-                
-                # Sektor aus sector_allocation für Holdings mit Unknown/Diversified zuweisen
-                if sector_allocation and unknown_sector_holdings:
-                    assigned_sectors = _assign_sectors_from_allocation(
-                        unknown_sector_holdings, sector_allocation, position['value']
-                    )
-                    for (_, holding_info), sector_name in zip(unknown_sector_holdings, assigned_sectors):
-                        holding_info['sector'] = sector_name
-                        holding_info['industry'] = sector_name
-                        expanded.append(holding_info)
-                        print(f"DEBUG:     Added holding (sector from allocation): {holding_info['name']} = €{holding_info['value']:.2f} ({holding_info['currency']}, {sector_name})")
-                
-                # Verarbeite "Other Holdings": einheitlich nach Sektor, Währung und Land aus Allokationen
-                if other_holdings_entry:
-                    sector_alloc_list = etf_details.get('sector_allocation') or []
-                    currency_alloc_list = etf_details.get('currency_allocation') or []
-                    country_alloc_list = etf_details.get('country_allocation') or []
-                    other_value = other_holdings_entry['value']
+            source = 'failed'
 
-                    # Sektor-Gewichte: aus Sector Allocation oder ein Eintrag "Diversified"
-                    if sector_alloc_list:
-                        sector_weights = [
-                            (_normalize_sector_name(s['name']), s['weight'])
-                            for s in sector_alloc_list if s.get('weight', 0) > 0
-                        ]
-                    else:
-                        sector_weights = [('Diversified', 1.0)]
+            # 1. Lokale Datei: nutzen wenn vorhanden und nicht veraltet
+            if ticker_for_file and not etf_parser.is_file_stale(ticker_for_file, etf_update_interval_days):
+                etf_details = etf_parser.parse_etf_file(ticker_for_file)
+                if etf_details:
+                    source = 'file'
 
-                    # Währungs-Gewichte für "Other": Gesamt-ETF minus Top-Holdings, normalisiert
-                    if currency_alloc_list:
-                        other_currency_weights = {}
-                        for c in currency_alloc_list:
-                            total_c = c['weight']
-                            top_c = top_holdings_currency_distribution.get(c['name'], 0.0)
-                            other_c = max(0.0, total_c - top_c)
-                            if other_c > 0.001:
-                                other_currency_weights[c['name']] = other_c
-                        total_other_currency = sum(other_currency_weights.values())
-                        if total_other_currency > 0:
-                            currency_weights = [(cur, w / total_other_currency) for cur, w in other_currency_weights.items()]
-                        else:
-                            currency_weights = [('Mixed', 1.0)]
-                    else:
-                        currency_weights = [('Mixed', 1.0)]
+            # 2. Morningstar: holen, speichern, nutzen
+            if not etf_details:
+                ms_details = get_etf_details_from_morningstar(isin)
+                if ms_details:
+                    try:
+                        save_etf_detail_file(ms_details, ticker_for_file, source_label="Morningstar (auto)")
+                    except Exception as e:
+                        print(f"⚠️  Konnte ETF-Detail-Datei nicht speichern: {e}")
+                    etf_details = ms_details
+                    source = 'morningstar'
 
-                    # Länder-Gewichte: aus Country Allocation (Name → ISO-Code für Auswertung)
-                    if country_alloc_list:
-                        country_weights = [
-                            (_allocation_country_name_to_code(c['name']), c['weight'])
-                            for c in country_alloc_list if c.get('weight', 0) > 0
-                        ]
-                    else:
-                        country_weights = [('Other', 1.0)]
-
-                    # Eine Zeile pro (Sektor, Währung, Land) – alle drei Ansichten (Branche, Währung, Land) korrekt
-                    print(f"DEBUG:     Processing Other Holdings: {len(sector_weights)}×{len(currency_weights)}×{len(country_weights)} Kombinationen (Sektor×Währung×Land)")
-                    for (sector_name_norm, s_w) in sector_weights:
-                        for (currency_name, c_w) in currency_weights:
-                            for (country_code, country_w) in country_weights:
-                                part_value = other_value * s_w * c_w * country_w
-                                if part_value < 0.01:  # Rundungsrausch vermeiden
-                                    continue
-                                holding_info = {
-                                    'name': other_holdings_entry['name'],
-                                    'type': etf_details.get('type', 'Stock'),
-                                    'value': part_value,
-                                    'weight_in_portfolio': part_value / portfolio_data['total_value'],
-                                    'currency': currency_name,
-                                    'country': country_code,
-                                    'source_etf': position['name'],
-                                    'original_type': 'ETF_Holding',
-                                    'sector': sector_name_norm,
-                                    'industry': sector_name_norm,
-                                    'sector_source': 'etf_details',
-                                    'etf_type': etf_details.get('type', 'Stock')
-                                }
-                                expanded.append(holding_info)
-            
-            # PRIORITÄT 2: Fallback zu bisherigem Fetcher (Mock, APIs)
-            else:
-                print(f"DEBUG:   No detail file found, falling back to fetcher...")
-                # ETF auflösen via Fetcher
-                ticker_symbol = position.get('ticker_symbol', '')
+            # 3. Fetcher-Fallback: holen, in unser Format konvertieren, speichern, nutzen
+            if not etf_details:
                 holdings_data = fetcher.get_etf_holdings(
-                    position['isin'], 
-                    use_cache=use_cache,
-                    ticker_symbol=ticker_symbol
+                    isin, use_cache=True, ticker_symbol=position.get('ticker_symbol', '')
                 )
-                
-                if holdings_data and 'holdings' in holdings_data:
-                    print(f"DEBUG:   ✅ ETF resolved via fetcher! {len(holdings_data['holdings'])} holdings found")
-                    # Jede Holding als eigene Position
-                    for holding in holdings_data['holdings']:
-                        holding_value = position['value'] * holding['weight']
-                        
-                        # Währung der Holding verwenden (nicht die des ETFs!)
-                        holding_currency = holding.get('currency', 'USD')  # Default USD für US-Aktien
-                        holding_sector = holding.get('sector', 'Unknown')
-                        holding_industry = holding.get('industry', 'Unknown')
-                        holding_country = holding.get('country', '')  # Optional: Ländercode aus CSV
-                        
-                        # Normalisiere Sektor-Namen
-                        holding_sector = _normalize_sector_name(holding_sector)
-                        
-                        # Holding-Name: Bei "Other Holdings" den ETF-Namen hinzufügen
-                        holding_name = holding['name']
-                        if 'Other Holdings' in holding_name or 'other holdings' in holding_name.lower():
-                            holding_name = f"Other Holdings - {position['name']}"
-                        
-                        # Holding-Informationen abrufen
-                        holding_info = {
-                            'name': holding_name,
-                            'type': 'Stock',  # Holdings sind meistens Aktien
-                            'value': holding_value,
-                            'weight_in_portfolio': holding_value / portfolio_data['total_value'],
-                            'currency': holding_currency,  # Währung der einzelnen Aktie!
-                            'country': holding_country,  # Ländercode falls vorhanden
-                            'source_etf': position['name'],
-                            'original_type': 'ETF_Holding',
-                            'sector': holding_sector,
-                            'industry': holding_industry,
-                            'sector_source': 'etf'  # NIEDRIGE PRIORITÄT (aus ETF)
-                        }
-                        
-                        expanded.append(holding_info)
-                        print(f"DEBUG:     Added holding: {holding_name} = €{holding_value:.2f} ({holding_currency}, {holding_sector})")
-                else:
-                    print(f"DEBUG:   ⚠️  ETF could not be resolved - treating as whole")
-                    # ETF konnte nicht aufgelöst werden - als Ganzes behandeln
-                    diagnostics = get_diagnostics()
-                    diagnostics.add_warning(
-                        'ETF-Daten',
-                        f'ETF "{position["name"]}" konnte nicht aufgelöst werden',
-                        f'ISIN: {position["isin"]}. Bitte erstelle eine ETF-Detail-Datei in data/etf_details/.'
-                    )
-                    expanded.append({
-                        'name': position['name'],
-                        'type': position['type'],
-                        'value': position['value'],
-                        'weight_in_portfolio': position['value'] / portfolio_data['total_value'],
-                        'currency': position['currency'],
-                        'source_etf': None,
-                        'original_type': 'ETF',
-                        'sector': 'ETF',
-                        'industry': 'ETF'
-                    })
-        
+                if holdings_data and holdings_data.get('holdings'):
+                    # Typ ableiten: Commodity (XGDU), Money Market (XEON)
+                    fetcher_type = 'Stock'
+                    fetcher_name = holdings_data.get('name', name)
+                    fetcher_holdings = holdings_data['holdings']
+                    if any('physical gold' in (h.get('name') or '').lower() for h in fetcher_holdings):
+                        fetcher_type = 'Commodity'
+                    elif any(kw in (fetcher_name or '').lower() for kw in ('gold', 'physical gold', 'etc ', 'commodity')):
+                        fetcher_type = 'Commodity'
+                    elif any(kw in (h.get('name') or '').lower() for h in fetcher_holdings for kw in ('overnight', 'swap', 'rate')):
+                        fetcher_type = 'Money Market'
+                    elif any(kw in (fetcher_name or '').lower() for kw in ('overnight', 'money market', 'geldmarkt', 'xeon')):
+                        fetcher_type = 'Money Market'
+                    fetcher_details = {
+                        'isin': isin,
+                        'name': fetcher_name,
+                        'type': fetcher_type,
+                        'region': '',
+                        'currency': 'EUR',
+                        'ter': '',
+                        'country_allocation': [],
+                        'sector_allocation': [],
+                        'currency_allocation': [],
+                        'holdings': [
+                            {
+                                'name': h['name'],
+                                'weight': h['weight'],
+                                'currency': h.get('currency') or ('None' if fetcher_type == 'Commodity' else ('EUR' if fetcher_type == 'Money Market' else 'USD')),
+                                'sector': h.get('sector') or ('Commodity' if fetcher_type == 'Commodity' else ('Cash' if fetcher_type == 'Money Market' else 'Unknown')),
+                                'country': h.get('country', ''),
+                                'isin': h.get('isin', ''),
+                            }
+                            for h in fetcher_holdings
+                        ],
+                    }
+                    try:
+                        save_etf_detail_file(
+                            fetcher_details, ticker_for_file, source_label=f"{holdings_data.get('source', 'Fetcher')} (Fallback)"
+                        )
+                    except Exception as e:
+                        print(f"⚠️  Konnte ETF-Detail-Datei nicht speichern: {e}")
+                    etf_details = fetcher_details
+                    source = 'fetcher'
+
+            if etf_details:
+                etf_resolution.append({'isin': isin, 'ticker': ticker_for_file, 'name': name, 'source': source})
+                _expand_positions_using_etf_details(etf_details, position, portfolio_data, expanded, ticker_for_file)
+            else:
+                etf_resolution.append({'isin': isin, 'ticker': ticker_for_file, 'name': name, 'source': 'failed'})
+                diagnostics = get_diagnostics()
+                diagnostics.add_warning(
+                    'ETF-Daten',
+                    f'ETF "{name}" konnte nicht aufgelöst werden',
+                    f'ISIN: {isin}. Morningstar und Fetcher lieferten keine Daten.',
+                )
+                expanded.append({
+                    'name': position['name'],
+                    'type': position['type'],
+                    'value': position['value'],
+                    'weight_in_portfolio': position['value'] / portfolio_data['total_value'],
+                    'currency': position['currency'],
+                    'source_etf': None,
+                    'original_type': 'ETF',
+                    'sector': 'ETF',
+                    'industry': 'ETF',
+                })
         else:
             # Direkte Positionen (Aktien, Rohstoffe, Cash)
             pos_info = {
@@ -366,7 +262,177 @@ def _expand_etf_holdings(portfolio_data: Dict, fetcher: ETFDataFetcher, use_cach
             
             expanded.append(pos_info)
     
-    return expanded
+    return expanded, etf_resolution
+
+
+def _expand_positions_using_etf_details(
+    etf_details: Dict,
+    position: Dict,
+    portfolio_data: Dict,
+    expanded: List[Dict],
+    source_etf_ticker: str = '',
+) -> None:
+    """
+    Gemeinsame Logik zum Aufschlüsseln eines ETFs anhand eines ETF-Detail-Dicts.
+
+    Wird sowohl für lokal gespeicherte ETF-Detail-Dateien als auch für
+    live von der Morningstar-API geholte Details verwendet.
+    """
+    # Sammle Währungsverteilung der Top Holdings (zur späteren Berechnung von "Other Holdings")
+    top_holdings_currency_distribution: Dict[str, float] = {}
+    other_holdings_entry = None
+    sector_allocation = etf_details.get('sector_allocation') or []
+    # Holdings mit Unknown/Diversified Sektor für spätere Zuordnung aus sector_allocation sammeln
+    unknown_sector_holdings = []
+
+    # Holdings aus Detail-Quelle verarbeiten
+    for holding in etf_details.get('holdings', []):
+        try:
+            holding_weight = float(holding.get('weight', 0.0))
+        except (TypeError, ValueError):
+            holding_weight = 0.0
+        if holding_weight <= 0:
+            continue
+
+        holding_value = position['value'] * holding_weight
+
+        # Währung: Holding-Währung oder ETF-Währung (bei leerem Holding z.B. Money Market)
+        holding_currency = holding.get('currency') or etf_details.get('currency', 'EUR')
+        holding_sector = holding.get('sector', 'Unknown')
+        holding_country = holding.get('country', '')
+
+        # Normalisiere Sektor-Namen (etf_type für Cash/Derivative: Bond vs Stock)
+        holding_sector = _normalize_sector_name(holding_sector, etf_details.get('type', 'Stock'))
+
+        # Holding-Name: Bei "Other Holdings" den ETF-Namen hinzufügen
+        holding_name = holding.get('name', '')
+        is_other_holdings = 'Other Holdings' in holding_name or 'other holdings' in holding_name.lower()
+
+        if is_other_holdings:
+            # "Other Holdings" speichern für spätere Verarbeitung
+            holding_name = f"Other Holdings - {position['name']}"
+            other_holdings_entry = {
+                'name': holding_name,
+                'weight': holding_weight,
+                'value': holding_value,
+                'sector': holding_sector,
+                'country': holding_country
+            }
+            continue  # Erstmal überspringen, später verarbeiten
+
+        # Sammle Währung der Top Holdings
+        if holding_currency not in top_holdings_currency_distribution:
+            top_holdings_currency_distribution[holding_currency] = 0.0
+        top_holdings_currency_distribution[holding_currency] += holding_weight
+
+        # Reguläre Holding-Verarbeitung (nicht "Other Holdings")
+        holding_info = {
+            'name': holding_name,
+            'type': etf_details.get('type', 'Stock'),  # Type aus Metadata
+            'value': holding_value,
+            'weight_in_portfolio': holding_value / portfolio_data['total_value'],
+            'currency': holding_currency,
+            'country': holding_country,
+            'source_etf': position['name'],
+            'source_etf_ticker': source_etf_ticker,
+            'original_type': 'ETF_Holding',
+            'sector': holding_sector,
+            'industry': holding_sector,
+            'sector_source': 'etf_details',  # MITTLERE PRIORITÄT
+            'etf_type': etf_details.get('type', 'Stock')  # ETF-Typ (Money Market, Stock, etc.)
+        }
+        # Wenn Sektor unbekannt/diversified und Sector Allocation vorhanden: später zuordnen
+        if sector_allocation and holding_sector in ('Unknown', 'Diversified'):
+            unknown_sector_holdings.append((holding_value, holding_info))
+        else:
+            expanded.append(holding_info)
+            print(f"DEBUG:     Added holding: {holding_name} = €{holding_value:.2f} ({holding_currency}, {holding_sector})")
+
+    # Sektor aus sector_allocation für Holdings mit Unknown/Diversified zuweisen
+    if sector_allocation and unknown_sector_holdings:
+        assigned_sectors = _assign_sectors_from_allocation(
+            unknown_sector_holdings, sector_allocation, position['value'],
+            etf_details.get('type', 'Stock')
+        )
+        for (_, holding_info), sector_name in zip(unknown_sector_holdings, assigned_sectors):
+            holding_info['sector'] = sector_name
+            holding_info['industry'] = sector_name
+            expanded.append(holding_info)
+            print(f"DEBUG:     Added holding (sector from allocation): {holding_info['name']} = €{holding_info['value']:.2f} ({holding_info['currency']}, {sector_name})")
+
+    # Verarbeite "Other Holdings": einheitlich nach Sektor, Währung und Land aus Allokationen
+    if other_holdings_entry:
+        sector_alloc_list = etf_details.get('sector_allocation') or []
+        currency_alloc_list = etf_details.get('currency_allocation') or []
+        country_alloc_list = etf_details.get('country_allocation') or []
+        other_value = other_holdings_entry['value']
+
+        # Sektor-Gewichte: aus Sector Allocation, auf Summe 1 normalisiert
+        # (Morningstar-Daten können >100% pro Kategorie liefern)
+        if sector_alloc_list:
+            etf_type = etf_details.get('type', 'Stock')
+            raw_sector = [
+                (_normalize_sector_name(s['name'], etf_type), s['weight'])
+                for s in sector_alloc_list if s.get('weight', 0) > 0
+            ]
+            total_s = sum(w for _, w in raw_sector)
+            sector_weights = [(n, w / total_s) for n, w in raw_sector] if total_s > 0 else [('Diversified', 1.0)]
+        else:
+            sector_weights = [('Diversified', 1.0)]
+
+        # Währungs-Gewichte für "Other": Gesamt-ETF minus Top-Holdings, normalisiert
+        if currency_alloc_list:
+            other_currency_weights: Dict[str, float] = {}
+            for c in currency_alloc_list:
+                total_c = c['weight']
+                top_c = top_holdings_currency_distribution.get(c['name'], 0.0)
+                other_c = max(0.0, total_c - top_c)
+                if other_c > 0.001:
+                    other_currency_weights[c['name']] = other_c
+            total_other_currency = sum(other_currency_weights.values())
+            if total_other_currency > 0:
+                currency_weights = [(cur, w / total_other_currency) for cur, w in other_currency_weights.items()]
+            else:
+                currency_weights = [('Mixed', 1.0)]
+        else:
+            currency_weights = [('Mixed', 1.0)]
+
+        # Länder-Gewichte: aus Country Allocation, auf Summe 1 normalisiert
+        # (Morningstar-Daten können >100% pro Land liefern)
+        if country_alloc_list:
+            raw_country = [
+                (_allocation_country_name_to_code(c['name']), c['weight'])
+                for c in country_alloc_list if c.get('weight', 0) > 0
+            ]
+            total_c = sum(w for _, w in raw_country)
+            country_weights = [(code, w / total_c) for code, w in raw_country] if total_c > 0 else [('Other', 1.0)]
+        else:
+            country_weights = [('Other', 1.0)]
+
+        # Eine Zeile pro (Sektor, Währung, Land) – alle drei Ansichten (Branche, Währung, Land) korrekt
+        print(f"DEBUG:     Processing Other Holdings: {len(sector_weights)}×{len(currency_weights)}×{len(country_weights)} Kombinationen (Sektor×Währung×Land)")
+        for (sector_name_norm, s_w) in sector_weights:
+            for (currency_name, c_w) in currency_weights:
+                for (country_code, country_w) in country_weights:
+                    part_value = other_value * s_w * c_w * country_w
+                    if part_value < 0.001:  # Rundungsrausch vermeiden, aber keine Werte verlieren
+                        continue
+                    holding_info = {
+                        'name': other_holdings_entry['name'],
+                        'type': etf_details.get('type', 'Stock'),
+                        'value': part_value,
+                        'weight_in_portfolio': part_value / portfolio_data['total_value'],
+                        'currency': currency_name,
+                        'country': country_code,
+                        'source_etf': position['name'],
+                        'source_etf_ticker': source_etf_ticker,
+                        'original_type': 'ETF_Holding',
+                        'sector': sector_name_norm,
+                        'industry': sector_name_norm,
+                        'sector_source': 'etf_details',
+                        'etf_type': etf_details.get('type', 'Stock')
+                    }
+                    expanded.append(holding_info)
 
 
 def _calculate_asset_class_risk(expanded_positions: List[Dict], portfolio_data: Dict) -> pd.DataFrame:
@@ -418,6 +484,9 @@ def _calculate_sector_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
     
     for position in expanded_positions:
         sector = position.get('sector', 'Unknown')
+        # Money-Market-Holdings (z.B. TRS €STR) mit Unknown → Cash (für Cash-Checkbox-Filter)
+        if sector == 'Unknown' and position.get('etf_type') == 'Money Market':
+            sector = 'Cash'
         
         # Überspringe "Diversified" und "ETF" - diese sind keine echten Branchen
         if sector in ['Diversified', 'ETF']:
@@ -476,9 +545,8 @@ def _calculate_currency_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
         }
         for currency, value in currencies.items()
     ])
-    
-    df = df.sort_values('Wert (€)', ascending=False).reset_index(drop=True)
-    
+    if len(df) > 0:
+        df = df.sort_values('Wert (€)', ascending=False).reset_index(drop=True)
     return df
 
 
@@ -565,11 +633,12 @@ def _calculate_country_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
         
         # 4. Für ETF-Holdings ohne explizites Land: Verwende Währung als Proxy
         if not country_name or country_name.startswith('Unbekannt'):
-            currency = position.get('currency', '')
-            # Map Currency zu Land (für ETF-Holdings ohne ISIN)
+            currency = position.get('currency', '') or (
+                'EUR' if position.get('etf_type') == 'Money Market' else ''
+            )
             country_name = _currency_to_country(currency)
         
-        if not country_name:
+        if not country_name or country_name == 'Unbekannt':
             country_name = 'Unbekannt'
         
         if country_name not in countries:
@@ -648,8 +717,21 @@ def _allocation_country_name_to_code(name: str) -> str:
 
 def _country_code_to_name(code: str) -> str:
     """
-    Konvertiert ISO 3166-1 Alpha-2 Ländercode zu Ländername
+    Konvertiert ISO 3166-1 Alpha-2 Ländercode (oder 3-Buchstaben) zu Ländername
     """
+    if not code:
+        return 'Unbekannt'
+    code = code.strip().upper()
+    # 3-Buchstaben-Codes zu Alpha-2 normalisieren (z.B. USA→US, GBR→GB)
+    code_3_to_2 = {
+        'USA': 'US', 'GBR': 'GB', 'CHE': 'CH', 'DEU': 'DE', 'FRA': 'FR',
+        'ITA': 'IT', 'ESP': 'ES', 'NLD': 'NL', 'BEL': 'BE', 'AUT': 'AT',
+        'IRL': 'IE', 'LUX': 'LU', 'JPN': 'JP', 'CHN': 'CN', 'AUS': 'AU',
+        'CAN': 'CA', 'KOR': 'KR', 'HKG': 'HK', 'SGP': 'SG', 'BRA': 'BR',
+        'IND': 'IN', 'ZAF': 'ZA', 'MEX': 'MX', 'RUS': 'RU', 'POL': 'PL',
+    }
+    if len(code) == 3 and code in code_3_to_2:
+        code = code_3_to_2[code]
     country_map = {
         'US': 'USA',
         'Other': 'Sonstige',
@@ -706,16 +788,29 @@ def _calculate_position_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
         if position.get('type') == 'Cash':
             name_normalized = 'cash_all'  # Einheitlicher Key für alle Cash
             display_name = 'Cash'  # Einheitlicher Anzeigename
+        # Money-Market-Holdings mit kryptischem Namen (TRS, Swap, €STR): Ticker statt Name
+        elif (position.get('etf_type') == 'Money Market'
+              and position.get('source_etf_ticker')
+              and _is_cryptic_money_market_holding(name)):
+            display_name = position['source_etf_ticker']
         else:
             display_name = name
         
+        sector_for_pos = position.get('sector', 'Unknown')
+        if sector_for_pos == 'Unknown' and position.get('etf_type') == 'Money Market':
+            sector_for_pos = 'Cash'
         if name_normalized not in positions:
+            ticker_val = position.get('ticker_symbol', '') or (
+                position.get('source_etf_ticker', '') if (
+                    position.get('etf_type') == 'Money Market' and _is_cryptic_money_market_holding(name)
+                ) else ''
+            )
             positions[name_normalized] = {
                 'display_name': display_name,
-                'ticker': position.get('ticker_symbol', ''),  # Ticker-Symbol speichern
+                'ticker': ticker_val,
                 'value': 0.0,
                 'sources': [],
-                'sector': position.get('sector', 'Unknown'),
+                'sector': sector_for_pos,
                 'type': position.get('type', 'Unknown'),
                 'sector_priority': 0  # 0=niedrig (ETF), 1=mittel (ISIN), 2=hoch (CSV)
             }
@@ -723,6 +818,9 @@ def _calculate_position_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
         # Ticker-Symbol aktualisieren wenn vorhanden und noch nicht gesetzt
         if position.get('ticker_symbol') and not positions[name_normalized]['ticker']:
             positions[name_normalized]['ticker'] = position.get('ticker_symbol', '')
+        elif (position.get('source_etf_ticker') and not positions[name_normalized]['ticker']
+              and position.get('etf_type') == 'Money Market' and _is_cryptic_money_market_holding(name)):
+            positions[name_normalized]['ticker'] = position['source_etf_ticker']
         
         positions[name_normalized]['value'] += position['value']
         
@@ -746,7 +844,7 @@ def _calculate_position_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
         
         # Wenn neue Position höhere Priorität hat, überschreibe Sektor
         if new_priority > current_priority:
-            positions[name_normalized]['sector'] = position.get('sector', 'Unknown')
+            positions[name_normalized]['sector'] = sector_for_pos
             positions[name_normalized]['sector_priority'] = new_priority
             print(f"DEBUG: Sector override for {name}: {position.get('sector')} (priority {new_priority})")
     
@@ -767,6 +865,14 @@ def _calculate_position_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
     df = df.sort_values('Wert (€)', ascending=False).reset_index(drop=True)
     
     return df
+
+
+def _is_cryptic_money_market_holding(name: str) -> bool:
+    """Erkennt kryptische Money-Market-Holding-Namen (TRS, Swap, €STR, etc.)"""
+    if not name:
+        return False
+    n = name.lower()
+    return any(kw in n for kw in ('trs ', 'trs solactive', 'swap', 'overnight', '€str', 'estr', 'rate swap'))
 
 
 def _normalize_position_name(name: str) -> str:
@@ -842,7 +948,8 @@ def _get_stock_currency(isin: str, default_currency: str) -> str:
 def _assign_sectors_from_allocation(
     holdings_with_values: List[tuple],
     sector_allocation: List[Dict],
-    etf_total_value: float
+    etf_total_value: float,
+    etf_type: str = 'Stock',
 ) -> List[str]:
     """
     Ordnet Holdings ohne Sektor (Unknown/Diversified) den Sektoren aus sector_allocation
@@ -873,21 +980,59 @@ def _assign_sectors_from_allocation(
                 best_gap = gap
                 best_sector = s_name
         if best_sector:
-            assigned[idx] = _normalize_sector_name(best_sector)
+            assigned[idx] = _normalize_sector_name(best_sector, etf_type)
             sector_sums[best_sector] += value
     return assigned
 
 
-def _normalize_sector_name(sector: str) -> str:
+def _normalize_sector_name(sector: str, etf_type: str = '') -> str:
     """
-    Normalisiert Branchennamen zu einheitlichen Kategorien
+    Normalisiert Branchennamen zu einheitlichen Kategorien.
 
-    Mappt verschiedene Bezeichnungen (deutsch/englisch, verschiedene Standards)
-    auf einheitliche Namen.
+    etf_type: 'Bond' = Bond-ETF (Cash/Derivative → Bonds: …), sonst Aktien-ETF
+    (Cash/Derivative bei Aktien-ETFs = Kassenbestand/Swap-Replikation, keine Anleihen)
     """
     if not sector or sector == 'Unknown':
         return 'Unknown'
     
+    # Morningstar Bond-Sector-Codes (10=Government, 30=Corporate, 60=Derivative, …)
+    bond_sector_codes = {
+        '10': 'Bonds: Government', '20': 'Bonds: Municipal', '30': 'Bonds: Corporate',
+        '40': 'Bonds: Securitized', '50': 'Bonds: Cash', '60': 'Bonds: Derivative',
+    }
+    if str(sector).strip() in bond_sector_codes:
+        return bond_sector_codes[str(sector).strip()]
+
+    # Morningstar Stock-Sektor-Codes (GECS: 101–311)
+    stock_sector_codes = {
+        '101': 'Materials', '102': 'Consumer Cyclical', '103': 'Financial Services',
+        '104': 'Real Estate', '205': 'Consumer Staples', '206': 'Healthcare',
+        '207': 'Utilities', '308': 'Communication Services', '309': 'Energy',
+        '310': 'Industrials', '311': 'Technology',
+    }
+    if str(sector).strip() in stock_sector_codes:
+        return stock_sector_codes[str(sector).strip()]
+
+    s_check = str(sector).strip().lower()
+    is_bond_etf = (etf_type or '').lower() == 'bond'
+
+    # Cash/Derivative: Nur bei Bond-ETFs als "Bonds:" prefixen
+    # Bei Aktien-ETFs (EUNL etc.) = Kassenbestand/Swap-Replikation, keine Anleihen
+    if s_check in ('cash', 'derivative'):
+        return f'Bonds: {sector.strip().title()}' if is_bond_etf else sector.strip().title()
+
+    # Explizit bond-spezifische Namen (z.B. "Bonds/Cash" von Morningstar)
+    if s_check in ('bonds/cash', 'bonds/cash & equivalents'):
+        return 'Bonds: Cash'
+
+    # Bond-Sektoren als Namen (nur für Bond-ETFs relevant)
+    bond_sector_names = {
+        'government': 'Bonds: Government', 'municipal': 'Bonds: Municipal',
+        'corporate': 'Bonds: Corporate', 'securitized': 'Bonds: Securitized',
+    }
+    if is_bond_etf and s_check in bond_sector_names:
+        return bond_sector_names[s_check]
+
     # Eingabe bereinigen (Leerzeichen, &/und)
     s = sector.strip()
     while '  ' in s:

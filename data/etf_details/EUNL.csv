@@ -1,65 +1,112 @@
 # ETF Metadata
 ISIN,IE00B4L5Y983
-Name,iShares Core MSCI World UCITS ETF USD (Acc)
+Name,iShares Core MSCI World ETF USD Acc
 Ticker,EUNL
 Type,Stock
-Region,World
-Currency,USD
-TER,0.20
-Last Updated,2026-02-09
-Source,justETF (auto-generated)
+Region,
+Currency,EUR
+TER,0.2
+Last Updated,2026-03-03
+Source,Morningstar (auto)
 
 # Country Allocation (%)
 Country,Weight
-United States,68.2
-Japan,5.4
-United Kingdom,3.3
-Canada,3.0
-Switzerland,2.5
-France,2.4
-Germany,2.4
-Australia,1.5
-Netherlands,1.4
-Ireland,1.2
-Other,8.6
+AUS,3.5
+AUT,0.2
+BEL,0.5
+BRA,0.2
+CAN,7.1
+CHE,5.6
+CHN,0.3
+CZE,0.0
+DEU,4.8
+DNK,0.8
+ESP,1.9
+FIN,0.5
+FRA,4.9
+GBR,7.6
+HKG,0.9
+IRL,0.3
+ISR,0.5
+ITA,1.5
+JPN,12.3
+LUX,0.0
+MAC,0.0
+MEX,0.1
+MYS,0.0
+NLD,3.2
+NOR,0.3
+NZL,0.1
+POL,0.0
+PRT,0.1
+SGP,1.1
+SWE,1.9
+USA,339.9
 
 # Sector Allocation (%)
 Sector,Weight
-Technology,28.3
-Financials,14.8
-Industrials,10.2
-Consumer Discretionary,10.1
-Health Care,9.1
-Telecommunication,8.7
-Consumer Staples,4.9
-Energy,3.3
-Basic Materials,2.7
-Utilities,2.5
-Real Estate,1.7
-Other,3.7
+101,7.2
+102,18.9
+103,32.1
+104,3.8
+205,11.4
+206,19.8
+207,5.5
+308,17.6
+309,8.0
+310,23.9
+311,51.9
+Cash,214.0
+Derivative,86.0
 
-# Currency Allocation (%) - auto-derived from countries
+# Currency Allocation (%)
 Currency,Weight
-USD,68.2
-EUR,7.5
-JPY,5.4
-GBP,3.3
-CAD,3.0
-CHF,2.5
-AUD,1.5
-Other,8.6
+USD,343.4
+EUR,23.2
+JPY,12.3
+GBP,7.6
+CAD,7.1
+SEK,1.9
+SGD,1.1
+HKD,0.9
+ISK,0.5
+NOK,0.3
+CHF,0.3
+BRL,0.2
+AUD,0.2
+NZD,0.1
+MXN,0.1
+MYR,0.0
+CZK,0.0
+MAD,0.0
+PLN,0.0
 
 # Top Holdings
 Name,Weight,Currency,Sector,Country,ISIN
-NVIDIA Corp.,5.21,USD,Unknown,US,
-Apple,5.01,USD,Unknown,US,
-Microsoft,4.21,USD,Unknown,US,
-"Amazon.com, Inc.",2.71,USD,Unknown,US,
-"Alphabet, Inc. A",2.26,USD,Unknown,US,
-Broadcom,2.19,USD,Unknown,US,
-"Alphabet, Inc. C",1.89,USD,Unknown,US,
-Meta Platforms,1.70,USD,Unknown,US,
-Tesla,1.47,USD,Unknown,US,
-Eli Lilly & Co.,1.05,USD,Unknown,US,
-Other Holdings,72.30,Mixed,Diversified,Mixed,
+NVIDIA Corp,5.04,USD,Unknown,USA,US67066G1040
+Apple Inc,4.55,USD,Unknown,USA,US0378331005
+Microsoft Corp,3.25,USD,Unknown,USA,US5949181045
+Amazon.com Inc,2.37,USD,Unknown,USA,US0231351067
+Alphabet Inc Class A,2.13,USD,Unknown,USA,US02079K3059
+Alphabet Inc Class C,1.78,USD,Unknown,USA,US02079K1079
+Broadcom Inc,1.69,USD,Unknown,USA,US11135F1012
+Meta Platforms Inc Class A,1.65,USD,Unknown,USA,US30303M1027
+Tesla Inc,1.33,USD,Unknown,USA,US88160R1014
+Eli Lilly and Co,0.99,USD,Unknown,USA,US5324571083
+JPMorgan Chase & Co,0.96,USD,Unknown,USA,US46625H1005
+Berkshire Hathaway Inc Class B,0.81,USD,Unknown,USA,US0846707026
+Exxon Mobil Corp,0.76,USD,Unknown,USA,US30231G1022
+Johnson & Johnson,0.70,USD,Unknown,USA,US4781601046
+ASML Holding NV,0.67,EUR,Unknown,NLD,NL0010273215
+Walmart Inc,0.66,USD,Unknown,USA,US9311421039
+Visa Inc Class A,0.63,USD,Unknown,USA,US92826C8394
+Micron Technology Inc,0.54,USD,Unknown,USA,US5951121038
+Costco Wholesale Corp,0.53,USD,Unknown,USA,US22160K1051
+Mastercard Inc Class A,0.52,USD,Unknown,USA,US57636Q1040
+AbbVie Inc,0.48,USD,Unknown,USA,US00287Y1091
+Netflix Inc,0.48,USD,Unknown,USA,US64110L1061
+Procter & Gamble Co,0.46,USD,Unknown,USA,US7427181091
+The Home Depot Inc,0.44,USD,Unknown,USA,US4370761029
+GE Aerospace,0.42,USD,Unknown,USA,US3696043013
+Other Holdings,66.19,Mixed,Diversified,Mixed,
 
