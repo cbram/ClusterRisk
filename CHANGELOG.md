@@ -1,5 +1,22 @@
 # Changelog - ClusterRisk
 
+## [2.0.0] - 2026-03-02 - Morningstar-Integration, Beispiel-Button, Screenshot-Galerie
+
+### ✨ Neue Features
+
+- **Morningstar-Integration**: ETF-Holdings via Morningstar-API (morningstar_fetcher, csv_importer)
+- **Beispiel-Portfolio laden**: Button in Sidebar lädt Beispiel ohne CSV-Upload
+- **Screenshot-Galerie**: 3 Screenshots in README (Hauptansicht, Anlageklasse, Branche)
+- **Bond-ETF IEGA**: iShares Core EUR Govt Bond ergänzt
+
+### 🔧 Verbesserungen
+
+- Branchen-Filter (Aktien/Bonds), Sektor-Normalisierung
+- Länder-3-Buchstaben-Codes, Währungs-Fallback
+- docs/screenshots, Konzept-Dokumentation Morningstar
+
+---
+
 ## [1.6.0] - 2026-03-02 - UI/UX: Einheitliche Farben, Filter, Rundung
 
 ### ✨ Neue Features
