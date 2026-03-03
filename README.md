@@ -488,10 +488,10 @@ Mögliche Bereiche:
 Dieses Tool dient ausschließlich zu Informationszwecken und stellt keine Anlageberatung dar. Investitionsentscheidungen sollten immer auf eigener Recherche und ggf. professioneller Beratung basieren.
 
 **Datenquellen:**
-Die Nennung von Websites (justETF, extraETF, etc.) und ETF-Anbietern (iShares, Vanguard, Amundi, Xtrackers, etc.) erfolgt ausschließlich zu Informationszwecken. Es besteht keine geschäftliche Beziehung, Partnerschaft oder Empfehlung. Die genannten Namen und Marken sind Eigentum ihrer jeweiligen Inhaber.
+Die Nennung von Websites und Diensten (justETF, extraETF, Morningstar, etc.) sowie ETF-Anbietern (iShares, Vanguard, Amundi, Xtrackers, etc.) erfolgt ausschließlich zu Informationszwecken. Es besteht keine geschäftliche Beziehung, Partnerschaft oder Empfehlung. Die genannten Namen und Marken sind Eigentum ihrer jeweiligen Inhaber.
 
 **ETF-Daten:**
-Die in den Beispiel-ETF-Detail-Dateien enthaltenen Daten basieren auf öffentlich zugänglichen Informationen (Factsheets, Websites der ETF-Anbieter). Nutzer sind selbst dafür verantwortlich, die Aktualität und Richtigkeit der Daten zu überprüfen.
+Die in den Beispiel-ETF-Detail-Dateien enthaltenen Daten basieren auf öffentlich zugänglichen Informationen (Factsheets, Websites der ETF-Anbieter, Morningstar). Nutzer sind selbst dafür verantwortlich, die Aktualität und Richtigkeit der Daten zu überprüfen.
 
 **Datengenauigkeit:**
 Die Genauigkeit der Analysen hängt von der Qualität der bereitgestellten Daten ab. Es wird keine Gewähr für die Richtigkeit der Ergebnisse übernommen.
