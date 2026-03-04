@@ -53,7 +53,7 @@
 
 ## 🚀 Installation
 
-### Lokale Installation (macOS)
+### Lokale Installation (macOS / Linux)
 
 ```bash
 # Repository klonen oder herunterladen
@@ -71,6 +71,34 @@ streamlit run app.py
 ```
 
 Die App läuft dann auf `http://localhost:8501`
+
+### Lokale Installation (Windows)
+
+**Voraussetzung:** [Python 3.9+](https://www.python.org/downloads/) (bei Installation "Add Python to PATH" aktivieren)
+
+```powershell
+# Repository klonen oder herunterladen
+cd ClusterRisk
+
+# Virtual Environment erstellen
+python -m venv venv
+
+# Aktivieren (PowerShell)
+.\venv\Scripts\Activate.ps1
+
+# Oder in CMD:
+# venv\Scripts\activate.bat
+
+# Dependencies installieren
+pip install -r requirements.txt
+
+# App starten
+streamlit run app.py
+```
+
+Die App läuft dann auf `http://localhost:8501`
+
+*Hinweis:* Falls PowerShell die Ausführung von Skripten blockiert, zuerst `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser` ausführen.
 
 ### Docker Installation
 
