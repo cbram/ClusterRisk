@@ -587,8 +587,8 @@ def generate_etf_detail_file(
     diagnostics = get_diagnostics()
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
-    
-    filepath = output_path / f"{ticker}.csv"
+    safe_ticker = Path(ticker).name  # Strip any directory components to prevent path traversal
+    filepath = output_path / f"{safe_ticker}.csv"
     
     print(f"\n{'='*60}")
     print(f"ETF-Detail-Generator: {isin} → {ticker}.csv")

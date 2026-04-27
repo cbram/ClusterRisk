@@ -9,6 +9,23 @@ from typing import Dict
 from datetime import datetime
 
 
+_FORMULA_PREFIXES = ('=', '+', '-', '@', '|', '%')
+
+
+def _sanitize_df(df: pd.DataFrame) -> pd.DataFrame:
+    """Prefix string cells that start with formula characters with a literal apostrophe.
+
+    Prevents CSV/Excel formula injection when user-controlled strings (position names,
+    sector names, etc.) are written to spreadsheet cells.
+    """
+    df = df.copy()
+    for col in df.select_dtypes(include='object').columns:
+        df[col] = df[col].apply(
+            lambda v: f"'{v}" if isinstance(v, str) and v.startswith(_FORMULA_PREFIXES) else v
+        )
+    return df
+
+
 def export_to_calc(risk_data: Dict, format: str = 'xlsx') -> bytes:
     """
     Exportiert Risiko-Daten nach Excel oder LibreOffice
@@ -55,8 +72,8 @@ def _export_to_xlsx(risk_data: Dict) -> bytes:
             sheet_name = sheet_names.get(category, category)
             
             if isinstance(df, pd.DataFrame):
-                df.to_excel(writer, sheet_name=sheet_name, index=False)
-                
+                _sanitize_df(df).to_excel(writer, sheet_name=sheet_name, index=False)
+
                 # Formatierung
                 worksheet = writer.sheets[sheet_name]
                 _format_worksheet(worksheet, df)
@@ -92,8 +109,8 @@ def _export_to_ods(risk_data: Dict) -> bytes:
             sheet_name = sheet_names.get(category, category)
             
             if isinstance(df, pd.DataFrame):
-                df.to_excel(writer, sheet_name=sheet_name, index=False)
-    
+                _sanitize_df(df).to_excel(writer, sheet_name=sheet_name, index=False)
+
     output.seek(0)
     return output.getvalue()
 

@@ -71,7 +71,8 @@ def save_etf_detail_file(
     """
     output_path = Path(etf_details_dir)
     output_path.mkdir(parents=True, exist_ok=True)
-    filepath = output_path / f"{ticker}.csv"
+    safe_ticker = Path(ticker).name  # Strip any directory components to prevent path traversal
+    filepath = output_path / f"{safe_ticker}.csv"
 
     isin = details.get('isin', '')
     name = details.get('name', 'Unknown')
