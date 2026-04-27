@@ -46,71 +46,41 @@ def export_to_calc(risk_data: Dict, format: str = 'xlsx') -> bytes:
         raise ValueError(f"Unbekanntes Format: {format}")
 
 
-def _export_to_xlsx(risk_data: Dict) -> bytes:
-    """
-    Exportiert nach Excel (.xlsx)
-    """
-    output = BytesIO()
-    
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        
-        # Übersichts-Sheet
-        _create_overview_sheet(risk_data, writer)
-        
-        # Sheet pro Kategorie
-        for category, df in risk_data.items():
-            if category == 'total_value':
-                continue
-            
-            sheet_names = {
-                'asset_class': 'Anlageklasse',
-                'sector': 'Branche_Sektor',
-                'currency': 'Währung',
-                'positions': 'Einzelpositionen'
-            }
-            
-            sheet_name = sheet_names.get(category, category)
-            
-            if isinstance(df, pd.DataFrame):
-                _sanitize_df(df).to_excel(writer, sheet_name=sheet_name, index=False)
+_SHEET_NAMES = {
+    'asset_class': 'Anlageklasse',
+    'sector': 'Branche_Sektor',
+    'currency': 'Währung',
+    'positions': 'Einzelpositionen',
+}
 
-                # Formatierung
-                worksheet = writer.sheets[sheet_name]
-                _format_worksheet(worksheet, df)
-    
+
+def _write_category_sheets(risk_data: Dict, writer, apply_formatting: bool = False) -> None:
+    """Write one sanitized sheet per risk category; optionally apply xlsx formatting."""
+    for category, df in risk_data.items():
+        if category == 'total_value' or not isinstance(df, pd.DataFrame):
+            continue
+        sheet_name = _SHEET_NAMES.get(category, category)
+        _sanitize_df(df).to_excel(writer, sheet_name=sheet_name, index=False)
+        if apply_formatting:
+            _format_worksheet(writer.sheets[sheet_name], df)
+
+
+def _export_to_xlsx(risk_data: Dict) -> bytes:
+    """Exportiert nach Excel (.xlsx)"""
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        _create_overview_sheet(risk_data, writer)
+        _write_category_sheets(risk_data, writer, apply_formatting=True)
     output.seek(0)
     return output.getvalue()
 
 
 def _export_to_ods(risk_data: Dict) -> bytes:
-    """
-    Exportiert nach LibreOffice (.ods)
-    """
+    """Exportiert nach LibreOffice (.ods)"""
     output = BytesIO()
-    
-    # ODS Export mit pandas
     with pd.ExcelWriter(output, engine='odf') as writer:
-        
-        # Übersichts-Sheet
         _create_overview_sheet(risk_data, writer)
-        
-        # Sheet pro Kategorie
-        for category, df in risk_data.items():
-            if category == 'total_value':
-                continue
-            
-            sheet_names = {
-                'asset_class': 'Anlageklasse',
-                'sector': 'Branche_Sektor',
-                'currency': 'Währung',
-                'positions': 'Einzelpositionen'
-            }
-            
-            sheet_name = sheet_names.get(category, category)
-            
-            if isinstance(df, pd.DataFrame):
-                _sanitize_df(df).to_excel(writer, sheet_name=sheet_name, index=False)
-
+        _write_category_sheets(risk_data, writer, apply_formatting=False)
     output.seek(0)
     return output.getvalue()
 

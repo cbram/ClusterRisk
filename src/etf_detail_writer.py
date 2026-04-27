@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Dict, List
 from datetime import datetime
 
-from .etf_detail_generator import COUNTRY_TO_CURRENCY, _derive_currency_allocation
+from .etf_currency_mapping import COUNTRY_TO_CURRENCY, derive_currency_allocation as _derive_currency_allocation
 
 
 def _derive_currency_from_holdings(holdings: List[Dict]) -> List[Dict]:

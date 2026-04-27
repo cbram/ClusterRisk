@@ -12,140 +12,9 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime
 from .diagnostics import get_diagnostics
-
-
-# Mapping von Ländern zu Währungen
-COUNTRY_TO_CURRENCY = {
-    # Nordamerika
-    'United States': 'USD', 'US': 'USD', 'USA': 'USD',
-    'Canada': 'CAD', 'CA': 'CAD',
-    'Mexico': 'MXN', 'MX': 'MXN',
-    
-    # Europa (EUR-Zone)
-    'Germany': 'EUR', 'DE': 'EUR', 'Deutschland': 'EUR',
-    'France': 'EUR', 'FR': 'EUR', 'Frankreich': 'EUR',
-    'Netherlands': 'EUR', 'NL': 'EUR', 'Niederlande': 'EUR',
-    'Italy': 'EUR', 'IT': 'EUR', 'Italien': 'EUR',
-    'Spain': 'EUR', 'ES': 'EUR', 'Spanien': 'EUR',
-    'Belgium': 'EUR', 'BE': 'EUR', 'Belgien': 'EUR',
-    'Austria': 'EUR', 'AT': 'EUR', 'Österreich': 'EUR',
-    'Finland': 'EUR', 'FI': 'EUR', 'Finnland': 'EUR',
-    'Ireland': 'EUR', 'IE': 'EUR', 'Irland': 'EUR',
-    'Portugal': 'EUR', 'PT': 'EUR',
-    'Greece': 'EUR', 'GR': 'EUR', 'Griechenland': 'EUR',
-    'Luxembourg': 'EUR', 'LU': 'EUR', 'Luxemburg': 'EUR',
-    'Slovakia': 'EUR', 'SK': 'EUR',
-    'Slovenia': 'EUR', 'SI': 'EUR',
-    'Estonia': 'EUR', 'EE': 'EUR',
-    'Latvia': 'EUR', 'LV': 'EUR',
-    'Lithuania': 'EUR', 'LT': 'EUR',
-    'Cyprus': 'EUR', 'CY': 'EUR',
-    'Malta': 'EUR', 'MT': 'EUR',
-    'Croatia': 'EUR', 'HR': 'EUR',
-    'Eurozone': 'EUR', 'EU': 'EUR',
-    
-    # Europa (Nicht-EUR)
-    'United Kingdom': 'GBP', 'GB': 'GBP', 'UK': 'GBP', 'Großbritannien': 'GBP',
-    'Switzerland': 'CHF', 'CH': 'CHF', 'Schweiz': 'CHF',
-    'Sweden': 'SEK', 'SE': 'SEK', 'Schweden': 'SEK',
-    'Norway': 'NOK', 'NO': 'NOK', 'Norwegen': 'NOK',
-    'Denmark': 'DKK', 'DK': 'DKK', 'Dänemark': 'DKK',
-    'Poland': 'PLN', 'PL': 'PLN', 'Polen': 'PLN',
-    'Czech Republic': 'CZK', 'CZ': 'CZK', 'Czechia': 'CZK',
-    'Hungary': 'HUF', 'HU': 'HUF', 'Ungarn': 'HUF',
-    'Romania': 'RON', 'RO': 'RON', 'Rumänien': 'RON',
-    'Turkey': 'TRY', 'TR': 'TRY', 'Türkei': 'TRY',
-    'Russia': 'RUB', 'RU': 'RUB', 'Russland': 'RUB',
-    'Iceland': 'ISK', 'IS': 'ISK',
-    
-    # Asien
-    'Japan': 'JPY', 'JP': 'JPY',
-    'China': 'CNY', 'CN': 'CNY',
-    'Hong Kong': 'HKD', 'HK': 'HKD', 'Hongkong': 'HKD',
-    'South Korea': 'KRW', 'KR': 'KRW', 'Korea': 'KRW',
-    'Taiwan': 'TWD', 'TW': 'TWD',
-    'India': 'INR', 'IN': 'INR', 'Indien': 'INR',
-    'Singapore': 'SGD', 'SG': 'SGD', 'Singapur': 'SGD',
-    'Indonesia': 'IDR', 'ID': 'IDR', 'Indonesien': 'IDR',
-    'Thailand': 'THB', 'TH': 'THB',
-    'Malaysia': 'MYR', 'MY': 'MYR',
-    'Philippines': 'PHP', 'PH': 'PHP', 'Philippinen': 'PHP',
-    'Vietnam': 'VND', 'VN': 'VND',
-    'Pakistan': 'PKR', 'PK': 'PKR',
-    'Bangladesh': 'BDT', 'BD': 'BDT',
-    'Sri Lanka': 'LKR', 'LK': 'LKR',
-    
-    # Ozeanien
-    'Australia': 'AUD', 'AU': 'AUD', 'Australien': 'AUD',
-    'New Zealand': 'NZD', 'NZ': 'NZD', 'Neuseeland': 'NZD',
-    
-    # Naher Osten
-    'Saudi Arabia': 'SAR', 'SA': 'SAR', 'Saudi-Arabien': 'SAR',
-    'United Arab Emirates': 'AED', 'AE': 'AED',
-    'Israel': 'ILS', 'IL': 'ILS',
-    'Qatar': 'QAR', 'QA': 'QAR',
-    'Kuwait': 'KWD', 'KW': 'KWD',
-    
-    # Südamerika
-    'Brazil': 'BRL', 'BR': 'BRL', 'Brasilien': 'BRL',
-    'Argentina': 'ARS', 'AR': 'ARS', 'Argentinien': 'ARS',
-    'Chile': 'CLP', 'CL': 'CLP',
-    'Colombia': 'COP', 'CO': 'COP', 'Kolumbien': 'COP',
-    'Peru': 'PEN', 'PE': 'PEN',
-    
-    # Afrika
-    'South Africa': 'ZAR', 'ZA': 'ZAR', 'Südafrika': 'ZAR',
-    'Nigeria': 'NGN', 'NG': 'NGN',
-    'Kenya': 'KES', 'KE': 'KES',
-    'Egypt': 'EGP', 'EG': 'EGP', 'Ägypten': 'EGP',
-    'Morocco': 'MAD', 'MA': 'MAD', 'Marokko': 'MAD',
-}
-
-
-def _derive_currency_allocation(country_allocation: List[Dict]) -> List[Dict]:
-    """
-    Leitet Währungs-Allokation aus der Länder-Allokation ab.
-    Eurozone-Länder werden zu EUR zusammengefasst.
-    
-    Args:
-        country_allocation: Liste von {'name': 'US', 'weight': 70.8}
-        
-    Returns:
-        Liste von {'name': 'USD', 'weight': 72.5}
-    """
-    currency_weights = {}
-    unmapped_weight = 0.0
-    
-    for entry in country_allocation:
-        country = entry['name']
-        weight = entry['weight']
-        
-        currency = COUNTRY_TO_CURRENCY.get(country)
-        
-        if currency:
-            currency_weights[currency] = currency_weights.get(currency, 0.0) + weight
-        elif country.lower() == 'other':
-            unmapped_weight += weight
-        else:
-            # Versuche Teilstring-Matching
-            matched = False
-            for key, cur in COUNTRY_TO_CURRENCY.items():
-                if key.lower() in country.lower() or country.lower() in key.lower():
-                    currency_weights[cur] = currency_weights.get(cur, 0.0) + weight
-                    matched = True
-                    break
-            if not matched:
-                unmapped_weight += weight
-    
-    # Sortiere nach Gewicht (absteigend)
-    result = [{'name': cur, 'weight': w} for cur, w in 
-              sorted(currency_weights.items(), key=lambda x: x[1], reverse=True)]
-    
-    # "Other" für nicht zugeordnete Währungen
-    if unmapped_weight > 0.1:  # Nur wenn > 0.1%
-        result.append({'name': 'Other', 'weight': unmapped_weight})
-    
-    return result
+from .etf_currency_mapping import COUNTRY_TO_CURRENCY, derive_currency_allocation as _derive_currency_allocation
+from .etf_details_parser import ETFDetailsParser
+from .etf_detail_writer import save_etf_detail_file
 
 
 class JustETFScraper:
@@ -715,9 +584,6 @@ def generate_etf_detail_file(
         proxy_isin=proxy_isin
     )
     
-    # 8. ISIN-Ticker-Map aktualisieren
-    _update_isin_ticker_map(isin, ticker, etf_name)
-    
     proxy_info = f" (via Proxy {proxy_isin})" if proxy_isin else ""
     msg = (
         f"ETF-Detail-Datei generiert: {filepath}{proxy_info}\n"
@@ -860,116 +726,27 @@ def _write_etf_detail_csv(
     proxy_isin: str = '',
     index_name: str = ''
 ):
-    """Schreibt die ETF-Detail-CSV-Datei im korrekten Format"""
-    
-    today = datetime.now().strftime('%Y-%m-%d')
-    
-    lines = []
-    
-    # Metadata
-    lines.append('# ETF Metadata')
-    lines.append(f'ISIN,{isin}')
-    lines.append(f'Name,{name}')
-    lines.append(f'Ticker,{ticker}')
-    lines.append(f'Type,{etf_type}')
-    if index_name:
-        lines.append(f'Index,{index_name}')
-    lines.append(f'Region,{region}')
-    lines.append(f'Currency,{currency}')
-    lines.append(f'TER,{ter}')
-    if proxy_isin:
-        lines.append(f'Proxy ISIN,{proxy_isin}')
-    lines.append(f'Last Updated,{today}')
-    lines.append(f'Source,{source}')
-    lines.append('')
-    
-    # Country Allocation
-    lines.append('# Country Allocation (%)')
-    lines.append('Country,Weight')
-    for c in countries:
-        lines.append(f'{c["name"]},{c["weight"]:.1f}')
-    lines.append('')
-    
-    # Sector Allocation
-    lines.append('# Sector Allocation (%)')
-    lines.append('Sector,Weight')
-    for s in sectors:
-        lines.append(f'{s["name"]},{s["weight"]:.1f}')
-    lines.append('')
-    
-    # Currency Allocation (abgeleitet)
-    lines.append('# Currency Allocation (%) - auto-derived from countries')
-    lines.append('Currency,Weight')
-    for cur in currency_allocation:
-        lines.append(f'{cur["name"]},{cur["weight"]:.1f}')
-    lines.append('')
-    
-    # Top Holdings (csv.writer für korrekte Komma-Behandlung in Firmennamen)
-    lines.append('# Top Holdings')
-    lines.append('')  # Platzhalter, wird durch csv.writer ersetzt
-    
-    # Schreibe Datei: Erst die Zeilen bis vor Holdings, dann Holdings via csv.writer
-    with open(filepath, 'w', encoding='utf-8', newline='') as f:
-        # Alles bis zum Holdings-Platzhalter schreiben
-        f.write('\n'.join(lines[:-1]))
-        f.write('\n')
-        
-        # Holdings als korrekte CSV mit Quoting schreiben
-        writer = csv.writer(f, quoting=csv.QUOTE_MINIMAL)
-        writer.writerow(['Name', 'Weight', 'Currency', 'Sector', 'Country', 'ISIN'])
-        
-        for h in holdings:
-            writer.writerow([
-                h['name'],
-                f'{h["weight"]:.2f}',
-                h['currency'],
-                h['sector'],
-                h['country'],
-                h.get('isin', '')
-            ])
-        
-        # Other Holdings Eintrag
-        if other_weight > 0.1:
-            writer.writerow(['Other Holdings', f'{other_weight:.2f}', 'Mixed', 'Diversified', 'Mixed', ''])
-        
-        f.write('\n')
-    
-    print(f"  Datei geschrieben: {filepath}")
+    """Delegates to the canonical save_etf_detail_file writer.
+
+    Incoming weights are in percent (0–100); save_etf_detail_file expects fractions (0–1).
+    """
+    details = {
+        'isin': isin,
+        'name': name,
+        'type': etf_type,
+        'index': index_name,
+        'region': region,
+        'currency': currency,
+        'ter': ter,
+        'proxy_isin': proxy_isin,
+        'country_allocation': [{'name': c['name'], 'weight': c['weight'] / 100} for c in countries],
+        'sector_allocation': [{'name': s['name'], 'weight': s['weight'] / 100} for s in sectors],
+        'currency_allocation': [{'name': c['name'], 'weight': c['weight'] / 100} for c in currency_allocation],
+        'holdings': [{**h, 'weight': h['weight'] / 100} for h in holdings],
+    }
+    save_etf_detail_file(details, ticker=ticker, source_label=source, etf_details_dir=str(filepath.parent))
 
 
-def _update_isin_ticker_map(isin: str, ticker: str, name: str):
-    """Aktualisiert die ISIN-Ticker-Map (fügt hinzu oder aktualisiert)"""
-    map_path = Path('data/etf_isin_ticker_map.csv')
-    
-    # Bestehende Einträge laden
-    existing_entries = []
-    isin_exists = False
-    
-    if map_path.exists():
-        with open(map_path, 'r', encoding='utf-8') as f:
-            reader = csv.reader(f)
-            for row in reader:
-                if len(row) >= 3:
-                    if row[0] == 'ISIN':  # Header
-                        continue
-                    if row[0] == isin:
-                        # Existierenden Eintrag aktualisieren
-                        existing_entries.append([isin, ticker, name])
-                        isin_exists = True
-                    else:
-                        existing_entries.append(row)
-    
-    # Neuen Eintrag hinzufügen wenn nicht vorhanden
-    if not isin_exists:
-        existing_entries.append([isin, ticker, name])
-    
-    # Datei schreiben
-    with open(map_path, 'w', encoding='utf-8', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(['ISIN', 'Ticker', 'Name'])
-        writer.writerows(existing_entries)
-    
-    print(f"  ISIN-Ticker-Map aktualisiert: {isin} → {ticker}")
 
 
 def preview_etf_data(isin: str) -> Optional[Dict]:
@@ -1008,51 +785,21 @@ def get_etf_detail_status(etf_details_dir: str = 'data/etf_details') -> List[Dic
         ticker = csv_file.stem
         
         try:
-            with open(csv_file, 'r', encoding='utf-8') as f:
-                content = f.read()
-            
-            # Einfaches Metadata-Parsing – nur im Metadata-Bereich lesen
-            # (stoppt bei der nächsten Section, um z.B. "Name,Weight,..." im Holdings-Header zu ignorieren)
-            isin = ''
-            name = ''
-            etf_type = 'Stock'
-            index_name = ''
-            region = ''
-            last_updated = ''
-            source = ''
-            proxy_isin = ''
-            in_metadata = True  # Beginnt im Metadata-Bereich
-            
-            for line in content.split('\n'):
-                line = line.strip()
-                
-                # Section-Header erkennen (beendet Metadata-Bereich)
-                if line in ('COUNTRY_ALLOCATION', 'SECTOR_ALLOCATION', 'CURRENCY_ALLOCATION', 'TOP_HOLDINGS'):
-                    in_metadata = False
-                elif line.startswith('# Country Allocation') or line.startswith('# Sector Allocation') or \
-                     line.startswith('# Currency Allocation') or line.startswith('# Top Holdings'):
-                    in_metadata = False
-                
-                if not in_metadata:
-                    continue
-                
-                if line.startswith('ISIN,'):
-                    isin = line.split(',', 1)[1].strip()
-                elif line.startswith('Name,'):
-                    name = line.split(',', 1)[1].strip()
-                elif line.startswith('Type,'):
-                    etf_type = line.split(',', 1)[1].strip()
-                elif line.startswith('Index,'):
-                    index_name = line.split(',', 1)[1].strip()
-                elif line.startswith('Region,'):
-                    region = line.split(',', 1)[1].strip()
-                elif line.startswith('Last Updated,'):
-                    last_updated = line.split(',', 1)[1].strip()
-                elif line.startswith('Source,'):
-                    source = line.split(',', 1)[1].strip()
-                elif line.startswith('Proxy ISIN,'):
-                    proxy_isin = line.split(',', 1)[1].strip()
-            
+            parser = ETFDetailsParser(etf_details_dir=etf_details_dir)
+            etf = parser.parse_etf_file(ticker)
+            if etf is None:
+                raise ValueError(f"ETFDetailsParser konnte {ticker}.csv nicht lesen")
+
+            meta = etf.get('metadata', {})
+            isin = meta.get('isin', '')
+            name = meta.get('name', '')
+            etf_type = meta.get('type', 'Stock')
+            index_name = meta.get('index', '')
+            region = meta.get('region', '')
+            last_updated = meta.get('last_updated', '')
+            source = meta.get('source', '')
+            proxy_isin = meta.get('proxy_isin', '')
+
             # Source bestimmen: auto, proxy, manual
             if proxy_isin:
                 data_source = 'proxy'
@@ -1060,11 +807,10 @@ def get_etf_detail_status(etf_details_dir: str = 'data/etf_details') -> List[Dic
                 data_source = 'auto'
             else:
                 data_source = 'manual'
-            
+
             # Alter berechnen
             days_old = None
             is_stale = False
-            
             if last_updated:
                 try:
                     updated_date = datetime.strptime(last_updated, '%Y-%m-%d')
@@ -1072,7 +818,7 @@ def get_etf_detail_status(etf_details_dir: str = 'data/etf_details') -> List[Dic
                     is_stale = days_old > 30
                 except ValueError:
                     pass
-            
+
             results.append({
                 'ticker': ticker,
                 'isin': isin,
@@ -1084,7 +830,7 @@ def get_etf_detail_status(etf_details_dir: str = 'data/etf_details') -> List[Dic
                 'days_old': days_old,
                 'is_stale': is_stale,
                 'source': source,
-                'data_source': data_source,  # 'auto', 'proxy', 'manual'
+                'data_source': data_source,
                 'proxy_isin': proxy_isin,
                 'file': str(csv_file),
             })
@@ -1124,50 +870,22 @@ def update_etf_detail_file(ticker: str, etf_details_dir: str = 'data/etf_details
     if not filepath.exists():
         return False, f"Datei {filepath} existiert nicht"
     
-    # Bestehende Metadaten lesen (nur aus Metadata-Bereich)
     try:
-        with open(filepath, 'r', encoding='utf-8') as f:
-            content = f.read()
-        
-        isin = ''
-        etf_type = 'Stock'
-        region = ''
-        source = ''
-        proxy_isin = ''
-        in_metadata = True
-        
-        for line in content.split('\n'):
-            line = line.strip()
-            
-            # Section-Header erkennen (beendet Metadata-Bereich)
-            if line in ('COUNTRY_ALLOCATION', 'SECTOR_ALLOCATION', 'CURRENCY_ALLOCATION', 'TOP_HOLDINGS'):
-                in_metadata = False
-            elif line.startswith('# Country Allocation') or line.startswith('# Sector Allocation') or \
-                 line.startswith('# Currency Allocation') or line.startswith('# Top Holdings'):
-                in_metadata = False
-            
-            if not in_metadata:
-                break
-            
-            if line.startswith('ISIN,'):
-                isin = line.split(',', 1)[1].strip()
-            elif line.startswith('Type,'):
-                etf_type = line.split(',', 1)[1].strip()
-            elif line.startswith('Region,'):
-                region = line.split(',', 1)[1].strip()
-            elif line.startswith('Source,'):
-                source = line.split(',', 1)[1].strip()
-            elif line.startswith('Proxy ISIN,'):
-                proxy_isin = line.split(',', 1)[1].strip()
-        
+        parser = ETFDetailsParser(etf_details_dir=etf_details_dir)
+        etf = parser.parse_etf_file(ticker)
+        if etf is None:
+            return False, f"ETFDetailsParser konnte {ticker}.csv nicht lesen"
+        meta = etf.get('metadata', {})
+        isin = meta.get('isin', '')
+        etf_type = meta.get('type', 'Stock')
+        region = meta.get('region', '')
+        source = meta.get('source', '')
+        proxy_isin = meta.get('proxy_isin', '')
         if not isin:
             return False, f"Keine ISIN in {filepath} gefunden"
-        
-        # Manuelle Dateien nicht automatisch aktualisieren
         is_auto = source and ('auto' in source.lower() or 'justetf' in source.lower() or 'proxy' in source.lower())
         if not is_auto and source:
             return False, f"{ticker}: Manuell gepflegt (Source: {source}) – übersprungen"
-        
     except Exception as e:
         return False, f"Fehler beim Lesen von {filepath}: {e}"
     
@@ -1239,16 +957,3 @@ def batch_update_etf_details(
     return results
 
 
-def _load_isin_ticker_map() -> Dict[str, str]:
-    """Lädt die ISIN-Ticker-Map als Dict {ISIN: Ticker}"""
-    map_path = Path('data/etf_isin_ticker_map.csv')
-    result = {}
-    
-    if map_path.exists():
-        with open(map_path, 'r', encoding='utf-8') as f:
-            reader = csv.reader(f)
-            for row in reader:
-                if len(row) >= 2 and row[0] != 'ISIN':
-                    result[row[0]] = row[1]
-    
-    return result
