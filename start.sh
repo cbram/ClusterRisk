@@ -1,47 +1,30 @@
 #!/bin/bash
+set -e
 
-# ClusterRisk - Lokaler Start-Script
-# Dieses Script startet die ClusterRisk App lokal auf dem Mac
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR"
 
-echo "🚀 ClusterRisk wird gestartet..."
-echo ""
+VENV="$SCRIPT_DIR/venv"
+HASH_FILE="$VENV/.requirements_hash"
+REQUIREMENTS="$SCRIPT_DIR/requirements.txt"
 
-# Prüfe ob Python installiert ist
-if ! command -v python3 &> /dev/null; then
-    echo "❌ Python 3 ist nicht installiert!"
-    echo "Bitte installiere Python 3.9 oder höher."
-    exit 1
+# Create venv if missing
+if [ ! -d "$VENV" ]; then
+    echo "Creating virtual environment..."
+    python3 -m venv "$VENV"
 fi
 
-# Prüfe ob Virtual Environment existiert
-if [ ! -d "venv" ]; then
-    echo "📦 Erstelle Virtual Environment..."
-    python3 -m venv venv
-    echo "✅ Virtual Environment erstellt"
+source "$VENV/bin/activate"
+
+# Install requirements only if requirements.txt changed
+CURRENT_HASH="$(md5 -q "$REQUIREMENTS" 2>/dev/null || md5sum "$REQUIREMENTS" | cut -d' ' -f1)"
+if [ ! -f "$HASH_FILE" ] || [ "$CURRENT_HASH" != "$(cat "$HASH_FILE")" ]; then
+    echo "Installing requirements..."
+    pip install -q --upgrade pip
+    pip install -q -r "$REQUIREMENTS"
+    echo "$CURRENT_HASH" > "$HASH_FILE"
+    echo "Requirements up to date."
 fi
 
-# Aktiviere Virtual Environment
-echo "🔧 Aktiviere Virtual Environment..."
-source venv/bin/activate
-
-# Installiere/Update Dependencies
-echo "📥 Installiere Dependencies..."
-pip install -q --upgrade pip
-pip install -q -r requirements.txt
-
-# Prüfe ob Installation erfolgreich war
-if [ $? -ne 0 ]; then
-    echo "❌ Fehler bei der Installation der Dependencies!"
-    exit 1
-fi
-
-echo "✅ Dependencies installiert"
-echo ""
-echo "🌐 Starte ClusterRisk Web-App..."
-echo ""
-echo "📊 Die App läuft auf: http://localhost:8501"
-echo "⌨️  Zum Beenden: Ctrl+C"
-echo ""
-
-# Starte Streamlit
-streamlit run app.py
+echo "Starting ClusterRisk on http://localhost:8501"
+streamlit run "$SCRIPT_DIR/app.py"
