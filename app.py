@@ -94,8 +94,10 @@ with st.sidebar:
                 if hasattr(effective_file, 'seek'):
                     effective_file.seek(0)  # Zurücksetzen für UploadedFile
             except Exception:
-                pass  # Fehler werden im Hauptbereich behandelt
-    
+                # Clear stale state so the main area is forced to re-parse and show the error.
+                st.session_state.pop('portfolio_data', None)
+                st.session_state.pop('risk_data', None)
+
     # Speichern-Button direkt unter dem Upload
     if st.button(
         "💾 In Historie speichern", 
@@ -131,8 +133,9 @@ with st.sidebar:
             )
             st.session_state['risk_data'] = risk_data_early
         except Exception:
-            pass  # Fehler werden im Hauptbereich behandelt
-    
+            # Remove stale risk_data so the main area recalculates and surfaces the error.
+            st.session_state.pop('risk_data', None)
+
     # ETF-Auflösung: erkannte ETFs und Download-Status
     if 'risk_data' in st.session_state and 'etf_resolution' in st.session_state['risk_data']:
         etf_res = st.session_state['risk_data']['etf_resolution']

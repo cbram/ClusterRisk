@@ -613,9 +613,11 @@ def _calculate_country_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
         # Land ermitteln (Priorität: explizit > ISIN > Währung)
         country_name = None
         
-        # 1. Prüfe explizites Country-Feld (aus User CSV - höchste Priorität!)
+        # 1. Prüfe explizites Country-Feld (aus User CSV / ETF-Holdings)
+        #    Morningstar liefert hier Klarnamen ("United States") oder ISO-3 ("USA"),
+        #    daher erst durch _allocation_country_name_to_code normalisieren.
         if 'country' in position and position['country']:
-            country_code = position['country']
+            country_code = _allocation_country_name_to_code(position['country'])
             country_name = _country_code_to_name(country_code)
         
         # 2. Für Cash und Geldmarkt-ETFs: IMMER Währung verwenden (nicht ISIN!)
@@ -693,26 +695,54 @@ def _currency_to_country(currency: str) -> str:
 
 def _allocation_country_name_to_code(name: str) -> str:
     """
-    Mappt Ländernamen aus ETF-Allocation (justETF/CSV, z.B. 'United States')
-    auf ISO 3166-1 Alpha-2 Codes für einheitliche Country-Risk-Auswertung.
+    Normalizes any country identifier (full English/German name, ISO-3, ISO-2)
+    to an ISO 3166-1 Alpha-2 code for consistent country-risk aggregation.
+    Unknown values map to 'Other' instead of guessing via string slicing.
     """
     if not name or not name.strip():
         return 'Other'
     name_clean = name.strip()
     allocation_to_code = {
         'United States': 'US', 'USA': 'US', 'US': 'US',
-        'Japan': 'JP', 'JP': 'JP',
-        'United Kingdom': 'GB', 'UK': 'GB', 'GB': 'GB', 'Großbritannien': 'GB',
-        'Canada': 'CA', 'CA': 'CA',
-        'Switzerland': 'CH', 'CH': 'CH', 'Schweiz': 'CH',
-        'France': 'FR', 'FR': 'FR', 'Frankreich': 'FR',
-        'Germany': 'DE', 'DE': 'DE', 'Deutschland': 'DE',
-        'Australia': 'AU', 'AU': 'AU', 'Australien': 'AU',
-        'Netherlands': 'NL', 'NL': 'NL', 'Niederlande': 'NL',
-        'Ireland': 'IE', 'IE': 'IE', 'Irland': 'IE',
-        'Other': 'Other', 'Mixed': 'Other',
+        'Germany': 'DE', 'DEU': 'DE', 'DE': 'DE', 'Deutschland': 'DE',
+        'United Kingdom': 'GB', 'GBR': 'GB', 'UK': 'GB', 'GB': 'GB', 'Großbritannien': 'GB',
+        'Canada': 'CA', 'CAN': 'CA', 'CA': 'CA', 'Kanada': 'CA',
+        'Switzerland': 'CH', 'CHE': 'CH', 'CH': 'CH', 'Schweiz': 'CH',
+        'France': 'FR', 'FRA': 'FR', 'FR': 'FR', 'Frankreich': 'FR',
+        'Australia': 'AU', 'AUS': 'AU', 'AU': 'AU', 'Australien': 'AU',
+        'Japan': 'JP', 'JPN': 'JP', 'JP': 'JP',
+        'Netherlands': 'NL', 'NLD': 'NL', 'NL': 'NL', 'Niederlande': 'NL',
+        'Ireland': 'IE', 'IRL': 'IE', 'IE': 'IE', 'Irland': 'IE',
+        'Italy': 'IT', 'ITA': 'IT', 'IT': 'IT', 'Italien': 'IT',
+        'Spain': 'ES', 'ESP': 'ES', 'ES': 'ES', 'Spanien': 'ES',
+        'Austria': 'AT', 'AUT': 'AT', 'AT': 'AT', 'Österreich': 'AT',
+        'Belgium': 'BE', 'BEL': 'BE', 'BE': 'BE', 'Belgien': 'BE',
+        'Sweden': 'SE', 'SWE': 'SE', 'SE': 'SE', 'Schweden': 'SE',
+        'Denmark': 'DK', 'DNK': 'DK', 'DK': 'DK', 'Dänemark': 'DK',
+        'Norway': 'NO', 'NOR': 'NO', 'NO': 'NO', 'Norwegen': 'NO',
+        'Finland': 'FI', 'FIN': 'FI', 'FI': 'FI', 'Finnland': 'FI',
+        'Luxembourg': 'LU', 'LUX': 'LU', 'LU': 'LU', 'Luxemburg': 'LU',
+        'China': 'CN', 'CHN': 'CN', 'CN': 'CN',
+        'South Korea': 'KR', 'Korea': 'KR', 'KOR': 'KR', 'KR': 'KR', 'Südkorea': 'KR',
+        'Hong Kong': 'HK', 'HKG': 'HK', 'HK': 'HK', 'Hongkong': 'HK',
+        'Singapore': 'SG', 'SGP': 'SG', 'SG': 'SG', 'Singapur': 'SG',
+        'Brazil': 'BR', 'BRA': 'BR', 'BR': 'BR', 'Brasilien': 'BR',
+        'India': 'IN', 'IND': 'IN', 'IN': 'IN', 'Indien': 'IN',
+        'South Africa': 'ZA', 'ZAF': 'ZA', 'ZA': 'ZA', 'Südafrika': 'ZA',
+        'Mexico': 'MX', 'MEX': 'MX', 'MX': 'MX', 'Mexiko': 'MX',
+        'Russia': 'RU', 'RUS': 'RU', 'RU': 'RU', 'Russland': 'RU',
+        'Poland': 'PL', 'POL': 'PL', 'PL': 'PL', 'Polen': 'PL',
+        'Czech Republic': 'CZ', 'CZE': 'CZ', 'CZ': 'CZ', 'Tschechien': 'CZ',
+        'Greece': 'GR', 'GRC': 'GR', 'GR': 'GR', 'Griechenland': 'GR',
+        'Portugal': 'PT', 'PRT': 'PT', 'PT': 'PT',
+        'Taiwan': 'TW', 'TWN': 'TW', 'TW': 'TW',
+        'New Zealand': 'NZ', 'NZL': 'NZ', 'NZ': 'NZ', 'Neuseeland': 'NZ',
+        'Thailand': 'TH', 'THA': 'TH', 'TH': 'TH',
+        'Malaysia': 'MY', 'MYS': 'MY', 'MY': 'MY',
+        'Indonesia': 'ID', 'IDN': 'ID', 'ID': 'ID', 'Indonesien': 'ID',
+        'Other': 'Other', 'Mixed': 'Other', 'Cash': 'Other',
     }
-    return allocation_to_code.get(name_clean, name_clean[:2] if len(name_clean) >= 2 else name_clean)
+    return allocation_to_code.get(name_clean, 'Other')
 
 
 def _country_code_to_name(code: str) -> str:
