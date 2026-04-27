@@ -166,7 +166,8 @@ def parse_portfolio_csv(filepath: str) -> Dict:
                 'portfolio': 'Portfolio',
                 'sector_from_pp': sector  # Sektor aus Ticker-Mapping
             })
-            print(f"DEBUG:   Position: {name} ({sec_type}, {currency}, {sector}, {isin[:10] if isin else 'no ISIN'}) = {shares} × €{value/shares:.2f} = €{value:.2f}")
+            price_per_share = value / shares if shares else 0.0
+            print(f"DEBUG:   Position: {name} ({sec_type}, {currency}, {sector}, {isin[:10] if isin else 'no ISIN'}) = {shares} × €{price_per_share:.2f} = €{value:.2f}")
     
     # Statistiken
     portfolio_data['total_positions'] = len(portfolio_data['positions'])

@@ -44,6 +44,9 @@ def calculate_cluster_risks(
     Returns:
         Dict mit Risiko-Analysen für alle Dimensionen
     """
+    if not portfolio_data.get('positions') or portfolio_data.get('total_value', 0) == 0:
+        raise ValueError("Portfolio enthält keine Positionen oder hat einen Gesamtwert von 0.")
+
     fetcher = ETFDataFetcher(cache_days=etf_update_interval_days)
     isin_ticker_map = _load_isin_ticker_map()
     expanded_positions, etf_resolution = _expand_etf_holdings(
