@@ -3,10 +3,13 @@ Risk Calculator
 Berechnet Klumpenrisiken über verschiedene Dimensionen
 """
 
+import logging
 import pandas as pd
 from typing import Dict, List
 from pathlib import Path
 from src.etf_data_fetcher import ETFDataFetcher
+
+logger = logging.getLogger(__name__)
 from src.etf_details_parser import get_etf_details_parser
 from src.diagnostics import get_diagnostics
 from src.morningstar_fetcher import get_etf_details_from_morningstar
@@ -18,14 +21,14 @@ def _load_isin_ticker_map() -> Dict[str, str]:
     map_file = Path("data/etf_isin_ticker_map.csv")
     
     if not map_file.exists():
-        print("⚠️  ISIN-Ticker-Mapping nicht gefunden: data/etf_isin_ticker_map.csv")
+        logger.warning("ISIN-Ticker-Mapping nicht gefunden: data/etf_isin_ticker_map.csv")
         return {}
     
     try:
         df = pd.read_csv(map_file)
         return dict(zip(df['ISIN'], df['Ticker']))
     except Exception as e:
-        print(f"❌ Fehler beim Laden des ISIN-Ticker-Mappings: {e}")
+        logger.error("Fehler beim Laden des ISIN-Ticker-Mappings: %s", e)
         return {}
 
 
@@ -123,7 +126,7 @@ def _expand_etf_holdings(
                     try:
                         save_etf_detail_file(ms_details, ticker_for_file, source_label="Morningstar (auto)")
                     except Exception as e:
-                        print(f"⚠️  Konnte ETF-Detail-Datei nicht speichern: {e}")
+                        logger.warning("Konnte ETF-Detail-Datei nicht speichern: %s", e)
                     etf_details = ms_details
                     source = 'morningstar'
 
@@ -172,7 +175,7 @@ def _expand_etf_holdings(
                             fetcher_details, ticker_for_file, source_label=f"{holdings_data.get('source', 'Fetcher')} (Fallback)"
                         )
                     except Exception as e:
-                        print(f"⚠️  Konnte ETF-Detail-Datei nicht speichern: {e}")
+                        logger.warning("Konnte ETF-Detail-Datei nicht speichern: %s", e)
                     etf_details = fetcher_details
                     source = 'fetcher'
 
@@ -219,7 +222,7 @@ def _expand_etf_holdings(
                     pos_info['sector'] = _normalize_sector_name(position['sector_from_pp'])
                     pos_info['industry'] = _normalize_sector_name(position['sector_from_pp'])
                     pos_info['sector_source'] = 'csv'  # HÖCHSTE PRIORITÄT
-                    print(f"DEBUG: Using PP sector for {position['name']}: {position['sector_from_pp']} -> {pos_info['sector']}")
+                    logger.debug("PP-Sektor: %s -> %s", position['name'], pos_info['sector'])
                 
                 # PRIORITÄT 2: Versuche über ISIN (nur wenn vorhanden)
                 elif position.get('isin'):
@@ -241,7 +244,7 @@ def _expand_etf_holdings(
                     pos_info['sector'] = 'Unknown'
                     pos_info['industry'] = 'Unknown'
                     pos_info['sector_source'] = 'none'
-                    print(f"DEBUG: ⚠️  No sector info for {position['name']} (no CSV sector, no ISIN)")
+                    logger.debug("Kein Sektor für %s (kein CSV-Sektor, keine ISIN)", position['name'])
                     # Diagnose: Keine Branche für Aktie gefunden
                     diagnostics = get_diagnostics()
                     diagnostics.add_warning(
@@ -340,7 +343,7 @@ def _expand_positions_using_etf_details(
             unknown_sector_holdings.append((holding_value, holding_info))
         else:
             expanded.append(holding_info)
-            print(f"DEBUG:     Added holding: {holding_name} = €{holding_value:.2f} ({holding_currency}, {holding_sector})")
+            logger.debug("Holding: %s = €%.2f (%s, %s)", holding_name, holding_value, holding_currency, holding_sector)
 
     # Sektor aus sector_allocation für Holdings mit Unknown/Diversified zuweisen
     if sector_allocation and unknown_sector_holdings:
@@ -352,7 +355,8 @@ def _expand_positions_using_etf_details(
             holding_info['sector'] = sector_name
             holding_info['industry'] = sector_name
             expanded.append(holding_info)
-            print(f"DEBUG:     Added holding (sector from allocation): {holding_info['name']} = €{holding_info['value']:.2f} ({holding_info['currency']}, {sector_name})")
+            logger.debug("Holding (Sektor aus Allokation): %s = €%.2f (%s, %s)",
+                         holding_info['name'], holding_info['value'], holding_info['currency'], sector_name)
 
     # Verarbeite "Other Holdings": einheitlich nach Sektor, Währung und Land aus Allokationen
     if other_holdings_entry:
@@ -404,7 +408,8 @@ def _expand_positions_using_etf_details(
             country_weights = [('Other', 1.0)]
 
         # Eine Zeile pro (Sektor, Währung, Land) – alle drei Ansichten (Branche, Währung, Land) korrekt
-        print(f"DEBUG:     Processing Other Holdings: {len(sector_weights)}×{len(currency_weights)}×{len(country_weights)} Kombinationen (Sektor×Währung×Land)")
+        logger.debug("Other Holdings: %d×%d×%d Kombinationen (Sektor×Währung×Land)",
+                     len(sector_weights), len(currency_weights), len(country_weights))
         for (sector_name_norm, s_w) in sector_weights:
             for (currency_name, c_w) in currency_weights:
                 for (country_code, country_w) in country_weights:
@@ -519,7 +524,7 @@ def _calculate_currency_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
     for position in expanded_positions:
         # Überspringe Commodities - sie haben kein Währungsrisiko
         if position.get('type') == 'Commodity':
-            print(f"DEBUG: Skipping {position['name']} (Commodity) from currency risk")
+            logger.debug("Währungsrisiko: %s (Commodity) übersprungen", position['name'])
             continue
         
         currency = position.get('currency', 'EUR')
@@ -870,7 +875,7 @@ def _calculate_position_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
         if new_priority > current_priority:
             positions[name_normalized]['sector'] = sector_for_pos
             positions[name_normalized]['sector_priority'] = new_priority
-            print(f"DEBUG: Sector override for {name}: {position.get('sector')} (priority {new_priority})")
+            logger.debug("Sektor-Override: %s -> %s (Priorität %d)", name, position.get('sector'), new_priority)
     
     # DataFrame erstellen
     df = pd.DataFrame([

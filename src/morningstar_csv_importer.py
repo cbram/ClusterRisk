@@ -20,7 +20,7 @@ PP_DATA_FETCHED_PATH = "data/pp_data_fetched.csv"
 
 import csv
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from datetime import datetime
 from collections import defaultdict
 
@@ -296,7 +296,7 @@ def import_pp_data_fetched(
     output_dir: str = "data/etf_details",
     isin_ticker_map_path: str = "data/etf_isin_ticker_map.csv",
     source_label: str = "Morningstar (pp-portfolio-classifier)",
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     """
     Hauptfunktion: Liest pp_data_fetched.csv, mappt auf Ticker und schreibt ETF-Detail-CSVs.
 

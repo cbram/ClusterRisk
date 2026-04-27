@@ -3,11 +3,14 @@ CSV Parser für Portfolio Performance Vermögensaufstellung
 Parst die CSV-Exporte aus PP (viel einfacher als XML!)
 """
 
+import logging
 import pandas as pd
 from typing import Dict, List
 from datetime import datetime
 from .ticker_sector_mapper import get_sector_for_ticker
 from .diagnostics import get_diagnostics
+
+logger = logging.getLogger(__name__)
 
 
 def parse_portfolio_csv(filepath: str) -> Dict:
@@ -22,17 +25,17 @@ def parse_portfolio_csv(filepath: str) -> Dict:
     Returns:
         Dict mit 'positions', 'total_value', etc.
     """
-    print(f"DEBUG: Parsing CSV: {filepath}")
+    logger.debug("Parsing CSV: %s", filepath)
     
     # Lese CSV mit Semikolon als Separator
     df = pd.read_csv(filepath, sep=';', encoding='utf-8')
     
-    print(f"DEBUG: CSV geladen - {len(df)} Zeilen")
-    
+    logger.debug("CSV geladen - %d Zeilen", len(df))
+
     # Branchen-Spalte flexibel ermitteln (verschiedene PP-Export-Formate)
     sector_column = _find_sector_column(df.columns.tolist())
     if sector_column:
-        print(f"DEBUG: Branchen-Spalte erkannt: '{sector_column}'")
+        logger.debug("Branchen-Spalte erkannt: '%s'", sector_column)
     
     # Portfolio-Daten initialisieren
     portfolio_data = {
@@ -85,7 +88,7 @@ def parse_portfolio_csv(filepath: str) -> Dict:
                 'portfolio': 'Cash',
                 'sector_from_pp': None
             })
-            print(f"DEBUG:   Cash-Position: {name} = €{value:.2f}")
+            logger.debug("Cash-Position: %s = €%.2f", name, value)
         
         else:
             # Das ist ein Wertpapier
@@ -129,7 +132,7 @@ def parse_portfolio_csv(filepath: str) -> Dict:
             # Override: Falls Notiz "CASH" oder "GELDMARKT" enthält -> als Cash behandeln
             if notiz and any(keyword in notiz for keyword in ['CASH', 'GELDMARKT', 'TAGESGELD']):
                 sec_type = 'Cash'
-                print(f"DEBUG:   Notiz-Override: {name} -> Cash (Notiz: {notiz})")
+                logger.debug("Notiz-Override: %s -> Cash (Notiz: %s)", name, notiz)
             
             # Sektor/Branche aus CSV auslesen (Priorität 1) – nutzt flexibel erkannte Spalte
             sector = None
@@ -137,15 +140,15 @@ def parse_portfolio_csv(filepath: str) -> Dict:
                 sector_value = str(row[sector_column]).strip()
                 if sector_value and sector_value != '':
                     sector = _normalize_sector_name(sector_value)
-                    print(f"DEBUG:   Branche aus CSV: {name} -> {sector} (Original: {sector_value})")
+                    logger.debug("Branche aus CSV: %s -> %s (Original: %s)", name, sector, sector_value)
             
             # Fallback: Sektor aus Ticker ableiten (nur für Aktien, nicht für ETFs)
             if not sector and sec_type == 'Stock':
                 sector = _get_sector_from_ticker(symbol)
                 if sector:
-                    print(f"DEBUG:   Branche aus Ticker: {name} ({symbol}) -> {sector}")
+                    logger.debug("Branche aus Ticker: %s (%s) -> %s", name, symbol, sector)
                 else:
-                    print(f"DEBUG:   ⚠️  Keine Branche gefunden für {name} (Ticker: {symbol}, kein Mapping)")
+                    logger.debug("Keine Branche gefunden für %s (Ticker: %s, kein Mapping)", name, symbol)
                     # Diagnose: Keine Branche gefunden
                     diagnostics = get_diagnostics()
                     diagnostics.add_warning(
@@ -167,7 +170,9 @@ def parse_portfolio_csv(filepath: str) -> Dict:
                 'sector_from_pp': sector  # Sektor aus Ticker-Mapping
             })
             price_per_share = value / shares if shares else 0.0
-            print(f"DEBUG:   Position: {name} ({sec_type}, {currency}, {sector}, {isin[:10] if isin else 'no ISIN'}) = {shares} × €{price_per_share:.2f} = €{value:.2f}")
+            logger.debug("Position: %s (%s, %s, %s, %s) = %s × €%.2f = €%.2f",
+                         name, sec_type, currency, sector, isin[:10] if isin else 'no ISIN',
+                         shares, price_per_share, value)
     
     # Statistiken
     portfolio_data['total_positions'] = len(portfolio_data['positions'])
@@ -175,9 +180,8 @@ def parse_portfolio_csv(filepath: str) -> Dict:
     portfolio_data['etf_count'] = sum(1 for pos in portfolio_data['positions'] if pos['type'] == 'ETF')
     portfolio_data['stock_count'] = sum(1 for pos in portfolio_data['positions'] if pos['type'] == 'Stock')
     
-    print(f"DEBUG: CSV-Parsing erfolgreich:")
-    print(f"DEBUG:   {portfolio_data['total_positions']} Positionen")
-    print(f"DEBUG:   Gesamtwert: €{portfolio_data['total_value']:.2f}")
+    logger.debug("CSV-Parsing erfolgreich: %d Positionen, Gesamtwert €%.2f",
+                 portfolio_data['total_positions'], portfolio_data['total_value'])
     
     return portfolio_data
 

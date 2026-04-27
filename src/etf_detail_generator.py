@@ -336,9 +336,12 @@ class JustETFScraper:
             if len(rows) < 2:
                 continue
             
-            # Prüfe ob das eine Holdings-Tabelle sein könnte
-            header = rows[0].get_text(strip=True).lower()
-            if 'holding' in header or 'position' in header or 'name' in header:
+            # Accept a table only when it looks like a holdings table:
+            # must have a name-like AND a weight/percentage-like header column.
+            header_cells = [td.get_text(strip=True).lower() for td in rows[0].find_all(['th', 'td'])]
+            has_name_col = any(kw in c for c in header_cells for kw in ('holding', 'position', 'name', 'security'))
+            has_weight_col = any(kw in c for c in header_cells for kw in ('%', 'weight', 'anteil', 'gewicht'))
+            if has_name_col and has_weight_col:
                 for row in rows[1:]:
                     cols = row.find_all('td')
                     if len(cols) >= 2:
@@ -824,6 +827,7 @@ def _enrich_holdings(holdings: List[Dict], countries: List[Dict]) -> List[Dict]:
             'currency': 'USD',  # Default
             'sector': 'Unknown',
             'country': '',
+            'isin': holding.get('isin', ''),
         }
         
         # ISIN-basierte Anreicherung
