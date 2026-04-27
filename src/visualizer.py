@@ -10,6 +10,39 @@ import pandas as pd
 from typing import Dict, Optional
 from config import RISK_THRESHOLDS
 
+
+def _cap_df_with_sonstige(df: pd.DataFrame, max_items: int, label_col: str, value_col: str) -> pd.DataFrame:
+    """Top max_items Zeilen; Rest als eine Zeile „Sonstige“ mit summiertem Wert und Anteil (%)."""
+    if len(df) <= max_items:
+        return df.head(max_items).copy()
+    head = df.head(max_items).copy()
+    tail = df.iloc[max_items:]
+    others_value = float(tail[value_col].sum())
+    if 'Anteil (%)' in tail.columns:
+        others_anteil = round(float(tail['Anteil (%)'].sum()), 1)
+    else:
+        total = float(df[value_col].sum()) or 1.0
+        others_anteil = round((others_value / total) * 100, 1)
+    row: Dict = {label_col: 'Sonstige', value_col: others_value, 'Anteil (%)': others_anteil}
+    if 'Ticker' in df.columns:
+        row['Ticker'] = ''
+    return pd.concat([head, pd.DataFrame([row])], ignore_index=True)
+
+
+def _add_display_label_positions(df_plot: pd.DataFrame, label_col: str, max_chars: int = 25) -> pd.DataFrame:
+    """Kürzt Labels für positions-Treemap/Pie (Ticker oder Positionsname)."""
+    if label_col != 'Position' or 'Ticker' not in df_plot.columns:
+        return df_plot
+    max_len = max_chars
+    df_plot = df_plot.copy()
+    df_plot['Display_Label'] = df_plot.apply(
+        lambda row: row['Ticker'] if row['Ticker'] and str(row['Ticker']).strip()
+        else str(row['Position'])[:max_len],
+        axis=1
+    )
+    return df_plot
+
+
 # Einheitliche Farbgebung in Treemap, Pie und Bar-Chart (Wiedererkennungswert)
 OTHER_HOLDINGS_COLOR = '#87CEEB'   # Hellblau für "Other Holdings"
 # Bunte Palette für alle übrigen Items (gleiche Reihenfolge = gleiche Farbe in allen Charts)
@@ -96,25 +129,22 @@ def _create_treemap(df: pd.DataFrame, category: str, max_items: int = 30, color_
     """
     Erstellt eine Treemap-Visualisierung.
     color_map: Einheitliche Label→Farbe (aus _build_unified_color_map).
+    Prozent = Spalte Anteil (%) (Anteil am Gesamtportfolio), nicht Plotly-intern.
     """
     label_col, value_col = _get_column_names(category)
-    
-    df_plot = df.head(max_items).copy()
-    
+    df_plot = _cap_df_with_sonstige(df, max_items, label_col, value_col)
+    plot_label = label_col
     if category == 'positions' and 'Ticker' in df_plot.columns:
-        df_plot['Display_Label'] = df_plot.apply(
-            lambda row: row['Ticker'] if row['Ticker'] and row['Ticker'].strip() else row['Position'][:25], 
-            axis=1
-        )
+        df_plot = _add_display_label_positions(df_plot, label_col, max_chars=25)
         plot_label = 'Display_Label'
-    else:
-        plot_label = label_col
     
-    # Farben aus einheitlicher Map (nur Keys die in df_plot vorkommen)
     color_discrete_map = {k: v for k, v in (color_map or {}).items() if k in df_plot[label_col].values}
+    if 'Sonstige' in df_plot[label_col].values and 'Sonstige' not in color_discrete_map:
+        n = len(color_discrete_map)
+        color_discrete_map['Sonstige'] = ITEM_PALETTE[n % len(ITEM_PALETTE)]
     
     if category == 'positions' and color_discrete_map:
-        # Für Positionen mit Other Holdings: Verwende Original-Namen für Farb-Mapping
+        df_plot = df_plot.copy()
         df_plot['Color_Key'] = df_plot[label_col]
         fig = px.treemap(
             df_plot,
@@ -123,7 +153,7 @@ def _create_treemap(df: pd.DataFrame, category: str, max_items: int = 30, color_
             color='Color_Key',
             color_discrete_map=color_discrete_map,
             hover_data={
-                label_col: True,  # Zeige vollen Namen im Hover
+                label_col: True,
                 value_col: ':,.2f',
                 'Anteil (%)': ':.1f',
                 'Ticker': True if 'Ticker' in df_plot.columns else False
@@ -143,11 +173,33 @@ def _create_treemap(df: pd.DataFrame, category: str, max_items: int = 30, color_
             }
         )
     
-    # Formatierung: Name, Wert (2 Dezimalstellen), Prozent (2 Dezimalstellen)
-    fig.update_traces(
-        texttemplate="<b>%{label}</b><br>€ %{value:,.2f}<br>%{percentRoot:.1%}",
-        textfont_size=12
-    )
+    # px.treemap appends one synthetic root node to the trace, so customdata must
+    # have len(df_plot) + 1 entries to stay aligned with the trace arrays.
+    anteile = df_plot['Anteil (%)'].astype(float)
+    if category == 'positions':
+        full_names = df_plot[label_col].astype(str)
+        custom = list(zip(anteile, full_names))
+        custom.append((100.0, ""))  # root node
+        fig.update_traces(
+            customdata=custom,
+            texttemplate="<b>%{label}</b><br>€ %{value:,.2f}<br>%{customdata[0]:.1f}%",
+            hovertemplate=(
+                '<b>%{customdata[1]}</b><br>Wert: €%{value:,.2f}<br>'
+                'Anteil: %{customdata[0]:.1f}%<extra></extra>'
+            ),
+            textfont_size=12
+        )
+    else:
+        customdata = anteile.values.reshape(-1, 1).tolist()
+        customdata.append([100.0])  # root node
+        fig.update_traces(
+            customdata=customdata,
+            texttemplate="<b>%{label}</b><br>€ %{value:,.2f}<br>%{customdata[0]:.1f}%",
+            hovertemplate=(
+                '<b>%{label}</b><br>Wert: €%{value:,.2f}<br>Anteil: %{customdata[0]:.1f}%<extra></extra>'
+            ),
+            textfont_size=12
+        )
     
     fig.update_layout(
         height=500,
@@ -162,34 +214,16 @@ def _create_pie_chart(df: pd.DataFrame, category: str, max_items: int = 10, colo
     """
     Erstellt ein Kreisdiagramm.
     color_map: Einheitliche Label→Farbe (aus _build_unified_color_map).
+    Prozent = Spalte Anteil (%) (Anteil am Gesamtportfolio).
     """
     label_col, value_col = _get_column_names(category)
-    
-    df_plot = df.head(max_items).copy()
-    
-    if len(df) > max_items:
-        others_value = df.iloc[max_items:][value_col].sum()
-        others_row = pd.DataFrame([{
-            label_col: 'Sonstige',
-            value_col: others_value,
-            'Anteil (%)': (others_value / df[value_col].sum()) * 100
-        }])
-        if 'Ticker' in df.columns:
-            others_row['Ticker'] = ''
-        df_plot = pd.concat([df_plot, others_row], ignore_index=True)
-    
+    df_plot = _cap_df_with_sonstige(df, max_items, label_col, value_col)
+    plot_label = label_col
+    original_label = label_col
     if category == 'positions' and 'Ticker' in df_plot.columns:
-        df_plot['Display_Label'] = df_plot.apply(
-            lambda row: row['Ticker'] if row['Ticker'] and row['Ticker'].strip() else row['Position'][:20], 
-            axis=1
-        )
+        df_plot = _add_display_label_positions(df_plot, label_col, max_chars=20)
         plot_label = 'Display_Label'
-        original_label = label_col
-    else:
-        plot_label = label_col
-        original_label = label_col
     
-    # Einheitliche Farben: aus color_map; "Sonstige" ggf. ergänzen
     pie_color_map = dict(color_map) if color_map else {}
     if 'Sonstige' in df_plot[original_label].values and 'Sonstige' not in pie_color_map:
         n = len(pie_color_map)
@@ -198,8 +232,8 @@ def _create_pie_chart(df: pd.DataFrame, category: str, max_items: int = 10, colo
         if label not in pie_color_map:
             pie_color_map[label] = OTHER_HOLDINGS_COLOR if 'Other Holdings' in str(label) else ITEM_PALETTE[len(pie_color_map) % len(ITEM_PALETTE)]
     
-    # Erstelle Pie Chart
     if pie_color_map and category == 'positions':
+        df_plot = df_plot.copy()
         df_plot['Color_Key'] = df_plot[original_label]
         fig = px.pie(
             df_plot,
@@ -209,9 +243,17 @@ def _create_pie_chart(df: pd.DataFrame, category: str, max_items: int = 10, colo
             color='Color_Key',
             color_discrete_map=pie_color_map
         )
-        # Hover-Daten manuell hinzufügen mit vollem Namen
+        anteile = df_plot['Anteil (%)'].astype(float)
+        full_names = df_plot[original_label].astype(str)
+        custom = list(zip(anteile, full_names))
         fig.update_traces(
-            hovertemplate='<b>%{label}</b><br>Name: ' + df_plot[original_label].astype(str) + '<br>Wert: €%{value:,.2f}<br>Anteil: %{percent}<extra></extra>'
+            customdata=custom,
+            hovertemplate=(
+                '<b>%{customdata[1]}</b><br>Wert: €%{value:,.2f}<br>'
+                'Anteil: %{customdata[0]:.1f}%<extra></extra>'
+            ),
+            texttemplate='%{label}<br>%{customdata[0]:.1f}%',
+            textinfo='text',
         )
     elif pie_color_map:
         fig = px.pie(
@@ -222,12 +264,16 @@ def _create_pie_chart(df: pd.DataFrame, category: str, max_items: int = 10, colo
             color=original_label,
             color_discrete_map=pie_color_map
         )
-        # Hover-Daten manuell hinzufügen
+        anteile = df_plot['Anteil (%)'].astype(float).values.reshape(-1, 1)
         fig.update_traces(
-            hovertemplate='<b>%{label}</b><br>Wert: €%{value:,.2f}<br>Anteil: %{percent}<extra></extra>'
+            customdata=anteile,
+            hovertemplate=(
+                '<b>%{label}</b><br>Wert: €%{value:,.2f}<br>Anteil: %{customdata[0]:.1f}%<extra></extra>'
+            ),
+            texttemplate='%{label}<br>%{customdata[0]:.1f}%',
+            textinfo='text',
         )
     else:
-        # Standard Farben
         fig = px.pie(
             df_plot,
             names=plot_label,
@@ -235,10 +281,18 @@ def _create_pie_chart(df: pd.DataFrame, category: str, max_items: int = 10, colo
             hole=0.4,
             hover_data={'Anteil (%)': ':.1f'}
         )
+        anteile = df_plot['Anteil (%)'].astype(float).values.reshape(-1, 1)
+        fig.update_traces(
+            customdata=anteile,
+            texttemplate='%{label}<br>%{customdata[0]:.1f}%',
+            textinfo='text',
+            hovertemplate=(
+                '<b>%{label}</b><br>Wert: €%{value:,.2f}<br>Anteil: %{customdata[0]:.1f}%<extra></extra>'
+            ),
+        )
     
     fig.update_traces(
         textposition='inside',
-        textinfo='percent+label',
         textfont_size=10
     )
     
@@ -255,13 +309,15 @@ def _create_bar_chart(df: pd.DataFrame, category: str, thresholds: Dict, max_ite
     """
     Erstellt ein horizontales Balkendiagramm.
     color_map: Einheitliche Label→Farbe (aus _build_unified_color_map).
+    Wie Treemap/Pie: bei mehr als max_items eine „Sonstige“-Zeile.
     """
     label_col, value_col = _get_column_names(category)
-    
-    df_plot = df.head(max_items).copy()
-    
-    # Einheitliche Farben aus color_map (wie Treemap + Pie)
+    df_plot = _cap_df_with_sonstige(df, max_items, label_col, value_col)
     color_map = color_map or {}
+    if 'Sonstige' in df_plot[label_col].values and 'Sonstige' not in color_map:
+        color_map = dict(color_map)
+        n = len(color_map)
+        color_map['Sonstige'] = ITEM_PALETTE[n % len(ITEM_PALETTE)]
     colors = [color_map.get(row[label_col], ITEM_PALETTE[i % len(ITEM_PALETTE)]) for i, (_, row) in enumerate(df_plot.iterrows())]
     
     fig = go.Figure(data=[

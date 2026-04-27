@@ -6,76 +6,76 @@ Type,Stock
 Region,
 Currency,EUR
 TER,0.2
-Last Updated,2026-03-03
+Last Updated,2026-04-02
 Source,Morningstar (auto)
 
 # Country Allocation (%)
 Country,Weight
-AUS,3.5
+AUS,3.4
 AUT,0.2
 BEL,0.5
 BRA,0.2
-CAN,7.1
-CHE,5.6
-CHN,0.3
+CAN,7.0
+CHE,5.5
+CHN,0.2
 CZE,0.0
-DEU,4.8
+DEU,4.5
 DNK,0.8
 ESP,1.9
 FIN,0.5
-FRA,4.9
-GBR,7.6
+FRA,4.7
+GBR,7.4
 HKG,0.9
 IRL,0.3
 ISR,0.5
 ITA,1.5
-JPN,12.3
+JPN,11.9
 LUX,0.0
 MAC,0.0
 MEX,0.1
 MYS,0.0
-NLD,3.2
-NOR,0.3
+NLD,3.1
+NOR,0.4
 NZL,0.1
 POL,0.0
 PRT,0.1
-SGP,1.1
-SWE,1.9
-USA,339.9
+SGP,0.9
+SWE,1.8
+USA,141.7
 
 # Sector Allocation (%)
 Sector,Weight
-101,7.2
-102,18.9
-103,32.1
-104,3.8
-205,11.4
-206,19.8
-207,5.5
-308,17.6
-309,8.0
-310,23.9
-311,51.9
-Cash,214.0
-Derivative,86.0
+101,6.7
+102,18.7
+103,32.2
+104,3.7
+205,11.0
+206,19.3
+207,5.6
+308,17.2
+309,9.5
+310,23.1
+311,53.1
+Cash,205.5
+Derivative,94.5
 
 # Currency Allocation (%)
 Currency,Weight
-USD,343.4
-EUR,23.2
-JPY,12.3
-GBP,7.6
-CAD,7.1
-SEK,1.9
-SGD,1.1
+USD,145.1
+EUR,22.4
+JPY,11.9
+GBP,7.4
+CAD,7.0
+SEK,1.8
 HKD,0.9
+SGD,0.9
 ISK,0.5
-NOK,0.3
-CHF,0.3
+NOK,0.4
+CHF,0.2
 BRL,0.2
 AUD,0.2
-NZD,0.1
 MXN,0.1
+NZD,0.1
 MYR,0.0
 CZK,0.0
 MAD,0.0
@@ -83,30 +83,30 @@ PLN,0.0
 
 # Top Holdings
 Name,Weight,Currency,Sector,Country,ISIN
-NVIDIA Corp,5.04,USD,Unknown,USA,US67066G1040
-Apple Inc,4.55,USD,Unknown,USA,US0378331005
+NVIDIA Corp,5.23,USD,Unknown,USA,US67066G1040
+Apple Inc,4.67,USD,Unknown,USA,US0378331005
 Microsoft Corp,3.25,USD,Unknown,USA,US5949181045
-Amazon.com Inc,2.37,USD,Unknown,USA,US0231351067
-Alphabet Inc Class A,2.13,USD,Unknown,USA,US02079K3059
-Alphabet Inc Class C,1.78,USD,Unknown,USA,US02079K1079
-Broadcom Inc,1.69,USD,Unknown,USA,US11135F1012
-Meta Platforms Inc Class A,1.65,USD,Unknown,USA,US30303M1027
-Tesla Inc,1.33,USD,Unknown,USA,US88160R1014
-Eli Lilly and Co,0.99,USD,Unknown,USA,US5324571083
-JPMorgan Chase & Co,0.96,USD,Unknown,USA,US46625H1005
-Berkshire Hathaway Inc Class B,0.81,USD,Unknown,USA,US0846707026
-Exxon Mobil Corp,0.76,USD,Unknown,USA,US30231G1022
-Johnson & Johnson,0.70,USD,Unknown,USA,US4781601046
-ASML Holding NV,0.67,EUR,Unknown,NLD,NL0010273215
-Walmart Inc,0.66,USD,Unknown,USA,US9311421039
-Visa Inc Class A,0.63,USD,Unknown,USA,US92826C8394
-Micron Technology Inc,0.54,USD,Unknown,USA,US5951121038
-Costco Wholesale Corp,0.53,USD,Unknown,USA,US22160K1051
-Mastercard Inc Class A,0.52,USD,Unknown,USA,US57636Q1040
-AbbVie Inc,0.48,USD,Unknown,USA,US00287Y1091
-Netflix Inc,0.48,USD,Unknown,USA,US64110L1061
-Procter & Gamble Co,0.46,USD,Unknown,USA,US7427181091
-The Home Depot Inc,0.44,USD,Unknown,USA,US4370761029
-GE Aerospace,0.42,USD,Unknown,USA,US3696043013
-Other Holdings,66.19,Mixed,Diversified,Mixed,
+Amazon.com Inc,2.51,USD,Unknown,USA,US0231351067
+Alphabet Inc Class A,2.06,USD,Unknown,USA,US02079K3059
+Broadcom Inc,1.75,USD,Unknown,USA,US11135F1012
+Alphabet Inc Class C,1.72,USD,Unknown,USA,US02079K1079
+Meta Platforms Inc Class A,1.50,USD,Unknown,USA,US30303M1027
+Tesla Inc,1.32,USD,Unknown,USA,US88160R1014
+JPMorgan Chase & Co,1.00,USD,Unknown,USA,US46625H1005
+Eli Lilly and Co,0.90,USD,Unknown,USA,US5324571083
+Exxon Mobil Corp,0.88,USD,Unknown,USA,US30231G1022
+Berkshire Hathaway Inc Class B,0.82,USD,Unknown,USA,US0846707026
+Johnson & Johnson,0.72,USD,Unknown,USA,US4781601046
+Walmart Inc,0.67,USD,Unknown,USA,US9311421039
+ASML Holding NV,0.66,EUR,Unknown,NLD,NL0010273215
+Visa Inc Class A,0.65,USD,Unknown,USA,US92826C8394
+Costco Wholesale Corp,0.55,USD,Unknown,USA,US22160K1051
+Mastercard Inc Class A,0.54,USD,Unknown,USA,US57636Q1040
+Chevron Corp,0.50,USD,Unknown,USA,US1667641005
+Micron Technology Inc,0.50,USD,Unknown,USA,US5951121038
+Netflix Inc,0.50,USD,Unknown,USA,US64110L1061
+AbbVie Inc,0.47,USD,Unknown,USA,US00287Y1091
+Palantir Technologies Inc Ordinary Shares - Class A,0.42,USD,Unknown,USA,US69608A1088
+Caterpillar Inc,0.42,USD,Unknown,USA,US1491231015
+Other Holdings,65.80,Mixed,Diversified,Mixed,
 

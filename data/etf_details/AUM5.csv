@@ -6,35 +6,35 @@ Type,Stock
 Region,
 Currency,EUR
 TER,0.15
-Last Updated,2026-03-03
+Last Updated,2026-04-02
 Source,Morningstar (auto)
 
 # Country Allocation (%)
 Country,Weight
-CHE,0.5
+CHE,0.6
 CHN,0.2
 GBR,0.1
 IRL,0.1
 NLD,0.2
-USA,199.0
+USA,198.9
 
 # Sector Allocation (%)
 Sector,Weight
-101,3.5
-102,21.2
-103,25.3
-104,3.7
-205,10.0
-206,18.9
-207,4.5
-308,22.5
-309,6.3
-310,15.9
-311,68.2
+101,3.9
+102,20.2
+103,24.5
+104,4.0
+205,10.9
+206,19.7
+207,5.0
+308,21.5
+309,7.0
+310,17.3
+311,66.2
 
 # Currency Allocation (%)
 Currency,Weight
-USD,199.0
+USD,198.9
 EUR,0.8
 CHF,0.2
 GBP,0.1

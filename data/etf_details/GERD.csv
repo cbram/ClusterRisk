@@ -6,41 +6,41 @@ Type,Stock
 Region,
 Currency,EUR
 TER,0.45
-Last Updated,2026-03-03
+Last Updated,2026-04-02
 Source,Morningstar (auto)
 
 # Country Allocation (%)
 Country,Weight
-ARE,1.1
+ARE,1.0
 AUS,4.6
 AUT,0.4
 BEL,0.9
 BRA,2.3
-CAN,6.9
+CAN,6.6
 CHE,4.6
 CHL,0.3
-CHN,10.6
+CHN,10.5
 CMR,0.0
 COL,0.1
 CZE,0.1
 DEU,7.9
 DNK,1.6
 EGY,0.0
-ESP,3.3
+ESP,3.4
 FIN,0.9
-FRA,6.1
-GBR,7.8
+FRA,6.0
+GBR,8.0
 GRC,0.3
 GTM,0.0
 HKG,1.9
 HUN,0.1
-IDN,0.6
-IND,5.7
-IRL,0.4
-ISR,1.3
-ITA,2.9
+IDN,0.5
+IND,5.3
+IRL,0.3
+ISR,1.4
+ITA,3.0
 JPN,11.3
-KOR,5.4
+KOR,4.9
 KWT,0.3
 LUX,0.2
 MAC,0.0
@@ -48,100 +48,100 @@ MEX,1.1
 MHL,0.0
 MYS,0.6
 NLD,3.2
-NOR,0.8
+NOR,0.9
 NZL,0.2
 PHL,0.2
 POL,0.6
 PRI,0.1
 PRT,0.2
 QAT,0.3
-SAU,1.3
+SAU,1.5
 SGP,1.9
-SWE,2.6
+SWE,2.5
 THA,0.7
-TUR,0.3
+TUR,0.2
 TWN,4.3
-USA,90.3
-ZAF,1.5
+USA,91.5
+ZAF,1.4
 
 # Sector Allocation (%)
 Sector,Weight
-101,13.0
-102,17.1
-103,38.5
-104,4.1
-205,10.2
+101,12.1
+102,16.4
+103,38.8
+104,4.0
+205,10.1
 206,17.9
-207,6.3
-308,17.5
-309,8.7
-310,26.0
-311,40.8
-Corporate,10.6
-Cash,148.3
-Derivative,141.1
+207,6.6
+308,18.0
+309,10.6
+310,25.0
+311,40.5
+Corporate,32.7
+Cash,250.1
+Derivative,17.3
 
 # Currency Allocation (%)
 Currency,Weight
-USD,94.9
-EUR,31.3
+USD,96.2
+EUR,31.1
 JPY,11.3
-CHF,10.6
-GBP,7.8
-CAD,6.9
-INR,5.7
-KRW,5.4
+CHF,10.5
+GBP,8.0
+CAD,6.6
+INR,5.3
+KRW,4.9
 TWD,4.3
-SEK,2.6
+SEK,2.5
 BRL,2.3
 HKD,1.9
 SGD,1.9
-AUD,1.7
-ZAR,1.5
-ISK,1.3
+AUD,1.9
+ZAR,1.4
+ISK,1.4
 MXN,1.1
-ARS,1.1
-NOK,0.8
+ARS,1.0
+NOK,0.9
 THB,0.7
 MYR,0.6
-IDR,0.6
 PLN,0.6
+IDR,0.5
 KWD,0.3
-TRY,0.3
+TRY,0.2
 NZD,0.2
 PHP,0.2
 HUF,0.1
-CZK,0.1
 COP,0.1
+CZK,0.1
 EGP,0.0
 MAD,0.0
 
 # Top Holdings
 Name,Weight,Currency,Sector,Country,ISIN
-Deutsche Telekom AG,1.11,EUR,Unknown,DEU,DE0005557508
-Taiwan Semiconductor Manufacturing Co Ltd,1.09,TWD,Unknown,TWN,TW0002330008
-Micron Technology Inc,1.05,USD,Unknown,USA,US5951121038
-Apple Inc,0.95,USD,Unknown,USA,US0378331005
-Meta Platforms Inc Class A,0.93,USD,Unknown,USA,US30303M1027
-NVIDIA Corp,0.93,USD,Unknown,USA,US67066G1040
-Visa Inc Class A,0.83,USD,Unknown,USA,US92826C8394
-Mastercard Inc Class A,0.83,USD,Unknown,USA,US57636Q1040
-Microsoft Corp,0.77,USD,Unknown,USA,US5949181045
-Eli Lilly and Co,0.74,USD,Unknown,USA,US5324571083
-Broadcom Inc,0.65,USD,Unknown,USA,US11135F1012
-ASML Holding NV,0.62,EUR,Unknown,NLD,NL0010273215
-Alibaba Group Holding Ltd Ordinary Shares,0.62,HKD,Unknown,CHN,KYG017191142
-Samsung Electronics Co Ltd,0.60,KRW,Unknown,KOR,KR7005930003
-Alphabet Inc Class A,0.58,USD,Unknown,USA,US02079K3059
-Netflix Inc,0.57,USD,Unknown,USA,US64110L1061
-Alphabet Inc Class C,0.57,USD,Unknown,USA,US02079K1079
-SK Hynix Inc,0.54,KRW,Unknown,KOR,KR7000660001
-Amazon.com Inc,0.47,USD,Unknown,USA,US0231351067
-GE Aerospace,0.46,USD,Unknown,USA,US3696043013
-AbbVie Inc,0.45,USD,Unknown,USA,US00287Y1091
-Banco Bilbao Vizcaya Argentaria SA,0.44,EUR,Unknown,ESP,ES0113211835
+Deutsche Telekom AG,1.15,EUR,Unknown,DEU,DE0005557508
+Taiwan Semiconductor Manufacturing Co Ltd,1.06,TWD,Unknown,TWN,TW0002330008
+Apple Inc,0.94,USD,Unknown,USA,US0378331005
+Mastercard Inc Class A,0.91,USD,Unknown,USA,US57636Q1040
+Micron Technology Inc,0.89,USD,Unknown,USA,US5951121038
+Visa Inc Class A,0.89,USD,Unknown,USA,US92826C8394
+NVIDIA Corp,0.88,USD,Unknown,USA,US67066G1040
+Meta Platforms Inc Class A,0.86,USD,Unknown,USA,US30303M1027
+Microsoft Corp,0.79,USD,Unknown,USA,US5949181045
+Netflix Inc,0.75,USD,Unknown,USA,US64110L1061
+Eli Lilly and Co,0.69,USD,Unknown,USA,US5324571083
+Broadcom Inc,0.64,USD,Unknown,USA,US11135F1012
+ASML Holding NV,0.58,EUR,Unknown,NLD,NL0010273215
+Alphabet Inc Class A,0.56,USD,Unknown,USA,US02079K3059
+Samsung Electronics Co Ltd,0.56,KRW,Unknown,KOR,KR7005930003
+Alibaba Group Holding Ltd Ordinary Shares,0.55,HKD,Unknown,CHN,KYG017191142
+Alphabet Inc Class C,0.54,USD,Unknown,USA,US02079K1079
+Amazon.com Inc,0.49,USD,Unknown,USA,US0231351067
+SK Hynix Inc,0.48,KRW,Unknown,KOR,KR7000660001
+AbbVie Inc,0.46,USD,Unknown,USA,US00287Y1091
 KLA Corp,0.43,USD,Unknown,USA,US4824801009
-Qualcomm Inc,0.41,USD,Unknown,USA,US7475251036
-Walmart Inc,0.39,USD,Unknown,USA,US9311421039
-Other Holdings,82.98,Mixed,Diversified,Mixed,
+Banco Bilbao Vizcaya Argentaria SA,0.42,EUR,Unknown,ESP,ES0113211835
+Walmart Inc,0.42,USD,Unknown,USA,US9311421039
+GE Aerospace,0.40,USD,Unknown,USA,US3696043013
+JPMorgan Chase & Co,0.40,USD,Unknown,USA,US46625H1005
+Other Holdings,83.24,Mixed,Diversified,Mixed,
 

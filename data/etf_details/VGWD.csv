@@ -6,46 +6,46 @@ Type,Stock
 Region,
 Currency,EUR
 TER,0.29
-Last Updated,2026-03-03
+Last Updated,2026-04-02
 Source,Morningstar (auto)
 
 # Country Allocation (%)
 Country,Weight
-ARE,0.9
-AUS,6.7
+ARE,0.8
+AUS,6.8
 AUT,0.4
 BEL,0.7
 BRA,2.2
 CAN,8.1
 CHE,9.2
 CHL,0.2
-CHN,6.6
+CHN,6.4
 COL,0.1
 CZE,0.1
-DEU,6.7
-DNK,1.4
+DEU,6.6
+DNK,1.0
 EGY,0.0
-ESP,3.9
+ESP,3.7
 FIN,0.9
-FRA,7.4
-GBR,13.7
+FRA,7.5
+GBR,13.6
 GRC,0.3
-HKG,2.4
+HKG,2.3
 HUN,0.2
 IDN,0.4
-IND,2.0
+IND,1.8
 IRL,0.3
 IRQ,0.0
 ISL,0.0
-ISR,0.8
+ISR,0.7
 ITA,3.0
-JPN,18.4
-KOR,5.0
+JPN,19.6
+KOR,6.1
 KWT,0.3
 MAC,0.0
 MEX,1.0
 MYS,0.7
-NLD,2.0
+NLD,1.9
 NOR,0.6
 NZL,0.1
 PER,0.1
@@ -54,53 +54,54 @@ POL,0.4
 PRT,0.2
 QAT,0.4
 ROU,0.1
-SAU,1.4
+SAU,1.3
 SGP,1.9
 SWE,3.2
-THA,0.6
+THA,0.7
 TUR,0.3
-TWN,4.7
-USA,78.4
-ZAF,1.4
+TWN,5.0
+USA,77.2
+ZAF,1.5
 
 # Sector Allocation (%)
 Sector,Weight
-101,10.5
-102,14.9
-103,57.8
+101,10.9
+102,15.0
+103,55.0
 104,1.8
-205,17.4
+205,17.9
 206,21.7
-207,10.8
-308,6.7
-309,16.4
-310,24.8
-311,17.2
-Corporate,200.0
+207,11.1
+308,6.8
+309,16.9
+310,25.6
+311,17.4
+Corporate,179.1
+Derivative,20.9
 
 # Currency Allocation (%)
 Currency,Weight
-USD,85.0
-EUR,35.0
-JPY,18.4
-GBP,13.7
+USD,84.0
+EUR,34.7
+JPY,19.6
+GBP,13.6
 CAD,8.1
-CHF,6.6
-KRW,5.0
-TWD,4.7
+CHF,6.4
+KRW,6.1
+TWD,5.0
 SEK,3.2
-HKD,2.4
+HKD,2.3
 BRL,2.2
-INR,2.0
 SGD,1.9
-AUD,1.8
-ZAR,1.4
+INR,1.8
+AUD,1.6
+ZAR,1.5
 MXN,1.0
-ARS,0.9
+ARS,0.8
 ISK,0.8
 MYR,0.7
+THB,0.7
 NOK,0.6
-THB,0.6
 IDR,0.4
 PLN,0.4
 KWD,0.3
@@ -108,8 +109,8 @@ TRY,0.3
 HUF,0.2
 PHP,0.2
 PEN,0.1
-COP,0.1
 NZD,0.1
+COP,0.1
 CZK,0.1
 RON,0.1
 MAD,0.0
@@ -117,30 +118,30 @@ EGP,0.0
 
 # Top Holdings
 Name,Weight,Currency,Sector,Country,ISIN
-JPMorgan Chase & Co,1.90,USD,Unknown,USA,US46625H1005
-Exxon Mobil Corp,1.48,USD,Unknown,USA,US30231G1022
-Johnson & Johnson,1.35,USD,Unknown,USA,US4781601046
-Samsung Electronics Co Ltd,1.30,KRW,Unknown,KOR,KR7005930003
-AbbVie Inc,0.98,USD,Unknown,USA,US00287Y1091
-The Home Depot Inc,0.92,USD,Unknown,USA,US4370761029
-Procter & Gamble Co,0.88,USD,Unknown,USA,US7427181091
-Bank of America Corp,0.82,USD,Unknown,USA,US0605051046
-Chevron Corp,0.82,USD,Unknown,USA,US1667641005
+JPMorgan Chase & Co,1.76,USD,Unknown,USA,US46625H1005
+Samsung Electronics Co Ltd,1.67,KRW,Unknown,KOR,KR7005930003
+Exxon Mobil Corp,1.52,USD,Unknown,USA,US30231G1022
+Johnson & Johnson,1.41,USD,Unknown,USA,US4781601046
+AbbVie Inc,0.97,USD,Unknown,USA,US00287Y1091
+Procter & Gamble Co,0.93,USD,Unknown,USA,US7427181091
+The Home Depot Inc,0.89,USD,Unknown,USA,US4370761029
+Chevron Corp,0.83,USD,Unknown,USA,US1667641005
 Roche Holding AG,0.79,CHF,Unknown,CHE,CH0012032048
-Cisco Systems Inc,0.77,USD,Unknown,USA,US17275R1023
-HSBC Holdings PLC,0.75,GBP,Unknown,GBR,GB0005405286
-Coca-Cola Co,0.72,USD,Unknown,USA,US1912161007
-Novartis AG Registered Shares,0.71,CHF,Unknown,CHE,CH0012005267
-International Business Machines Corp,0.71,USD,Unknown,USA,US4592001014
-Wells Fargo & Co,0.70,USD,Unknown,USA,US9497461015
-AstraZeneca PLC,0.69,GBP,Unknown,GBR,GB0009895292
+Novartis AG Registered Shares,0.77,CHF,Unknown,CHE,CH0012005267
+HSBC Holdings PLC,0.76,GBP,Unknown,GBR,GB0005405286
+Coca-Cola Co,0.75,USD,Unknown,USA,US1912161007
+Cisco Systems Inc,0.74,USD,Unknown,USA,US17275R1023
+AstraZeneca PLC,0.74,GBP,Unknown,GBR,GB0009895292
+Merck & Co Inc,0.74,USD,Unknown,USA,US58933Y1055
+Bank of America Corp,0.69,USD,Unknown,USA,US0605051046
 Philip Morris International Inc,0.69,USD,Unknown,USA,US7181721090
-Merck & Co Inc,0.69,USD,Unknown,USA,US58933Y1055
-RTX Corp,0.67,USD,Unknown,USA,US75513E1010
-UnitedHealth Group Inc,0.65,USD,Unknown,USA,US91324P1021
-The Goldman Sachs Group Inc,0.63,USD,Unknown,USA,US38141G1040
-Toyota Motor Corp,0.60,JPY,Unknown,JPN,JP3633400001
-Nestle SA,0.60,CHF,Unknown,CHE,CH0038863350
-Royal Bank of Canada,0.59,CAD,Unknown,CAN,CA7800871021
-Other Holdings,78.57,Mixed,Diversified,Mixed,
+Nestle SA,0.65,CHF,Unknown,CHE,CH0038863350
+RTX Corp,0.64,USD,Unknown,USA,US75513E1010
+UnitedHealth Group Inc,0.63,USD,Unknown,USA,US91324P1021
+Toyota Motor Corp,0.61,JPY,Unknown,JPN,JP3633400001
+Wells Fargo & Co,0.60,USD,Unknown,USA,US9497461015
+McDonald's Corp,0.57,USD,Unknown,USA,US5801351017
+Shell PLC,0.56,GBP,Unknown,GBR,GB00BP6MXD84
+Royal Bank of Canada,0.56,CAD,Unknown,CAN,CA7800871021
+Other Holdings,78.52,Mixed,Diversified,Mixed,
 
