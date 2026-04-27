@@ -486,7 +486,13 @@ def _calculate_sector_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
         # Money-Market-Holdings (z.B. TRS €STR) mit Unknown → Cash (für Cash-Checkbox-Filter)
         if sector == 'Unknown' and position.get('etf_type') == 'Money Market':
             sector = 'Cash'
-        
+
+        # Skip cash collateral within non-Money-Market ETFs (Morningstar reports swap/repo
+        # positions as sector 'cash' inside stock ETFs — not real cash, just a technical artifact)
+        etf_type = position.get('etf_type')
+        if sector == 'Cash' and etf_type is not None and etf_type != 'Money Market':
+            continue
+
         # Überspringe "Diversified" und "ETF" - diese sind keine echten Branchen
         if sector in ['Diversified', 'ETF']:
             continue
