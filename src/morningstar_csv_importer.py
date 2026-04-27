@@ -129,27 +129,6 @@ def load_pp_data_fetched(csv_path: str) -> List[Dict]:
     return rows
 
 
-def get_pp_csv_isins(csv_path: str) -> set:
-    """
-    Liest nur die ISINs aus pp_data_fetched.csv (schnell, ohne volles Parsing).
-    Returns: set von ISIN-Strings, oder leeres set wenn Datei fehlt/ungültig.
-    """
-    path = Path(csv_path)
-    if not path.exists():
-        return set()
-    isins = set()
-    try:
-        with open(path, 'r', encoding='utf-8') as f:
-            reader = csv.reader(f)
-            next(reader, None)  # Header
-            for row in reader:
-                if len(row) >= 1 and row[0].strip():
-                    isins.add(row[0].strip())
-    except Exception:
-        pass
-    return isins
-
-
 def update_single_etf_from_pp_csv(
     csv_path: str,
     isin: str,

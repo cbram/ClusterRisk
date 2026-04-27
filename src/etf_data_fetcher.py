@@ -5,13 +5,11 @@ Ruft ETF-Zusammensetzungen von verschiedenen Quellen ab
 
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
 from typing import Dict, List, Optional
 import yfinance as yf
 from pathlib import Path
 import json
-from datetime import datetime, timedelta
-import time
+from datetime import datetime
 
 
 class ETFDataFetcher:
@@ -55,17 +53,7 @@ class ETFDataFetcher:
         print(f"DEBUG:   Trying justETF...")
         holdings = self._fetch_from_justetf(isin)
         
-        # 2. Fallback: extraETF
-        if not holdings:
-            print(f"DEBUG:   Trying extraETF...")
-            holdings = self._fetch_from_extraetf(isin)
-        
-        # 3. Fallback: iShares direkt (für iShares ETFs)
-        if not holdings:
-            print(f"DEBUG:   Trying iShares...")
-            holdings = self._fetch_from_ishares(isin)
-        
-        # 4. Fallback: Yahoo Finance
+        # 2. Fallback: Yahoo Finance
         if not holdings:
             print(f"DEBUG:   Trying Yahoo Finance...")
             # Nutze Ticker-Symbol aus PP falls vorhanden
@@ -167,59 +155,6 @@ class ETFDataFetcher:
         name_lower = (etf_name or '').lower()
         return any(kw in name_lower for kw in ('overnight', 'money market', 'geldmarkt', 'swap', 'xeon'))
     
-    def _fetch_from_extraetf(self, isin: str) -> Optional[Dict]:
-        """
-        Holt Daten von extraETF.com
-        """
-        try:
-            url = f"https://de.extraetf.com/etf-profile/{isin}"
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-            }
-            
-            response = requests.get(url, headers=headers, timeout=10)
-            response.raise_for_status()
-            
-            soup = BeautifulSoup(response.content, 'html.parser')
-            
-            # ETF-Name
-            name_elem = soup.find('h1')
-            etf_name = name_elem.text.strip() if name_elem else "Unknown"
-            
-            # Holdings extrahieren (ähnliche Logik wie justETF)
-            holdings = []
-            # TODO: Implementiere spezifisches Parsing für extraETF
-            
-            if holdings:
-                return {
-                    'isin': isin,
-                    'name': etf_name,
-                    'holdings': holdings,
-                    'source': 'extraETF',
-                    'fetch_date': datetime.now().isoformat()
-                }
-        
-        except Exception as e:
-            print(f"extraETF fetch failed for {isin}: {str(e)}")
-        
-        return None
-    
-    def _fetch_from_ishares(self, isin: str) -> Optional[Dict]:
-        """
-        Holt Daten direkt von iShares (für iShares ETFs)
-        """
-        try:
-            # iShares API endpoint
-            url = f"https://www.ishares.com/uk/individual/en/products/etf-investments"
-            # TODO: Implementiere iShares API Zugriff
-            
-            pass
-        
-        except Exception as e:
-            print(f"iShares fetch failed for {isin}: {str(e)}")
-        
-        return None
-    
     def _fetch_from_yahoo(self, isin: str, ticker_symbol: str = '') -> Optional[Dict]:
         """
         Holt Daten von Yahoo Finance (funktioniert für viele ETFs)
@@ -315,20 +250,6 @@ class ETFDataFetcher:
         except Exception as e:
             print(f"  OpenFIGI lookup failed: {str(e)}")
         
-        # 3. Fallback: Versuche typische Ticker-Formate basierend auf ISIN
-        country_code = isin[:2]
-        possible_tickers = []
-        
-        if country_code == 'LU':
-            # Luxemburg ETFs oft an deutschen Börsen mit eigenem Symbol
-            # Kann nicht automatisch gemappt werden - braucht manuelle Eingabe
-            pass
-        elif country_code == 'IE':
-            # Irische ETFs oft in London (.L) oder Deutschland (.DE)
-            possible_tickers.extend([f"{isin}.L", f"{isin}.DE"])
-        elif country_code == 'DE':
-            possible_tickers.append(f"{isin}.DE")
-        
         print(f"  ⚠️  No ticker found for ISIN {isin} - add to manual mapping")
         return None
     
@@ -386,42 +307,3 @@ class ETFDataFetcher:
             print(f"Cache save failed for {isin}: {str(e)}")
 
 
-def get_stock_info(isin: str) -> Optional[Dict]:
-    """
-    Holt Informationen zu einer Einzelaktie (Branche, Sektor, etc.)
-    
-    Args:
-        isin: ISIN der Aktie
-    
-    Returns:
-        Dict mit Aktien-Informationen
-    """
-    try:
-        # Versuche über verschiedene Quellen
-        ticker_symbol = _isin_to_ticker_simple(isin)
-        
-        if ticker_symbol:
-            ticker = yf.Ticker(ticker_symbol)
-            info = ticker.info
-            
-            return {
-                'isin': isin,
-                'name': info.get('longName', 'Unknown'),
-                'sector': info.get('sector', 'Unknown'),
-                'industry': info.get('industry', 'Unknown'),
-                'country': info.get('country', 'Unknown'),
-                'currency': info.get('currency', 'EUR')
-            }
-    
-    except Exception as e:
-        print(f"Stock info fetch failed for {isin}: {str(e)}")
-    
-    return None
-
-
-def _isin_to_ticker_simple(isin: str) -> Optional[str]:
-    """
-    Vereinfachte ISIN zu Ticker Konvertierung
-    """
-    # TODO: Erweitere diese Funktion oder nutze eine API
-    return None

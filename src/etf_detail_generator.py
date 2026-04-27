@@ -998,9 +998,6 @@ def get_etf_detail_status(etf_details_dir: str = 'data/etf_details') -> List[Dic
     if not details_path.exists():
         return []
     
-    # ISIN-Ticker-Map laden für Reverse-Lookup
-    isin_map = _load_isin_ticker_map()
-    
     results = []
     
     for csv_file in sorted(details_path.glob('*.csv')):

@@ -6,7 +6,7 @@ Berechnet Klumpenrisiken über verschiedene Dimensionen
 import pandas as pd
 from typing import Dict, List
 from pathlib import Path
-from src.etf_data_fetcher import ETFDataFetcher, get_stock_info
+from src.etf_data_fetcher import ETFDataFetcher
 from src.etf_details_parser import get_etf_details_parser
 from src.diagnostics import get_diagnostics
 from src.morningstar_fetcher import get_etf_details_from_morningstar
@@ -226,24 +226,15 @@ def _expand_etf_holdings(
                     # Bestimme Handelswährung basierend auf ISIN
                     pos_info['currency'] = _get_stock_currency(position['isin'], position['currency'])
                     
-                    stock_info = get_stock_info(position['isin'])
-                    if stock_info:
-                        pos_info['sector'] = _normalize_sector_name(stock_info.get('sector', 'Unknown'))
-                        pos_info['industry'] = _normalize_sector_name(stock_info.get('industry', 'Unknown'))
-                        pos_info['sector_source'] = 'isin'  # MITTLERE PRIORITÄT
-                        print(f"DEBUG: Using ISIN sector for {position['name']}: {pos_info['sector']}")
-                    else:
-                        pos_info['sector'] = 'Unknown'
-                        pos_info['industry'] = 'Unknown'
-                        pos_info['sector_source'] = 'none'
-                        print(f"DEBUG: ⚠️  No sector found for {position['name']} (ISIN: {position.get('isin')})")
-                        # Diagnose: Keine Branche für Aktie gefunden
-                        diagnostics = get_diagnostics()
-                        diagnostics.add_warning(
-                            'Branchen',
-                            f'Keine Branche für Aktie "{position["name"]}" gefunden',
-                            f'ISIN: {position.get("isin", "nicht vorhanden")}. Die Aktie wird unter "Unknown" kategorisiert.'
-                        )
+                    pos_info['sector'] = 'Unknown'
+                    pos_info['industry'] = 'Unknown'
+                    pos_info['sector_source'] = 'none'
+                    diagnostics = get_diagnostics()
+                    diagnostics.add_warning(
+                        'Branchen',
+                        f'Keine Branche für Aktie "{position["name"]}" gefunden',
+                        f'ISIN: {position.get("isin", "nicht vorhanden")}. Die Aktie wird unter "Unknown" kategorisiert.'
+                    )
                 
                 else:
                     # PRIORITÄT 3: Fallback auf Unknown (CSV ohne Mapping)
