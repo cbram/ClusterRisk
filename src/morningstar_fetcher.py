@@ -186,19 +186,19 @@ def get_etf_details_from_morningstar(
     portfolio = portfolios[0] if portfolios else {}
 
     # 2. Top25: mehr Holdings (25 statt 10); ITsnapshot liefert keine Country/Sector
-    resp2 = requests.get(
-        url, params={**base_params, "viewid": "Top25"}, headers=headers, timeout=15
-    )
-    if resp2.status_code == 200:
-        try:
+    try:
+        resp2 = requests.get(
+            url, params={**base_params, "viewid": "Top25"}, headers=headers, timeout=15
+        )
+        if resp2.status_code == 200:
             data2 = resp2.json()
             if isinstance(data2, list) and data2:
                 p2 = (data2[0].get("Portfolios") or [{}])[0]
                 extra_holdings = p2.get("PortfolioHoldings", [])
                 if len(extra_holdings) > len(portfolio.get("PortfolioHoldings", [])):
                     portfolio["PortfolioHoldings"] = extra_holdings
-        except Exception:
-            pass
+    except Exception:
+        pass  # First request already succeeded; proceed with up to 10 holdings.
 
     # Asset-Type → ETF-Typ
     asset_type_alloc: Dict[str, float] = {}

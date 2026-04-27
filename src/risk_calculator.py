@@ -3,10 +3,13 @@ Risk Calculator
 Berechnet Klumpenrisiken über verschiedene Dimensionen
 """
 
+import logging
 import pandas as pd
 from typing import Dict, List
 from pathlib import Path
-from src.etf_data_fetcher import ETFDataFetcher, get_stock_info
+from src.etf_data_fetcher import ETFDataFetcher
+
+logger = logging.getLogger(__name__)
 from src.etf_details_parser import get_etf_details_parser
 from src.diagnostics import get_diagnostics
 from src.morningstar_fetcher import get_etf_details_from_morningstar
@@ -18,14 +21,14 @@ def _load_isin_ticker_map() -> Dict[str, str]:
     map_file = Path("data/etf_isin_ticker_map.csv")
     
     if not map_file.exists():
-        print("⚠️  ISIN-Ticker-Mapping nicht gefunden: data/etf_isin_ticker_map.csv")
+        logger.warning("ISIN-Ticker-Mapping nicht gefunden: data/etf_isin_ticker_map.csv")
         return {}
     
     try:
         df = pd.read_csv(map_file)
         return dict(zip(df['ISIN'], df['Ticker']))
     except Exception as e:
-        print(f"❌ Fehler beim Laden des ISIN-Ticker-Mappings: {e}")
+        logger.error("Fehler beim Laden des ISIN-Ticker-Mappings: %s", e)
         return {}
 
 
@@ -44,6 +47,9 @@ def calculate_cluster_risks(
     Returns:
         Dict mit Risiko-Analysen für alle Dimensionen
     """
+    if not portfolio_data.get('positions') or portfolio_data.get('total_value', 0) == 0:
+        raise ValueError("Portfolio enthält keine Positionen oder hat einen Gesamtwert von 0.")
+
     fetcher = ETFDataFetcher(cache_days=etf_update_interval_days)
     isin_ticker_map = _load_isin_ticker_map()
     expanded_positions, etf_resolution = _expand_etf_holdings(
@@ -120,7 +126,7 @@ def _expand_etf_holdings(
                     try:
                         save_etf_detail_file(ms_details, ticker_for_file, source_label="Morningstar (auto)")
                     except Exception as e:
-                        print(f"⚠️  Konnte ETF-Detail-Datei nicht speichern: {e}")
+                        logger.warning("Konnte ETF-Detail-Datei nicht speichern: %s", e)
                     etf_details = ms_details
                     source = 'morningstar'
 
@@ -169,7 +175,7 @@ def _expand_etf_holdings(
                             fetcher_details, ticker_for_file, source_label=f"{holdings_data.get('source', 'Fetcher')} (Fallback)"
                         )
                     except Exception as e:
-                        print(f"⚠️  Konnte ETF-Detail-Datei nicht speichern: {e}")
+                        logger.warning("Konnte ETF-Detail-Datei nicht speichern: %s", e)
                     etf_details = fetcher_details
                     source = 'fetcher'
 
@@ -216,38 +222,29 @@ def _expand_etf_holdings(
                     pos_info['sector'] = _normalize_sector_name(position['sector_from_pp'])
                     pos_info['industry'] = _normalize_sector_name(position['sector_from_pp'])
                     pos_info['sector_source'] = 'csv'  # HÖCHSTE PRIORITÄT
-                    print(f"DEBUG: Using PP sector for {position['name']}: {position['sector_from_pp']} -> {pos_info['sector']}")
+                    logger.debug("PP-Sektor: %s -> %s", position['name'], pos_info['sector'])
                 
                 # PRIORITÄT 2: Versuche über ISIN (nur wenn vorhanden)
                 elif position.get('isin'):
                     # Bestimme Handelswährung basierend auf ISIN
                     pos_info['currency'] = _get_stock_currency(position['isin'], position['currency'])
                     
-                    stock_info = get_stock_info(position['isin'])
-                    if stock_info:
-                        pos_info['sector'] = _normalize_sector_name(stock_info.get('sector', 'Unknown'))
-                        pos_info['industry'] = _normalize_sector_name(stock_info.get('industry', 'Unknown'))
-                        pos_info['sector_source'] = 'isin'  # MITTLERE PRIORITÄT
-                        print(f"DEBUG: Using ISIN sector for {position['name']}: {pos_info['sector']}")
-                    else:
-                        pos_info['sector'] = 'Unknown'
-                        pos_info['industry'] = 'Unknown'
-                        pos_info['sector_source'] = 'none'
-                        print(f"DEBUG: ⚠️  No sector found for {position['name']} (ISIN: {position.get('isin')})")
-                        # Diagnose: Keine Branche für Aktie gefunden
-                        diagnostics = get_diagnostics()
-                        diagnostics.add_warning(
-                            'Branchen',
-                            f'Keine Branche für Aktie "{position["name"]}" gefunden',
-                            f'ISIN: {position.get("isin", "nicht vorhanden")}. Die Aktie wird unter "Unknown" kategorisiert.'
-                        )
+                    pos_info['sector'] = 'Unknown'
+                    pos_info['industry'] = 'Unknown'
+                    pos_info['sector_source'] = 'none'
+                    diagnostics = get_diagnostics()
+                    diagnostics.add_warning(
+                        'Branchen',
+                        f'Keine Branche für Aktie "{position["name"]}" gefunden',
+                        f'ISIN: {position.get("isin", "nicht vorhanden")}. Die Aktie wird unter "Unknown" kategorisiert.'
+                    )
                 
                 else:
                     # PRIORITÄT 3: Fallback auf Unknown (CSV ohne Mapping)
                     pos_info['sector'] = 'Unknown'
                     pos_info['industry'] = 'Unknown'
                     pos_info['sector_source'] = 'none'
-                    print(f"DEBUG: ⚠️  No sector info for {position['name']} (no CSV sector, no ISIN)")
+                    logger.debug("Kein Sektor für %s (kein CSV-Sektor, keine ISIN)", position['name'])
                     # Diagnose: Keine Branche für Aktie gefunden
                     diagnostics = get_diagnostics()
                     diagnostics.add_warning(
@@ -346,7 +343,7 @@ def _expand_positions_using_etf_details(
             unknown_sector_holdings.append((holding_value, holding_info))
         else:
             expanded.append(holding_info)
-            print(f"DEBUG:     Added holding: {holding_name} = €{holding_value:.2f} ({holding_currency}, {holding_sector})")
+            logger.debug("Holding: %s = €%.2f (%s, %s)", holding_name, holding_value, holding_currency, holding_sector)
 
     # Sektor aus sector_allocation für Holdings mit Unknown/Diversified zuweisen
     if sector_allocation and unknown_sector_holdings:
@@ -358,7 +355,8 @@ def _expand_positions_using_etf_details(
             holding_info['sector'] = sector_name
             holding_info['industry'] = sector_name
             expanded.append(holding_info)
-            print(f"DEBUG:     Added holding (sector from allocation): {holding_info['name']} = €{holding_info['value']:.2f} ({holding_info['currency']}, {sector_name})")
+            logger.debug("Holding (Sektor aus Allokation): %s = €%.2f (%s, %s)",
+                         holding_info['name'], holding_info['value'], holding_info['currency'], sector_name)
 
     # Verarbeite "Other Holdings": einheitlich nach Sektor, Währung und Land aus Allokationen
     if other_holdings_entry:
@@ -410,7 +408,8 @@ def _expand_positions_using_etf_details(
             country_weights = [('Other', 1.0)]
 
         # Eine Zeile pro (Sektor, Währung, Land) – alle drei Ansichten (Branche, Währung, Land) korrekt
-        print(f"DEBUG:     Processing Other Holdings: {len(sector_weights)}×{len(currency_weights)}×{len(country_weights)} Kombinationen (Sektor×Währung×Land)")
+        logger.debug("Other Holdings: %d×%d×%d Kombinationen (Sektor×Währung×Land)",
+                     len(sector_weights), len(currency_weights), len(country_weights))
         for (sector_name_norm, s_w) in sector_weights:
             for (currency_name, c_w) in currency_weights:
                 for (country_code, country_w) in country_weights:
@@ -487,7 +486,13 @@ def _calculate_sector_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
         # Money-Market-Holdings (z.B. TRS €STR) mit Unknown → Cash (für Cash-Checkbox-Filter)
         if sector == 'Unknown' and position.get('etf_type') == 'Money Market':
             sector = 'Cash'
-        
+
+        # Skip cash collateral within non-Money-Market ETFs (Morningstar reports swap/repo
+        # positions as sector 'cash' inside stock ETFs — not real cash, just a technical artifact)
+        etf_type = position.get('etf_type')
+        if sector == 'Cash' and etf_type is not None and etf_type != 'Money Market':
+            continue
+
         # Überspringe "Diversified" und "ETF" - diese sind keine echten Branchen
         if sector in ['Diversified', 'ETF']:
             continue
@@ -525,7 +530,7 @@ def _calculate_currency_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
     for position in expanded_positions:
         # Überspringe Commodities - sie haben kein Währungsrisiko
         if position.get('type') == 'Commodity':
-            print(f"DEBUG: Skipping {position['name']} (Commodity) from currency risk")
+            logger.debug("Währungsrisiko: %s (Commodity) übersprungen", position['name'])
             continue
         
         currency = position.get('currency', 'EUR')
@@ -613,9 +618,11 @@ def _calculate_country_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
         # Land ermitteln (Priorität: explizit > ISIN > Währung)
         country_name = None
         
-        # 1. Prüfe explizites Country-Feld (aus User CSV - höchste Priorität!)
+        # 1. Prüfe explizites Country-Feld (aus User CSV / ETF-Holdings)
+        #    Morningstar liefert hier Klarnamen ("United States") oder ISO-3 ("USA"),
+        #    daher erst durch _allocation_country_name_to_code normalisieren.
         if 'country' in position and position['country']:
-            country_code = position['country']
+            country_code = _allocation_country_name_to_code(position['country'])
             country_name = _country_code_to_name(country_code)
         
         # 2. Für Cash und Geldmarkt-ETFs: IMMER Währung verwenden (nicht ISIN!)
@@ -693,26 +700,54 @@ def _currency_to_country(currency: str) -> str:
 
 def _allocation_country_name_to_code(name: str) -> str:
     """
-    Mappt Ländernamen aus ETF-Allocation (justETF/CSV, z.B. 'United States')
-    auf ISO 3166-1 Alpha-2 Codes für einheitliche Country-Risk-Auswertung.
+    Normalizes any country identifier (full English/German name, ISO-3, ISO-2)
+    to an ISO 3166-1 Alpha-2 code for consistent country-risk aggregation.
+    Unknown values map to 'Other' instead of guessing via string slicing.
     """
     if not name or not name.strip():
         return 'Other'
     name_clean = name.strip()
     allocation_to_code = {
         'United States': 'US', 'USA': 'US', 'US': 'US',
-        'Japan': 'JP', 'JP': 'JP',
-        'United Kingdom': 'GB', 'UK': 'GB', 'GB': 'GB', 'Großbritannien': 'GB',
-        'Canada': 'CA', 'CA': 'CA',
-        'Switzerland': 'CH', 'CH': 'CH', 'Schweiz': 'CH',
-        'France': 'FR', 'FR': 'FR', 'Frankreich': 'FR',
-        'Germany': 'DE', 'DE': 'DE', 'Deutschland': 'DE',
-        'Australia': 'AU', 'AU': 'AU', 'Australien': 'AU',
-        'Netherlands': 'NL', 'NL': 'NL', 'Niederlande': 'NL',
-        'Ireland': 'IE', 'IE': 'IE', 'Irland': 'IE',
-        'Other': 'Other', 'Mixed': 'Other',
+        'Germany': 'DE', 'DEU': 'DE', 'DE': 'DE', 'Deutschland': 'DE',
+        'United Kingdom': 'GB', 'GBR': 'GB', 'UK': 'GB', 'GB': 'GB', 'Großbritannien': 'GB',
+        'Canada': 'CA', 'CAN': 'CA', 'CA': 'CA', 'Kanada': 'CA',
+        'Switzerland': 'CH', 'CHE': 'CH', 'CH': 'CH', 'Schweiz': 'CH',
+        'France': 'FR', 'FRA': 'FR', 'FR': 'FR', 'Frankreich': 'FR',
+        'Australia': 'AU', 'AUS': 'AU', 'AU': 'AU', 'Australien': 'AU',
+        'Japan': 'JP', 'JPN': 'JP', 'JP': 'JP',
+        'Netherlands': 'NL', 'NLD': 'NL', 'NL': 'NL', 'Niederlande': 'NL',
+        'Ireland': 'IE', 'IRL': 'IE', 'IE': 'IE', 'Irland': 'IE',
+        'Italy': 'IT', 'ITA': 'IT', 'IT': 'IT', 'Italien': 'IT',
+        'Spain': 'ES', 'ESP': 'ES', 'ES': 'ES', 'Spanien': 'ES',
+        'Austria': 'AT', 'AUT': 'AT', 'AT': 'AT', 'Österreich': 'AT',
+        'Belgium': 'BE', 'BEL': 'BE', 'BE': 'BE', 'Belgien': 'BE',
+        'Sweden': 'SE', 'SWE': 'SE', 'SE': 'SE', 'Schweden': 'SE',
+        'Denmark': 'DK', 'DNK': 'DK', 'DK': 'DK', 'Dänemark': 'DK',
+        'Norway': 'NO', 'NOR': 'NO', 'NO': 'NO', 'Norwegen': 'NO',
+        'Finland': 'FI', 'FIN': 'FI', 'FI': 'FI', 'Finnland': 'FI',
+        'Luxembourg': 'LU', 'LUX': 'LU', 'LU': 'LU', 'Luxemburg': 'LU',
+        'China': 'CN', 'CHN': 'CN', 'CN': 'CN',
+        'South Korea': 'KR', 'Korea': 'KR', 'KOR': 'KR', 'KR': 'KR', 'Südkorea': 'KR',
+        'Hong Kong': 'HK', 'HKG': 'HK', 'HK': 'HK', 'Hongkong': 'HK',
+        'Singapore': 'SG', 'SGP': 'SG', 'SG': 'SG', 'Singapur': 'SG',
+        'Brazil': 'BR', 'BRA': 'BR', 'BR': 'BR', 'Brasilien': 'BR',
+        'India': 'IN', 'IND': 'IN', 'IN': 'IN', 'Indien': 'IN',
+        'South Africa': 'ZA', 'ZAF': 'ZA', 'ZA': 'ZA', 'Südafrika': 'ZA',
+        'Mexico': 'MX', 'MEX': 'MX', 'MX': 'MX', 'Mexiko': 'MX',
+        'Russia': 'RU', 'RUS': 'RU', 'RU': 'RU', 'Russland': 'RU',
+        'Poland': 'PL', 'POL': 'PL', 'PL': 'PL', 'Polen': 'PL',
+        'Czech Republic': 'CZ', 'CZE': 'CZ', 'CZ': 'CZ', 'Tschechien': 'CZ',
+        'Greece': 'GR', 'GRC': 'GR', 'GR': 'GR', 'Griechenland': 'GR',
+        'Portugal': 'PT', 'PRT': 'PT', 'PT': 'PT',
+        'Taiwan': 'TW', 'TWN': 'TW', 'TW': 'TW',
+        'New Zealand': 'NZ', 'NZL': 'NZ', 'NZ': 'NZ', 'Neuseeland': 'NZ',
+        'Thailand': 'TH', 'THA': 'TH', 'TH': 'TH',
+        'Malaysia': 'MY', 'MYS': 'MY', 'MY': 'MY',
+        'Indonesia': 'ID', 'IDN': 'ID', 'ID': 'ID', 'Indonesien': 'ID',
+        'Other': 'Other', 'Mixed': 'Other', 'Cash': 'Other',
     }
-    return allocation_to_code.get(name_clean, name_clean[:2] if len(name_clean) >= 2 else name_clean)
+    return allocation_to_code.get(name_clean, 'Other')
 
 
 def _country_code_to_name(code: str) -> str:
@@ -846,7 +881,7 @@ def _calculate_position_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
         if new_priority > current_priority:
             positions[name_normalized]['sector'] = sector_for_pos
             positions[name_normalized]['sector_priority'] = new_priority
-            print(f"DEBUG: Sector override for {name}: {position.get('sector')} (priority {new_priority})")
+            logger.debug("Sektor-Override: %s -> %s (Priorität %d)", name, position.get('sector'), new_priority)
     
     # DataFrame erstellen
     df = pd.DataFrame([

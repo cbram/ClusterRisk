@@ -3,11 +3,14 @@ Ticker-zu-Sektor Mapping mit automatischem Caching und API-Fallback
 """
 
 import json
+import logging
 import requests
 from pathlib import Path
 from datetime import datetime, timedelta
 import yfinance as yf
 from typing import Dict, Optional, Tuple
+
+logger = logging.getLogger(__name__)
 
 class TickerSectorMapper:
     """
@@ -47,10 +50,10 @@ class TickerSectorMapper:
             try:
                 with open(self.cache_file, 'r', encoding='utf-8') as f:
                     cache = json.load(f)
-                    print(f"✅ Ticker-Sektor-Cache geladen: {len(cache)} Einträge")
+                    logger.debug("Ticker-Sektor-Cache geladen: %d Einträge", len(cache))
                     return cache
             except Exception as e:
-                print(f"⚠️  Fehler beim Laden des Caches: {e}")
+                logger.warning("Fehler beim Laden des Caches: %s", e)
                 return {}
         return {}
     
@@ -59,9 +62,9 @@ class TickerSectorMapper:
         try:
             with open(self.cache_file, 'w', encoding='utf-8') as f:
                 json.dump(self.cache, f, indent=2, ensure_ascii=False)
-            print(f"💾 Ticker-Sektor-Cache gespeichert: {len(self.cache)} Einträge")
+            logger.debug("Ticker-Sektor-Cache gespeichert: %d Einträge", len(self.cache))
         except Exception as e:
-            print(f"⚠️  Fehler beim Speichern des Caches: {e}")
+            logger.warning("Fehler beim Speichern des Caches: %s", e)
     
     def _normalize_sector(self, sector: str) -> str:
         """Normalisiere Sektor-Namen"""
@@ -90,11 +93,11 @@ class TickerSectorMapper:
             
             sector = info.get('sector')
             if sector:
-                print(f"  📡 Yahoo Finance: {ticker} -> {sector}")
+                logger.debug("Yahoo Finance: %s -> %s", ticker, sector)
                 return self._normalize_sector(sector)
-            
+
         except Exception as e:
-            print(f"  ⚠️  Yahoo Finance Fehler für {ticker}: {e}")
+            logger.warning("Yahoo Finance Fehler für %s: %s", ticker, e)
         
         return None
     
@@ -119,11 +122,11 @@ class TickerSectorMapper:
                     figi_data = data[0]['data'][0]
                     sector = figi_data.get('marketSector')
                     if sector:
-                        print(f"  📡 OpenFIGI: {ticker} -> {sector}")
+                        logger.debug("OpenFIGI: %s -> %s", ticker, sector)
                         return self._normalize_sector(sector)
         
         except Exception as e:
-            print(f"  ⚠️  OpenFIGI Fehler für {ticker}: {e}")
+            logger.warning("OpenFIGI Fehler für %s: %s", ticker, e)
         
         return None
     
@@ -148,26 +151,29 @@ class TickerSectorMapper:
         # 1. Prüfe Cache
         if use_cache and self._is_cache_valid(ticker, max_age_days):
             sector = self.cache[ticker].get('sector', 'Unknown')
-            print(f"  💾 Cache-Hit: {ticker} -> {sector}")
+            logger.debug("Cache-Hit: %s -> %s", ticker, sector)
             return sector
         
         # 2. Hole von Yahoo Finance
         sector = self._fetch_from_yahoo(ticker)
-        
+        source = 'yahoo' if sector and sector != 'Unknown' else None
+
         # 3. Fallback: OpenFIGI
         if not sector or sector == 'Unknown':
             sector = self._fetch_from_openfigi(ticker)
-        
+            if sector and sector != 'Unknown':
+                source = 'openfigi'
+
         # 4. Fallback: Unknown
         if not sector:
             sector = 'Unknown'
-            print(f"  ❓ Kein Sektor gefunden für {ticker}")
-        
-        # 5. Speichere im Cache
+            source = 'unknown'
+
+        # 5. Speichere im Cache mit korrekter Quellen-Markierung
         self.cache[ticker] = {
             'sector': sector,
             'timestamp': datetime.now().isoformat(),
-            'source': 'yahoo' if sector != 'Unknown' else 'unknown'
+            'source': source or 'unknown',
         }
         self._save_cache()
         
@@ -209,13 +215,13 @@ class TickerSectorMapper:
             'source': 'manual'
         }
         self._save_cache()
-        print(f"✏️  Manual Update: {ticker} -> {sector}")
-    
+        logger.debug("Manual Update: %s -> %s", ticker, sector)
+
     def clear_cache(self):
         """Lösche kompletten Cache"""
         self.cache = {}
         self._save_cache()
-        print("🗑️  Cache gelöscht")
+        logger.debug("Cache gelöscht")
     
     def get_cache_stats(self) -> Dict:
         """Hole Cache-Statistiken"""

@@ -124,32 +124,6 @@ class HistoryDatabase:
             
             return df
     
-    def get_analysis(self, analysis_id: int) -> Optional[Dict]:
-        """
-        Holt eine spezifische Analyse
-        
-        Args:
-            analysis_id: ID der Analyse
-        
-        Returns:
-            Dict mit vollständigen Analyse-Daten
-        """
-        with sqlite3.connect(self.db_path) as conn:
-            cursor = conn.cursor()
-            
-            cursor.execute("""
-                SELECT risk_data
-                FROM analyses
-                WHERE id = ?
-            """, (analysis_id,))
-            
-            row = cursor.fetchone()
-            
-            if row:
-                return json.loads(row[0])
-        
-        return None
-    
     def get_timeline_data(self, category: str = 'total_value') -> pd.DataFrame:
         """
         Holt Zeitreihen-Daten für Verlaufsdiagramme
@@ -194,13 +168,6 @@ def get_history() -> pd.DataFrame:
     Convenience-Funktion zum Abrufen der Historie
     """
     return _db.get_all_analyses()
-
-
-def get_timeline(category: str = 'total_value') -> pd.DataFrame:
-    """
-    Convenience-Funktion für Zeitreihen-Daten
-    """
-    return _db.get_timeline_data(category)
 
 
 def get_history_timeseries() -> Optional[Dict]:

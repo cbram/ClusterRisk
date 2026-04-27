@@ -20,11 +20,12 @@ PP_DATA_FETCHED_PATH = "data/pp_data_fetched.csv"
 
 import csv
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from datetime import datetime
 from collections import defaultdict
 
-from .etf_detail_generator import COUNTRY_TO_CURRENCY
+from .etf_currency_mapping import COUNTRY_TO_CURRENCY
+from .etf_detail_writer import save_etf_detail_file
 
 
 # Morningstar-Sektoren → ClusterRisk-Sektor (abgestimmt mit risk_calculator._normalize_sector_name)
@@ -127,27 +128,6 @@ def load_pp_data_fetched(csv_path: str) -> List[Dict]:
                 'name': row[4].strip() if len(row) > 4 else '',
             })
     return rows
-
-
-def get_pp_csv_isins(csv_path: str) -> set:
-    """
-    Liest nur die ISINs aus pp_data_fetched.csv (schnell, ohne volles Parsing).
-    Returns: set von ISIN-Strings, oder leeres set wenn Datei fehlt/ungültig.
-    """
-    path = Path(csv_path)
-    if not path.exists():
-        return set()
-    isins = set()
-    try:
-        with open(path, 'r', encoding='utf-8') as f:
-            reader = csv.reader(f)
-            next(reader, None)  # Header
-            for row in reader:
-                if len(row) >= 1 and row[0].strip():
-                    isins.add(row[0].strip())
-    except Exception:
-        pass
-    return isins
 
 
 def update_single_etf_from_pp_csv(
@@ -254,62 +234,47 @@ def write_etf_detail_csv(
     output_dir: str = "data/etf_details",
     source_label: str = "Morningstar (pp-portfolio-classifier)",
 ) -> Path:
+    """Delegates to the canonical save_etf_detail_file writer.
+
+    data keys: asset_type, country (list of (name, fraction) tuples),
+               sector (same), holding (same).
     """
-    Schreibt eine ETF-Detail-CSV im ClusterRisk-Format.
-    data: Aus build_etf_data_by_isin (keys: name, asset_type, country, sector, region, holding).
-    """
-    out_dir = Path(output_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
-    filepath = out_dir / f"{ticker}.csv"
-    today = datetime.now().strftime('%Y-%m-%d')
     etf_type = _asset_type_to_etf_type(data.get('asset_type', {}))
     country_list = data.get('country', [])
-    # Sektoren nach Namen zusammenfassen (Summe der Gewichte)
+
     sector_merged: Dict[str, float] = {}
     for name, w in data.get('sector', []):
         sector_merged[name] = sector_merged.get(name, 0.0) + w
-    sector_list = list(sector_merged.items())
-    holding_list = data.get('holding', [])
+
     currency_alloc = _derive_currency_allocation(country_list)
 
-    lines = [
-        "# ETF Metadata",
-        f"ISIN,{isin}",
-        f"Name,{etf_name}",
-        f"Ticker,{ticker}",
-        f"Type,{etf_type}",
-        "Index,",
-        "Region,World",
-        "Currency,EUR",
-        "TER,",
-        f"Last Updated,{today}",
-        f"Source,{source_label}",
-        "",
-        "# Country Allocation (%)",
-        "Country,Weight",
-    ]
-    for name, w in sorted(country_list, key=lambda x: -x[1]):
-        lines.append(f"{name},{w * 100:.1f}")
-    lines.extend(["", "# Sector Allocation (%)", "Sector,Weight"])
-    for name, w in sorted(sector_list, key=lambda x: -x[1]):
-        lines.append(f"{name},{w * 100:.1f}")
-    lines.extend(["", "# Currency Allocation (%) - derived from countries", "Currency,Weight"])
-    for c in currency_alloc:
-        lines.append(f"{c['name']},{c['weight']:.1f}")
-    lines.extend(["", "# Top Holdings", "Name,Weight,Currency,Sector,Country,ISIN"])
-    for name, w in holding_list:
-        # pp_data_fetched liefert pro Holding nur Name und Gewicht
-        lines.append(f'"{name}",{w * 100:.2f},,Unknown,,')
-    # Optional: "Other Holdings" wenn Summe < 100%
-    holding_sum = sum(w for _, w in holding_list)
-    if holding_list and holding_sum < 0.999:
-        other_pct = (1.0 - holding_sum) * 100
-        lines.append(f"Other Holdings,{other_pct:.2f},Mixed,Diversified,Mixed,")
-    lines.append("")
-
-    with open(filepath, 'w', encoding='utf-8', newline='') as f:
-        f.write('\n'.join(lines))
-    return filepath
+    details = {
+        'isin': isin,
+        'name': etf_name,
+        'type': etf_type,
+        'index': '',
+        'region': 'World',
+        'currency': 'EUR',
+        'ter': '',
+        'proxy_isin': '',
+        'country_allocation': [
+            {'name': n, 'weight': w}
+            for n, w in sorted(country_list, key=lambda x: -x[1])
+        ],
+        'sector_allocation': [
+            {'name': n, 'weight': w}
+            for n, w in sorted(sector_merged.items(), key=lambda x: -x[1])
+        ],
+        'currency_allocation': [
+            {'name': c['name'], 'weight': c['weight'] / 100}
+            for c in currency_alloc
+        ],
+        'holdings': [
+            {'name': n, 'weight': w, 'currency': '', 'sector': 'Unknown', 'country': '', 'isin': ''}
+            for n, w in data.get('holding', [])
+        ],
+    }
+    return save_etf_detail_file(details, ticker=ticker, source_label=source_label, etf_details_dir=output_dir)
 
 
 def import_pp_data_fetched(
@@ -317,7 +282,7 @@ def import_pp_data_fetched(
     output_dir: str = "data/etf_details",
     isin_ticker_map_path: str = "data/etf_isin_ticker_map.csv",
     source_label: str = "Morningstar (pp-portfolio-classifier)",
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     """
     Hauptfunktion: Liest pp_data_fetched.csv, mappt auf Ticker und schreibt ETF-Detail-CSVs.
 
