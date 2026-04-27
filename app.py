@@ -45,6 +45,23 @@ Analysiere dein Investment-Portfolio auf Klumpenrisiken über verschiedene Dimen
 # Beispiel-Portfolio Pfad (für "Beispiel laden" Button)
 EXAMPLE_CSV = Path(__file__).parent / "data" / "Beispiel_Vermoegensaufstellung.csv"
 
+
+def _file_cache_key(effective_file, effective_name: str) -> str:
+    """Returns a cache key that changes when file content changes, not just the filename.
+
+    Streamlit UploadedFile provides a unique file_id per upload session, so two files
+    with the same name but different content get different keys. For path-based files
+    (e.g. the example CSV) we use name + modification time.
+    """
+    if hasattr(effective_file, 'file_id'):
+        return effective_file.file_id
+    try:
+        mtime = Path(str(effective_file)).stat().st_mtime
+        return f"{effective_name}:{mtime}"
+    except OSError:
+        return effective_name
+
+
 # Sidebar
 with st.sidebar:
     st.header("⚙️ Einstellungen")
@@ -84,11 +101,12 @@ with st.sidebar:
         st.caption(f"📄 Dateiformat: CSV")
         # Portfolio frühzeitig parsen und in session_state speichern,
         # damit ETF-Filterung weiter unten in der Sidebar darauf zugreifen kann
-        if 'portfolio_data' not in st.session_state or st.session_state.get('_last_uploaded_file') != effective_name:
+        file_key = _file_cache_key(effective_file, effective_name)
+        if 'portfolio_data' not in st.session_state or st.session_state.get('_last_uploaded_file') != file_key:
             try:
                 portfolio_data_early = parse_portfolio_csv(effective_file)
                 st.session_state['portfolio_data'] = portfolio_data_early
-                st.session_state['_last_uploaded_file'] = effective_name
+                st.session_state['_last_uploaded_file'] = file_key
                 if 'risk_data' in st.session_state:
                     del st.session_state['risk_data']  # Neu berechnen bei neuer Datei
                 if hasattr(effective_file, 'seek'):
@@ -293,7 +311,7 @@ else:
     with st.spinner("📂 Portfolio Performance CSV wird gelesen..."):
         try:
             # Portfolio aus session_state verwenden falls bereits in Sidebar geparst
-            if 'portfolio_data' in st.session_state and st.session_state.get('_last_uploaded_file') == effective_name:
+            if 'portfolio_data' in st.session_state and st.session_state.get('_last_uploaded_file') == _file_cache_key(effective_file, effective_name):
                 portfolio_data = st.session_state['portfolio_data']
             else:
                 portfolio_data = parse_portfolio_csv(effective_file)
