@@ -611,8 +611,8 @@ def _calculate_country_risk(expanded_positions: List[Dict]) -> pd.DataFrame:
     total_value = sum(pos['value'] for pos in expanded_positions)
     
     for position in expanded_positions:
-        # Überspringe ETFs die nicht aufgelöst wurden und "Diversified" Holdings
-        if position.get('sector') in ['ETF', 'Diversified']:
+        # Skip unresolved ETFs — they have no country information
+        if position.get('sector') == 'ETF':
             continue
         
         # Land ermitteln (Priorität: explizit > ISIN > Währung)

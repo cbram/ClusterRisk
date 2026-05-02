@@ -173,30 +173,22 @@ def _create_treemap(df: pd.DataFrame, category: str, max_items: int = 30, color_
             }
         )
     
-    # px.treemap appends one synthetic root node to the trace, so customdata must
-    # have len(df_plot) + 1 entries to stay aligned with the trace arrays.
-    anteile = df_plot['Anteil (%)'].astype(float)
+    # hover_data injects Anteil (%) into customdata at index 2 (after label_col and value_col),
+    # correctly aligned to Plotly's internal label order — which differs from the DataFrame order.
     if category == 'positions':
-        full_names = df_plot[label_col].astype(str)
-        custom = list(zip(anteile, full_names))
-        custom.append((100.0, ""))  # root node
         fig.update_traces(
-            customdata=custom,
-            texttemplate="<b>%{label}</b><br>€ %{value:,.2f}<br>%{customdata[0]:.1f}%",
+            texttemplate="<b>%{label}</b><br>€ %{value:,.2f}<br>%{customdata[2]:.1f}%",
             hovertemplate=(
-                '<b>%{customdata[1]}</b><br>Wert: €%{value:,.2f}<br>'
-                'Anteil: %{customdata[0]:.1f}%<extra></extra>'
+                '<b>%{customdata[0]}</b><br>Wert: €%{value:,.2f}<br>'
+                'Anteil: %{customdata[2]:.1f}%<extra></extra>'
             ),
             textfont_size=12
         )
     else:
-        customdata = anteile.values.reshape(-1, 1).tolist()
-        customdata.append([100.0])  # root node
         fig.update_traces(
-            customdata=customdata,
-            texttemplate="<b>%{label}</b><br>€ %{value:,.2f}<br>%{customdata[0]:.1f}%",
+            texttemplate="<b>%{label}</b><br>€ %{value:,.2f}<br>%{customdata[2]:.1f}%",
             hovertemplate=(
-                '<b>%{label}</b><br>Wert: €%{value:,.2f}<br>Anteil: %{customdata[0]:.1f}%<extra></extra>'
+                '<b>%{label}</b><br>Wert: €%{value:,.2f}<br>Anteil: %{customdata[2]:.1f}%<extra></extra>'
             ),
             textfont_size=12
         )
